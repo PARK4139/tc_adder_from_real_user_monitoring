@@ -367,7 +367,7 @@ def render_review(source: str) -> tuple[str, dict]:
 <p>{len(cards)}개 TC · {total_groups}개 Step 묶음 · 시나리오 작성 초안 · 실행 결과 없음</p></header>
 <div class="toolbar"><input id="search" type="text" aria-label="TC 퍼지 검색" autocomplete="off" autofocus placeholder="TC 검색기">
 <span id="count" role="status" aria-live="polite"></span></div>
-<div class="layout"><aside class="tree-panel"><h2 id="tc-tree-title" class="review-heading">TC 검수 트리(스위트)</h2><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
+<div class="layout"><aside class="tree-panel"><h2 id="tc-tree-title" class="review-heading">TC 검수 스위트</h2><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
 <h2 class="review-heading">TC 검수 본문</h2>
 <p id="empty" class="empty" hidden>검색 결과가 없습니다.</p><div id="results">{"".join(cards)}</div>
 <section class="intro"><h2>검수 범위</h2><ul>
