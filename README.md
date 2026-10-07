@@ -32,6 +32,7 @@ Qt의 `QT_USE_NATIVE_WINDOWS=1`을 실행 자식에 적용해 컨트롤을 식�
 | 창·모달·컨트롤·스크린샷 / 수집 목록 | `hpe990_ui_collect`, `hpe990_ui_catalog` |
 | BDD 시나리오 화면 / 뷰어 서버 정리 | `hpe990_ui_visualize`, `hpe990_ui_viewer_stop` |
 | 식별한 컨트롤 입력 / 창 이동·크기 | `hpe990_ui_control`, `hpe990_window_geometry` |
+| native UI ID 드래그 (소스 MCP) | `hpe990_ui_drag` |
 | 로컬 이벤트 읽기 / 검증·내보내기 | `hpe990_telemetry_read`, `hpe990_telemetry_export` |
 | 상태·전이 분석 / 시나리오·추적표 / 실제 BDD 실행 | `hpe990_ui_analyze`, `hpe990_bdd_catalog`, `hpe990_bdd_run` |
 

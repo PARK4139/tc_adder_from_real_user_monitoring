@@ -1,6 +1,7 @@
 """Implemented public Emulator operations, independently audited against MCP discovery."""
 
 OPERATION_TO_TOOL = {
+    "native_ui_id_drag": "hpe990_ui_drag",
     "start_pixel_text_value_ram": "hpe990_ram_semantic_start",
     "pixel_text_value_ram_health": "hpe990_ram_semantic_status",
     "stop_pixel_text_value_ram": "hpe990_ram_semantic_stop",

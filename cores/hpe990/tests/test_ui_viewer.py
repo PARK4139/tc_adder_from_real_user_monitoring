@@ -163,7 +163,8 @@ def test_bdd_catalog_changes_revision_and_reports_invalid_registration(tmp_path,
         encoding="utf-8",
     )
     first = ui_viewer.bdd_viewer_data()
-    assert first["bdd"]["expected_tests"] == 6 and first["bdd_error"] is None
+    assert len(first["bdd"]["scenarios"]) == first["bdd"]["expected_tests"] > 0
+    assert first["bdd_error"] is None
     updated = {**first["bdd"], "scenarios": first["bdd"]["scenarios"] + [{"name": "Added"}]}
     monkeypatch.setattr(ui_viewer, "bdd_registry", lambda family: updated)
     assert ui_viewer.bdd_viewer_data()["revision"] != first["revision"]
@@ -180,7 +181,7 @@ def test_bdd_catalog_changes_revision_and_reports_invalid_registration(tmp_path,
 def test_bdd_screen_has_no_gallery_and_requires_no_collected_ui(tmp_path, monkeypatch):
     monkeypatch.setattr(ui_viewer.hpe990_folders, "D_HPE990_EVIDENCE", tmp_path)
     data = ui_viewer.bdd_viewer_data()
-    assert data["summary"]["scenarios"] == 6
+    assert data["summary"]["scenarios"] == len(data["bdd"]["scenarios"]) > 0
     assert not (tmp_path / "ui").exists()
     assert "windows" not in data and "all_controls" not in data
     html = ui_viewer.render_html(data, "http://127.0.0.1:1234/token/")

@@ -23,14 +23,14 @@
       "TITLE": "TC 번호별 Steps / Expected Result 작성 및 표시",
       "SOURCE": "cores/hpe990/rules/scenarios/tc_format.py",
       "STATUS": "active",
-      "body_sha256": "86eee01986d984d5e3b162ed0d9507ad51cb43a5ea2f1bc18c9e3c2f3b7f43cc"
+      "body_sha256": "20cebd58a8d371fe1430d6124cb501121c82c94ff0a6272b1d8212bae35a5bf4"
     },
     {
       "RULE_ID": "HPE990_TC_UP_DICTIONARY",
       "TITLE": "TC up dictionary: TC 문구 작성",
       "SOURCE": "cores/hpe990/rules/scenarios/tc_up_dictionary.py",
       "STATUS": "active",
-      "body_sha256": "551c18afc7cf4d52587d63d5df32f41ef7a10a688e000b27ef9806469caf936a"
+      "body_sha256": "fbd05a46827dc0ca3ff270f60e962343b8ef5b6e1039111565439ab671cab5b2"
     },
     {
       "RULE_ID": "HPE990_UI_STEP_TEMPLATES",

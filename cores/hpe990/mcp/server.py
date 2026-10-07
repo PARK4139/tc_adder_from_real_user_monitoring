@@ -26,12 +26,13 @@ from cores.hpe990.mcp.tools.ui import (
     hpe990_ui_catalog,
     hpe990_ui_collect,
     hpe990_ui_control,
+    hpe990_ui_drag,
     hpe990_ui_viewer_stop,
     hpe990_ui_visualize,
     hpe990_window_geometry,
 )
 
-mcp = FastMCP("pk-hpe990-mcp")
+mcp = FastMCP("auto_emulator MCP")
 for tool in (
     hpe990_ram_semantic_start,
     hpe990_ram_semantic_status,
@@ -47,6 +48,7 @@ for tool in (
     hpe990_telemetry_read,
     hpe990_ui_collect,
     hpe990_ui_control,
+    hpe990_ui_drag,
     hpe990_ui_catalog,
     hpe990_window_geometry,
     hpe990_ui_visualize,

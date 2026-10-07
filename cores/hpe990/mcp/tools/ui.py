@@ -5,7 +5,46 @@ import uuid
 from cores.hpe990.functions.lifecycle import log_event
 from cores.hpe990.functions.monitoring import action_marker, ram_status, session_guard
 from cores.hpe990.functions.ui import collect_ui, control_ui, ui_catalog, window_geometry
+from cores.hpe990.functions.ui_drag import drag_ui
 from cores.hpe990.functions.ui_viewer import stop_ui_viewer, visualize_ui
+
+
+def hpe990_ui_drag(
+    session_id: str,
+    source_ui_id: str,
+    start_fraction: list[float],
+    end_fraction: list[float],
+    target_ui_id: str | None = None,
+    duration_ms: int = 500,
+) -> dict:
+    """Drag between currently observed native UI IDs using paced process-scoped messages.
+
+    Fractions lie strictly inside the source/target client areas. target_ui_id defaults
+    to source_ui_id. Validate the resulting UI state; delivery is not application success.
+    Rust and timeout cleanup release the mouse button; RAM records before/after evidence.
+    """
+    try:
+        return drag_ui(
+            session_id, source_ui_id, start_fraction, end_fraction, target_ui_id, duration_ms
+        )
+    except Exception as error:
+        try:
+            session_guard(session_id)
+            if not getattr(error, "hpe990_action_id", None) and ram_status(session_id)["active"]:
+                action_marker(
+                    session_id,
+                    uuid.uuid4().hex,
+                    "failed",
+                    {
+                        "action": "drag",
+                        "source_ui_id": source_ui_id,
+                        "target_ui_id": target_ui_id,
+                        "error_type": type(error).__name__,
+                    },
+                )
+        except (ValueError, RuntimeError, TimeoutError):
+            pass
+        raise
 
 
 def hpe990_ui_visualize(session_id: str | None = None, open_browser: bool = True) -> dict:

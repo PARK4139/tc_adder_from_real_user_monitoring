@@ -7,6 +7,7 @@ from string import Formatter
 from gherkin.parser import Parser
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.tc_repository import load_review_source
 from cores.hpe990.functions.tc_wording import normalize_expected_result
 
 
@@ -52,10 +53,9 @@ def _pending_label(field):
 
 
 def _authored_hints():
-    source = hpe990_folders.D_HPE990 / "docs/bdd/preferences_general.feature"
     hints = []
-    if source.exists():
-        for child in Parser().parse(source.read_text(encoding="utf-8"))["feature"]["children"]:
+    if hpe990_folders.D_HPE990_TC_CASES.exists():
+        for child in Parser().parse(load_review_source())["feature"]["children"]:
             scenario = child.get("scenario", {})
             kinds = [
                 t["name"][6:] for t in scenario.get("tags", []) if t["name"].startswith("@type-")

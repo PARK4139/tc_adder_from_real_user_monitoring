@@ -138,17 +138,19 @@ def compile_tc_templates(source: str, existing: dict) -> dict:
                 normalize_expected_result(text) for text in group["Expected Result"]
             ]
     document["schema_version"] = 2
-    document["derived_from"] = "cores/hpe990/docs/bdd/preferences_general.feature"
+    document["derived_from"] = "cores/hpe990/docs/bdd/cases/"
     document["source_sha256"] = hashlib.sha256(source.encode()).hexdigest()
     document["authored_template_count"] = len(representatives)
     return document
 
 
 def refresh_templates_from_tcs():
-    source = hpe990_folders.D_HPE990 / "docs/bdd/preferences_general.feature"
+    from cores.hpe990.functions.tc_repository import load_review_source
+
+    source = hpe990_folders.D_HPE990_TC_CASES
     target = hpe990_folders.F_HPE990_STEP_TEMPLATES
     document = compile_tc_templates(
-        source.read_text(encoding="utf-8"), json.loads(target.read_text(encoding="utf-8"))
+        load_review_source(), json.loads(target.read_text(encoding="utf-8"))
     )
     target.write_text(json.dumps(document, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     output = hpe990_folders.D_HPE990 / "docs/bdd/ui_step_templates.md"

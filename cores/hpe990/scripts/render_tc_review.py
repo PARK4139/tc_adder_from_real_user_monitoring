@@ -31,13 +31,13 @@ nav summary::-webkit-details-marker{display:none}nav summary:before{content:"›
 nav summary:hover{background:#f0f5fa}.tree-count{margin-left:auto;color:#7b8fa3;font-size:11px;font-weight:400;white-space:nowrap}.tree-children{margin-left:9px;padding-left:8px;border-left:1px solid #e1e9f2}
 nav a{display:block;padding:9px 7px;text-decoration:none;color:#315b82;font-size:12px;border-left:3px solid transparent;border-bottom:1px solid #edf1f6;border-radius:5px;scroll-margin-block:16px}
 nav a:hover{background:#f0f5fa}nav a[aria-current="true"]{background:#eaf3ff;border-left-color:#3074bd}.tree-leaf-top{display:flex;align-items:center;gap:6px}.tree-title{flex:1;min-width:max-content;font-size:13px;line-height:1.5;white-space:nowrap}
-.tree-id{display:inline-block;flex-shrink:0;color:#8091a3;font-size:10px;line-height:1.5;white-space:nowrap}.tree-chips{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:3px;flex-shrink:0}.tree-chip{white-space:nowrap;font-size:10px;line-height:1.5;padding:2px 5px;background:#fde8e8;color:#a12626;border-radius:4px}mark{background:#ffdf7d;color:inherit;border-radius:2px}
+.tree-id{display:inline-block;flex-shrink:0;color:#8091a3;font-size:10px;line-height:1.5;white-space:nowrap}.tree-chips{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:3px;flex-shrink:0}.tree-chip{white-space:nowrap;font-size:10px;line-height:1.5;padding:2px 5px;border-radius:4px}.tree-chip.pending{background:#fff2d9;color:#8a4b08}.tree-chip.actual{background:#fde8e8;color:#a12626}mark{background:#ffdf7d;color:inherit;border-radius:2px}
 article,.intro{background:white;border:1px solid #dae4ee;border-radius:10px;padding:22px;margin-bottom:22px}
 article{scroll-margin-top:95px}h2{font-size:18px;margin:0 0 10px;overflow-wrap:anywhere}h3{font-size:15px}
 .tc-heading{margin-bottom:10px}.tc-title{min-width:0}.tc-meta{font-size:12px;color:#66788a;line-height:1.5;margin-bottom:6px;overflow-wrap:anywhere}.tc-title-line{display:flex;align-items:center;gap:16px;min-width:0}.tc-title-line h2{flex:1;min-width:0;font-size:21px;font-weight:700;line-height:1.5;margin:0;white-space:nowrap;overflow-x:auto}.tc-id{font-size:12px;font-weight:400;color:#8091a3;margin-right:6px}.tc-chips{display:flex;flex:0 0 auto;justify-content:flex-end;flex-wrap:nowrap;gap:6px;max-width:40%;overflow-x:auto}.tc-chips .badge{flex:0 0 auto;white-space:nowrap}
 .badge{display:inline-block;font-size:12px;background:#edf4fa;color:#4f6780;border-radius:5px;padding:5px 8px}
 .legend-items{display:flex;flex-direction:column;gap:8px}.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#66788a}
-.pending{background:#fde8e8;color:#a12626}p,li{font-size:14px;line-height:1.7}.table-wrap{overflow:auto;margin-top:16px}
+.pending{background:#fff2d9;color:#8a4b08}.actual{background:#fde8e8;color:#a12626}p,li{font-size:14px;line-height:1.7}.table-wrap{overflow:auto;margin-top:16px}
 table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:14px}th,td{border:1px solid #ccd9e6;padding:14px;text-align:left;vertical-align:top;line-height:1.75;overflow-wrap:anywhere}
 th{background:#eaf1f8}th:first-child{width:65px;text-align:center}th:nth-child(2){width:49%}td:first-child{text-align:center;font-weight:600;background:#f7faff}
 ol{margin:0;padding-left:22px}td p{margin:0}.intro{color:#46617b}.empty{padding:20px;color:#6b7e93}
@@ -201,7 +201,9 @@ SPECIFICATION_LABELS = {
     "@spec-save-display": "저장·표시 규칙 미확정",
     "@spec-option-values": "선택값 미확정",
     "@spec-click-behavior": "클릭 동작 미확정",
+    "@actual-behavior-check": "실제 동작 확인 필요",
 }
+ACTUAL_BEHAVIOR_LABEL = "실제 동작 확인 필요"
 
 
 def render_navigation(entries: list[dict]) -> str:
@@ -219,7 +221,10 @@ def render_navigation(entries: list[dict]) -> str:
         labels = entry.get("specifications", ["요구사항 미확정"] if entry["pending"] else [])
         chip = (
             '<span class="tree-chips">'
-            + "".join(f'<span class="tree-chip">{escape(label)}</span>' for label in labels)
+            + "".join(
+                f'<span class="tree-chip {"actual" if label == ACTUAL_BEHAVIOR_LABEL else "pending"}">{escape(label)}</span>'
+                for label in labels
+            )
             + "</span>"
             if labels
             else ""
@@ -312,7 +317,8 @@ def render_review(source: str) -> tuple[str, dict]:
         chips_html = (
             '<div class="tc-chips">'
             + "".join(
-                f'<span class="badge pending">{escape(label)}</span>' for label in specifications
+                f'<span class="badge {"actual" if label == ACTUAL_BEHAVIOR_LABEL else "pending"}">{escape(label)}</span>'
+                for label in specifications
             )
             + "</div>"
             if specifications
@@ -376,15 +382,16 @@ def render_review(source: str) -> tuple[str, dict]:
 <section class="intro"><h2>검수 범위</h2><ul>
 <li>TC 초안 검수. 실제 실행·자동화 없음.</li>
 <li>미관찰 입력요소: 추가 확인 필요.</li>
-<li><span class="badge pending">빨간 chip</span>: PASS/FAIL 기준 미확정. 값·범위·동작 확정 후 검증.</li>
+<li><span class="badge pending">SQA 확인요소 · 색상 chip</span>: PASS/FAIL 기준 미확정. 값·범위·동작 확정 후 검증.</li>
 </ul><h3 id="ui-legend-title">UI 유형</h3><div class="legend-items" aria-labelledby="ui-legend-title">{legend_items}</div></section>
 </main></div><script>{SCRIPT}</script></body></html>"""
     return document, {"tc_count": len(cards), "step_groups": total_groups}
 
 
 def main():
-    source = hpe990_folders.D_HPE990 / "docs/bdd/preferences_general.feature"
-    document, summary = render_review(source.read_text(encoding="utf-8"))
+    from cores.hpe990.functions.tc_repository import load_review_source
+
+    document, summary = render_review(load_review_source())
     output = hpe990_folders.D_HPE990_EVIDENCE / "093ca349/preferences-general-tc-review.html"
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(document, encoding="utf-8")

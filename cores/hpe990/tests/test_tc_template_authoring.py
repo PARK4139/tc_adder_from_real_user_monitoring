@@ -3,13 +3,12 @@
 import json
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.tc_repository import load_review_source
 from cores.hpe990.functions.tc_template_authoring import compile_tc_templates
 
 
 def test_current_tc_patterns_preserve_flow_and_dictionary_wording():
-    source = (hpe990_folders.D_HPE990 / "docs/bdd/preferences_general.feature").read_text(
-        encoding="utf-8"
-    )
+    source = load_review_source()
     existing = json.loads(hpe990_folders.F_HPE990_STEP_TEMPLATES.read_text(encoding="utf-8"))
     compiled = compile_tc_templates(source, existing)
     assert compiled["authored_template_count"] == 9

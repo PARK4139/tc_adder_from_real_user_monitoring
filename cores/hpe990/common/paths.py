@@ -13,16 +13,20 @@ class Hpe990Folders:
         self.D_HPE990_RULES = self.D_HPE990 / "rules"
         self.D_HPE990_ISSUES = self.D_HPE990 / "issues"
         self.D_HPE990_CONFIGS = self.D_HPE990 / "configs"
+        self.D_HPE990_TC_CASES = self.D_HPE990 / "docs/bdd/cases"
         self.D_HPE990_RUNTIME = D_TEMP / "hpe990" / "runtime"
         self.D_HPE990_SEMANTIC_RAM = self.D_HPE990_RUNTIME / "semantic-ram"
         self.D_HPE990_BUILD = D_TEMP / "hpe990" / "build"
         self.D_HPE990_VISUAL_BUILD = self.D_HPE990_BUILD / "visual"
+        self.D_HPE990_INPUT_BUILD = self.D_HPE990_BUILD / "input"
         self.D_HPE990_EVIDENCE = D_TEMP / "hpe990" / "evidence"
         self.D_AUTO_EMULATOR_OUTPUT = D_ROOT
         self.F_HPE990_VISUAL = self.D_HPE990_VISUAL_BUILD / "release/hpe990-visual.exe"
+        self.F_HPE990_INPUT = self.D_HPE990_INPUT_BUILD / "release/hpe990-input.exe"
         self.F_HPE990_UI_REGISTRY = self.D_HPE990_RUNTIME / "ui-elements.sqlite3"
         self.F_HPE990_STEP_TEMPLATES = self.D_HPE990_CONFIGS / "ui_step_templates.json"
         self.F_HPE990_STEP_BINDINGS = self.D_HPE990_CONFIGS / "ui_step_bindings.json"
+        self.F_HPE990_TC_REVIEW = self.D_HPE990_CONFIGS / "tc_review.json"
 
 
 hpe990_folders = Hpe990Folders()

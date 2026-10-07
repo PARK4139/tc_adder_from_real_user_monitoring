@@ -5,6 +5,7 @@ import json
 import pytest
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.tc_repository import load_review_source
 from cores.hpe990.scripts.render_tc_review import TEST_TARGET, render_review
 
 
@@ -53,12 +54,12 @@ def test_duplicate_id_across_paths_is_rejected():
 
 def test_actual_drafts_match_issued_ids():
     root = hpe990_folders.D_HPE990
-    source = (root / "docs/bdd/preferences_general.feature").read_text(encoding="utf-8")
+    source = load_review_source()
     ledger = json.loads((root / "configs/tc_ids.json").read_text(encoding="utf-8"))
     document, summary = render_review(source)
     ids = ledger["issued_ids"]
     assert len(ids) == len(set(ids)) == summary["tc_count"] == 24
-    assert summary["step_groups"] == 117
+    assert summary["step_groups"] == 118
     assert ledger["next_number"] == 250
     assert ids == [f"TC-{n:03d}" for n in range(10, 250, 10)]
     assert not set(ledger["retired_ids"]) & set(ids)

@@ -13,6 +13,7 @@ import psutil
 from filelock import FileLock
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.tc_repository import load_review_source, review_stamp
 from cores.hpe990.scripts.render_tc_review import render_review
 
 LIVE_SCRIPT = """
@@ -46,7 +47,7 @@ def main():
     address = ipaddress.ip_address(args.bind or "")
     if not address.is_private or address.is_loopback or address.is_unspecified:
         raise ValueError("Specify one concrete private LAN address")
-    source = hpe990_folders.D_HPE990 / "docs/bdd/preferences_general.feature"
+    source = hpe990_folders.D_HPE990_TC_CASES
     export = hpe990_folders.D_HPE990_EVIDENCE / "093ca349/preferences-general-tc-review.html"
     token = args.token
     if not re.fullmatch(r"[a-z0-9](?:[a-z0-9-]{0,62}[a-z0-9])?", token):
@@ -59,7 +60,7 @@ def main():
     cache = {}
 
     def update():
-        contents = source.read_text(encoding="utf-8")
+        contents = load_review_source()
         revision = hashlib.sha256(contents.encode()).hexdigest()
         with changed:
             if revision == cache.get("revision"):
@@ -80,7 +81,7 @@ def main():
         stamp = None
         while not stop.exists():
             try:
-                current = (source.stat().st_mtime_ns, source.stat().st_size)
+                current = review_stamp()
                 if current != stamp:
                     update()
                     stamp = current

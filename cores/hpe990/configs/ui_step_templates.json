@@ -853,7 +853,7 @@
       ]
     }
   },
-  "derived_from": "cores/hpe990/docs/bdd/preferences_general.feature",
-  "source_sha256": "66cbb0c9f299f23fa2395d834200b91bdc3c8498cade3006de6a46467822a6cd",
+  "derived_from": "cores/hpe990/docs/bdd/cases/",
+  "source_sha256": "96ca1174d224999cb8d0517e7a0501abed6e6a133e24b4ffbfe6c1c681080d6f",
   "authored_template_count": 9
 }

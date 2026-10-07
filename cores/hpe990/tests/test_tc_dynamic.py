@@ -67,3 +67,30 @@ def test_missing_collection_does_not_invent_elements(tmp_path):
     database = tmp_path / "missing.sqlite3"
     assert general_elements(database) == []
     assert sync_general_expected(database, tmp_path / "missing.feature")["updated"] is False
+
+
+def test_default_sync_updates_only_individual_tc_file(tmp_path, monkeypatch):
+    from cores.hpe990.common.paths import hpe990_folders
+
+    cases = tmp_path / "cases"
+    cases.mkdir()
+    monkeypatch.setattr(hpe990_folders, "D_HPE990_TC_CASES", cases)
+    source = cases / "TC-010.feature"
+    source.write_text(
+        "@path-Setup/Preferences/General\nFeature: General\n"
+        "  @TC-010 @expected-collected-General\n  Scenario: TC-010 General\n"
+        "    When Scroll\n    # BEGIN collected General elements\n"
+        "    Then Old\n    # END collected General elements\n",
+        encoding="utf-8",
+    )
+    other = cases / "TC-030.feature"
+    other.write_text("Untouched authoring file", encoding="utf-8")
+    database = tmp_path / "ui.sqlite3"
+    with sqlite3.connect(database) as db:
+        db.execute("CREATE TABLE elements(number INTEGER PRIMARY KEY,selector TEXT)")
+        insert(db, "UI_GENERAL::WIDGET::Language")
+    result = sync_general_expected(database)
+    assert result["updated"] is True
+    assert result["source"] == str(source)
+    assert "And Language" in source.read_text(encoding="utf-8")
+    assert other.read_text(encoding="utf-8") == "Untouched authoring file"
