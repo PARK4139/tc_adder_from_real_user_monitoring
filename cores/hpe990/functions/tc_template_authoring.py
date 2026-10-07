@@ -7,6 +7,7 @@ from html import escape
 from gherkin.parser import Parser
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.tc_wording import normalize_expected_result
 
 
 def compile_tc_templates(source: str, existing: dict) -> dict:
@@ -17,15 +18,15 @@ def compile_tc_templates(source: str, existing: dict) -> dict:
             if tag["name"].startswith("@TC-"):
                 scenarios[tag["name"][1:]] = scenario
     representatives = {
-        "option-selector": ("TC-002", "Language"),
-        "radio": ("TC-003", "Beep Sound"),
-        "checkbox": ("TC-013", "Sleep Mode"),
-        "number": ("TC-014", "Wait (minutes)"),
-        "number-boundary": ("TC-015", "Wait (minutes)"),
-        "number-invalid": ("TC-016", "Wait (minutes)"),
-        "input-field": ("TC-030", "Config DB History"),
-        "button-save": ("TC-020", "Save"),
-        "button-cancel": ("TC-021", "Cancel"),
+        "option-selector": ("TC-030", "Language"),
+        "radio": ("TC-040", "Beep Sound"),
+        "checkbox": ("TC-060", "Sleep Mode"),
+        "number": ("TC-070", "Wait (minutes)"),
+        "number-boundary": ("TC-080", "Wait (minutes)"),
+        "number-invalid": ("TC-090", "Wait (minutes)"),
+        "input-field": ("TC-210", "Config DB History"),
+        "button-save": ("TC-230", "Save"),
+        "button-cancel": ("TC-240", "Cancel"),
     }
     document = json.loads(json.dumps(existing))
     for kind, (tc_id, name) in representatives.items():
@@ -68,9 +69,7 @@ def compile_tc_templates(source: str, existing: dict) -> dict:
             for literal, variable in sorted(replacements.items(), key=lambda item: -len(item[0])):
                 text = text.replace(literal, variable)
             if expected:
-                text = text.replace("표시된다.", "보여야 합니다.").replace(
-                    "표시된다", "보여야 합니다."
-                )
+                text = normalize_expected_result(text)
             return text
 
         groups, prerequisites, phase = [], [], "precondition"
@@ -127,7 +126,7 @@ def compile_tc_templates(source: str, existing: dict) -> dict:
             document["templates"][kind]["source_limit"] = (
                 "TC-030의 편집 가능 가정은 미검증. STATIC_DATA에는 적용하지 않고 표시 템플릿 사용."
             )
-    # Keep additional inclusive/exclusive boundary patterns alongside TC-015's full flow.
+    # Keep additional inclusive/exclusive boundary patterns alongside TC-080's full flow.
     document["templates"]["number-boundary-extended"] = (
         document["templates"]["number-boundary-extended"]
         if "number-boundary-extended" in document["templates"]
@@ -136,8 +135,7 @@ def compile_tc_templates(source: str, existing: dict) -> dict:
     for definition in document["templates"].values():
         for group in definition["steps"]:
             group["Expected Result"] = [
-                text.replace("표시된다.", "보여야 합니다.").replace("표시된다", "보여야 합니다.")
-                for text in group["Expected Result"]
+                normalize_expected_result(text) for text in group["Expected Result"]
             ]
     document["schema_version"] = 2
     document["derived_from"] = "cores/hpe990/docs/bdd/preferences_general.feature"
@@ -170,7 +168,7 @@ def refresh_templates_from_tcs():
             "",
             definition["title"],
             "",
-            "| Step | Steps |",
+            "| No. | Steps |",
             "|---|---|",
         ]
         for index, prerequisite in enumerate(definition["preconditions"], 1):
@@ -179,7 +177,7 @@ def refresh_templates_from_tcs():
                 + "<br>".join(escape(t).replace("|", "\\|") for t in prerequisite["Steps"])
                 + " |"
             )
-        lines += ["", "| Step | Steps | Expected Result |", "|---|---|---|"]
+        lines += ["", "| No. | Steps | Expected Result |", "|---|---|---|"]
         for index, group in enumerate(definition["steps"], 1):
             cells = [
                 "<br>".join(escape(t).replace("|", "\\|") for t in group[key])

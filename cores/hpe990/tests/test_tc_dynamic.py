@@ -25,15 +25,15 @@ def test_new_collected_element_updates_expected_without_authored_list(tmp_path):
     source.write_text(
         """@path-Setup/Preferences/General
 Feature: Dynamic
-  @TC-001 @expected-collected-General
-  Scenario: TC-001 General
+  @TC-010 @expected-collected-General
+  Scenario: TC-010 General
     Given Ready
     When Scroll
     # BEGIN collected General elements
     Then Old expected
     # END collected General elements
-  @TC-002
-  Scenario: TC-002 Unchanged
+  @TC-030
+  Scenario: TC-030 Unchanged
     When Select
     Then Authored result
 """,
@@ -41,7 +41,7 @@ Feature: Dynamic
     )
     markdown = source.with_suffix(".md")
     markdown.write_text(
-        "### TC-001 General\n| 2 | scroll | old |\n### TC-002 Unchanged\nKeep me\n",
+        "### TC-010 General\n| 2 | scroll | old |\n### TC-030 Unchanged\nKeep me\n",
         encoding="utf-8",
     )
     result = sync_general_expected(database, source)
@@ -59,7 +59,7 @@ Feature: Dynamic
     assert "    And Backup Date\n" in source.read_text(encoding="utf-8")
     assert "<br>Backup Date<br>" in markdown.read_text(encoding="utf-8")
     assert "Then Authored result" in source.read_text(encoding="utf-8")
-    assert markdown.read_text(encoding="utf-8").endswith("### TC-002 Unchanged\nKeep me\n")
+    assert markdown.read_text(encoding="utf-8").endswith("### TC-030 Unchanged\nKeep me\n")
     assert sync_general_expected(database, source)["updated"] is False
 
 

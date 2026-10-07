@@ -51,7 +51,7 @@ def test_selector_exact_numbered_groups_use_supplied_specs_and_no_new_tc_id():
     assert case["steps"][0]["Steps"] == ["Setup > Preferences > General 탭 선택"]
     assert case["steps"][1]["Steps"] == ["Language 선택기의 화살표 조작 후 English 선택"]
     assert case["steps"][1]["Expected Result"] == ["Language에 English가 보여야 합니다."]
-    assert [s["Step"] for s in case["steps"]] == [1, 2, 3, 4, 5]
+    assert [s["No."] for s in case["steps"]] == [1, 2, 3, 4, 5]
     assert case["pending_specifications"] == []
     assert case["status"] == "draft" and not case["executable"]
     assert "tc_id" not in draft
@@ -66,7 +66,7 @@ def test_boundary_cases_keep_min_max_inclusive_and_exclusive_pending():
     boundary = draft["cases"][1]
     assert boundary["template_id"] == "number-boundary"
     assert len(boundary["steps"]) == 5
-    assert boundary["source_tc_ids"] == ["TC-015"]
+    assert boundary["source_tc_ids"] == ["TC-080"]
     boundary = next(
         case for case in draft["cases"] if case["template_id"] == "number-boundary-extended"
     )
@@ -99,14 +99,14 @@ def test_templates_have_individual_preconditions_and_valid_action_phrases(kind):
     element = dict(ui_id="UI-000001", name="<test>")
     draft = generate_drafts([element], definitions(), {"UI-000001": {"ui_type": kind}})[0]
     case = draft["cases"][0]
-    assert case["preconditions"][0]["Step"] == 1
+    assert case["preconditions"][0]["No."] == 1
     assert case["pending_specifications"]
     for step in case["steps"]:
         assert step["Steps"] and step["Expected Result"]
         assert all(not text.endswith(("한다", "된다", "한다.", "된다.")) for text in step["Steps"])
     document = _review_html([draft])
     assert "&lt;test&gt;" in document and "<test>" not in document
-    assert "<th>Step</th><th>Steps</th><th>Expected Result</th>" in document
+    assert "<th>No.</th><th>Steps</th><th>Expected Result</th>" in document
 
 
 def test_unknown_binding_type_and_name_override_are_rejected():
@@ -115,3 +115,22 @@ def test_unknown_binding_type_and_name_override_are_rejected():
         generate_drafts([element], definitions(), {"UI-000001": {"ui_type": "fiction"}})
     with pytest.raises(ValueError):
         generate_drafts([element], definitions(), {"UI-000001": {"parameters": {"name": "fake"}}})
+
+
+def test_supplied_expectations_follow_dictionary_without_changing_action():
+    draft = generate_drafts(
+        [dict(ui_id="UI-000001", name="Button")],
+        definitions(),
+        {
+            "UI-000001": {
+                "ui_type": "button",
+                "parameters": {
+                    "path": "Setup 진입",
+                    "expected_action_result": "설정값이 표시된다.",
+                },
+            }
+        },
+    )[0]
+    step = draft["cases"][0]["steps"][0]
+    assert step["Steps"] == ["Setup 진입", "Button 클릭"]
+    assert step["Expected Result"] == ["설정값이 보여야 합니다."]

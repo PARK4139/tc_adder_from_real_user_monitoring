@@ -4,6 +4,10 @@ RULE_ID = "HPE990_TC_UP_DICTIONARY"
 TITLE = "TC up dictionary: TC 문구 작성"
 SOURCE = "cores/hpe990/rules/scenarios/tc_up_dictionary.py"
 STATUS = "active"
+EXPECTED_RESULT_REPLACEMENTS = (
+    ("표시된다.", "보여야 합니다."),
+    ("표시된다", "보여야 합니다."),
+)
 BODY = r"""
 # TC up dictionary
 
@@ -33,7 +37,7 @@ BODY = r"""
 ## 사전 조건 문구
 
 - 각 번호의 제목은 `Emulator 준비`, `키보드 연결`, `시험값 준비`처럼 준비 동작명으로 작성한다.
-  Step에는 번호를, Steps에는 준비 항목 제목과 상세 절차·준비 상태를 함께 기재한다.
+  No.에는 번호를, Steps에는 준비 항목 제목과 상세 절차·준비 상태를 함께 기재한다.
   제목 다음 줄부터 상세 절차를 들여쓰며 중간에 빈 줄을 넣지 않는다.
 - 하나의 준비 항목에 여러 상세 절차가 있으면 한 번의 줄바꿈으로 이어 쓴다. 절차 사이에 빈 줄이나
   연속 줄바꿈을 넣지 않는다. Gherkin DocString 내부의 빈 줄과 Markdown 셀의 `<br><br>`도 금지한다.
@@ -76,7 +80,7 @@ BODY = r"""
 
 수정 후 TC 표시:
 
-| Step | Steps | Expected Result |
+| No. | Steps | Expected Result |
 |---|---|---|
 | 1 | 1. Setup > Preferences > General 탭 선택 | Preferences 창의 General 탭과 설정 영역이 보여야 합니다. |
 
@@ -115,7 +119,7 @@ TC 제목: Beep Sound 선택 및 저장값 확인 (라디오 버튼)
 사전 조건: 시험용 Edger 화면, 활성 RAM, 시험 전 선택과 복구 방법 기록.
 다음 표는 작성 양식 예시이며 실행·통과 증거가 아니다.
 
-| Step | Steps | Expected Result |
+| No. | Steps | Expected Result |
 |---|---|---|
 | 1 | 1. Setup > Preferences > General 탭 선택 | General 설정 영역이 보여야 합니다. |
 | 2 | 1. Beep Sound의 OFF 항목 선택 | OFF 항목 선택, ON 항목 선택 해제 상태가 보여야 합니다. |

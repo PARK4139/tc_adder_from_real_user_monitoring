@@ -79,7 +79,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -121,12 +121,12 @@
         }
       ],
       "source_tc_ids": [
-        "TC-002"
+        "TC-030"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
       "related_tc_ids": [
-        "TC-002"
+        "TC-030"
       ]
     },
     "input-field": {
@@ -154,7 +154,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -207,12 +207,12 @@
         }
       ],
       "source_tc_ids": [
-        "TC-030"
+        "TC-210"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
       "related_tc_ids": [
-        "TC-030"
+        "TC-210"
       ],
       "source_limit": "TC-030의 편집 가능 가정은 미검증. STATIC_DATA에는 적용하지 않고 표시 템플릿 사용."
     },
@@ -238,7 +238,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -281,13 +281,13 @@
         }
       ],
       "source_tc_ids": [
-        "TC-014"
+        "TC-070"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
       "related_tc_ids": [
-        "TC-014",
-        "TC-017"
+        "TC-070",
+        "TC-170"
       ]
     },
     "checkbox": {
@@ -306,7 +306,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -348,12 +348,12 @@
         }
       ],
       "source_tc_ids": [
-        "TC-013"
+        "TC-060"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
       "related_tc_ids": [
-        "TC-013"
+        "TC-060"
       ]
     },
     "radio": {
@@ -372,7 +372,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -416,21 +416,21 @@
         }
       ],
       "source_tc_ids": [
-        "TC-003"
+        "TC-040"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
       "related_tc_ids": [
-        "TC-003",
-        "TC-004",
-        "TC-005",
-        "TC-006",
-        "TC-007",
-        "TC-008",
-        "TC-009",
-        "TC-010",
-        "TC-011",
-        "TC-012"
+        "TC-040",
+        "TC-050",
+        "TC-100",
+        "TC-110",
+        "TC-120",
+        "TC-130",
+        "TC-140",
+        "TC-150",
+        "TC-160",
+        "TC-200"
       ]
     },
     "button": {
@@ -498,7 +498,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -539,13 +539,13 @@
         }
       ],
       "source_tc_ids": [
-        "TC-015"
+        "TC-080"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
       "related_tc_ids": [
-        "TC-015",
-        "TC-018"
+        "TC-080",
+        "TC-180"
       ]
     },
     "save-reopen": {
@@ -622,7 +622,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -681,13 +681,13 @@
         }
       ],
       "source_tc_ids": [
-        "TC-016"
+        "TC-090"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
       "related_tc_ids": [
-        "TC-016",
-        "TC-019"
+        "TC-090",
+        "TC-190"
       ]
     },
     "button-save": {
@@ -706,7 +706,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -740,7 +740,7 @@
         }
       ],
       "source_tc_ids": [
-        "TC-020"
+        "TC-230"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
@@ -762,7 +762,7 @@
             "{path}"
           ],
           "Expected Result": [
-            "{screen_expected_result}"
+            "Preferences 창의 General 탭과 설정 영역이 보여야 합니다."
           ]
         },
         {
@@ -792,7 +792,7 @@
         }
       ],
       "source_tc_ids": [
-        "TC-021"
+        "TC-240"
       ],
       "type_verified": false,
       "source_status": "authored_draft",
@@ -854,6 +854,6 @@
     }
   },
   "derived_from": "cores/hpe990/docs/bdd/preferences_general.feature",
-  "source_sha256": "622c7744b021f99a64a63f44e5eccb6f0ca6810f3d9150ec4adf1cc137182115",
+  "source_sha256": "66cbb0c9f299f23fa2395d834200b91bdc3c8498cade3006de6a46467822a6cd",
   "authored_template_count": 9
 }

@@ -53,7 +53,7 @@ def _write_changed(path, content):
 
 
 def sync_general_expected(database=None, source=None) -> dict:
-    """Refresh only the explicitly marked TC-001 block and its derived Markdown row."""
+    """Refresh only the explicitly marked TC-010 block and its derived Markdown row."""
     database = database or hpe990_folders.F_HPE990_UI_REGISTRY
     source = source or hpe990_folders.D_HPE990 / "docs/bdd/preferences_general.feature"
     elements = general_elements(database)
@@ -78,14 +78,14 @@ def sync_general_expected(database=None, source=None) -> dict:
         markdown = source.with_suffix(".md")
         if markdown.exists():
             document = markdown.read_text(encoding="utf-8")
-            prefix, rest = document.split("### TC-001 ", 1)
+            prefix, rest = document.split("### TC-010 ", 1)
             case, suffix = rest.split("\n### ", 1)
             row = "| 2 | 1. General 설정 영역을 위에서 아래까지 스크롤하며 입력요소 확인 | "
             row += "<br>".join(text.replace("|", "\\|") for text in expected) + " |"
             case, count = re.subn(r"^\| 2 \|.*$", lambda _: row, case, flags=re.M)
             if count != 1:
-                raise ValueError("Expected one TC-001 Markdown step 2")
-            _write_changed(markdown, prefix + "### TC-001 " + case + "\n### " + suffix)
+                raise ValueError("Expected one TC-010 Markdown step 2")
+            _write_changed(markdown, prefix + "### TC-010 " + case + "\n### " + suffix)
     return {
         "updated": updated,
         "element_count": len(elements),

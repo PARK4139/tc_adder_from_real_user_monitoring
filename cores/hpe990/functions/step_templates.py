@@ -7,6 +7,7 @@ from string import Formatter
 from gherkin.parser import Parser
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.tc_wording import normalize_expected_result
 
 
 def _pending_label(field):
@@ -159,9 +160,11 @@ def generate_drafts(elements, templates, bindings, authored=None):
             title = resolve(definition["title"])
             steps = [
                 {
-                    "Step": index,
+                    "No.": index,
                     "Steps": [resolve(t) for t in group["Steps"]],
-                    "Expected Result": [resolve(t) for t in group["Expected Result"]],
+                    "Expected Result": [
+                        normalize_expected_result(resolve(t)) for t in group["Expected Result"]
+                    ],
                 }
                 for index, group in enumerate(definition["steps"], 1)
             ]
@@ -176,12 +179,12 @@ def generate_drafts(elements, templates, bindings, authored=None):
                     "source_limit": definition.get("source_limit"),
                     "title": title,
                     "preconditions": [
-                        {"Step": index, "Steps": [resolve(text) for text in row["Steps"]]}
+                        {"No.": index, "Steps": [resolve(text) for text in row["Steps"]]}
                         for index, row in enumerate(definition.get("preconditions", []), 1)
                     ]
                     or [
                         {
-                            "Step": 1,
+                            "No.": 1,
                             "Steps": [
                                 "시험 환경 및 복구 준비",
                                 "해당 UI 진입 조건과 시험 전 값·복구 방법 확인",
@@ -225,22 +228,22 @@ def _review_html(drafts):
                 "<small>미확정: "
                 + escape(", ".join(case["pending_labels"]) or "없음")
                 + "</small>",
-                "<h3>Pre-condition</h3><table><tr><th>Step</th><th>Steps</th></tr>",
+                "<h3>Pre-condition</h3><table><tr><th>No.</th><th>Steps</th></tr>",
             ]
             if case.get("source_limit"):
                 parts.append("<p>" + escape(case["source_limit"]) + "</p>")
             for row in case["preconditions"]:
                 parts.append(
-                    f"<tr><td>{row['Step']}</td><td>"
+                    f"<tr><td>{row['No.']}</td><td>"
                     + "<br>".join(map(escape, row["Steps"]))
                     + "</td></tr>"
                 )
             parts.append(
-                "</table><table><tr><th>Step</th><th>Steps</th><th>Expected Result</th></tr>"
+                "</table><table><tr><th>No.</th><th>Steps</th><th>Expected Result</th></tr>"
             )
             for row in case["steps"]:
                 parts.append(
-                    f"<tr><td>{row['Step']}</td><td>"
+                    f"<tr><td>{row['No.']}</td><td>"
                     + "<br>".join(map(escape, row["Steps"]))
                     + "</td><td>"
                     + "<br>".join(map(escape, row["Expected Result"]))
@@ -279,7 +282,7 @@ def template_catalog(session_id, ui_ids=None):
     destination = hpe990_folders.D_HPE990_EVIDENCE / "ui" / session_id / "step-templates"
     destination.mkdir(parents=True, exist_ok=True)
     report = {
-        "schema_version": 1,
+        "schema_version": 2,
         "session_id": session_id,
         "template_source": str(hpe990_folders.F_HPE990_STEP_TEMPLATES),
         "bindings_source": str(hpe990_folders.F_HPE990_STEP_BINDINGS),

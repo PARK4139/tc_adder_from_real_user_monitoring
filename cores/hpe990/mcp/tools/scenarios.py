@@ -11,7 +11,7 @@ from cores.hpe990.functions.tc_template_authoring import refresh_templates_from_
 def hpe990_tc_templates(
     session_id: str, ui_ids: list[str] | None = None, refresh_from_tcs: bool = False
 ) -> dict:
-    """Generate per-UI-ID draft Step/Steps/Expected Result groups and JSON/HTML review.
+    """Generate per-UI-ID draft No./Steps/Expected Result groups and JSON/HTML review.
 
     Covers collected screens, modals/popups and child controls using shared templates.
     Optional ui_ids limits output to observed IDs. Unverified types and absent values,

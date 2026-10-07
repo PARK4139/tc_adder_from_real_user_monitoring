@@ -34,7 +34,7 @@ def hpe990_ui_collect(
     verified value/editability. Disabling screenshots also disables visual collection.
     Every element has a persistent ui_id registered in the family SQLite SSOT.
     identity_scope distinguishes reusable semantic paths from unresolved session identities.
-    Successful collection refreshes TC-001's marked General display expectations from
+    Successful collection refreshes TC-010's marked General display expectations from
     the identity registry; tc_sync reports generation status, never a test execution result.
     """
     return collect_ui(session_id, screenshots, accessibility_backend)

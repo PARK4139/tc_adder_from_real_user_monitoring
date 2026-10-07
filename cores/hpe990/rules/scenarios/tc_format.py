@@ -7,7 +7,7 @@ STATUS = "active"
 BODY = r"""
 ## 수집 목록 기반 동적 Expected Result
 
-- TC-001의 General 요소 표시 목록은 UI ID SSOT의 관찰된 General 정의에서 생성한다.
+- TC-010의 General 요소 표시 목록은 UI ID SSOT의 관찰된 General 정의에서 생성한다.
   수동 요소명 목록을 별도 정본으로 관리하지 않는다. 이름 없는 요소의 의미나
   입력 가능 여부는 추정하지 않으며, 표시 필드와 그룹도 표시 확인 대상으로 포함한다.
 - `@expected-collected-General`과 generated block 경계로 자동 생성 영역을 표시한다.
@@ -50,6 +50,10 @@ BODY = r"""
 - 작성 전 실제 UI 수집 자료에서 경로·라벨·입력 유형을 확인한다. 다른 제품의
   예시를 근거로 드롭다운, 지원 언어, 입력 범위 등을 가정하지 않는다.
 
+- 사용자 명시적 재번호 요청에 따른 2026-10-07 General 마이그레이션은 기존 ID 유지의 일회성 예외다.
+  재번호 내역과 이전 발급 기록은 `tc_ids.json`의 `renumber_migrations`에 보존한다.
+  현재 표시 순서는 TC-010부터 TC-240까지 10 단위이며 다음 기본 발급 번호는 250이다.
+
 ## TC 중간 삽입 번호와 예시
 
 - 중간 TC 삽입 시 앞·뒤 TC 번호를 각각 L, R로 두고, 열린 구간 `L < 번호 < R`에서
@@ -81,19 +85,19 @@ BODY = r"""
 
 - 공통 사전 조건 섹션과 Gherkin Background를 사용하지 않는다. 같은 준비 사항이라도
   각 TC의 사전 조건에 모두 기재하여 해당 TC만 읽어도 준비할 수 있게 한다.
-- 각 TC에 `사전 조건`을 두고 `Step | Steps`의 2열 표로 작성한다.
-  컬럼명은 정확히 `Step`, `Steps`만 사용한다.
+- 각 TC에 `사전 조건`을 두고 `No. | Steps`의 2열 표로 작성한다.
+  컬럼명은 정확히 `No.`, `Steps`만 사용한다.
   준비 항목 번호는 TC마다 1부터 시작하여 1, 2, 3 순서로 부여한다.
 - 사전 조건의 제목·상세 절차 문구와 줄바꿈은 TC up dictionary를 따른다.
 - Gherkin은 TC 내부 Given/And의 텍스트를 준비 항목 제목으로, DocString을 상세 절차와 정보로
-  작성한다. Markdown·HTML은 같은 내용을 `Step | Steps` 표로 표시한다.
+  작성한다. Markdown·HTML은 같은 내용을 `No. | Steps` 표로 표시한다.
   상세 정보 셀 내부의 단일 줄바꿈과 하위 정보 들여쓰기를 유지한다.
 - 사전 조건은 Steps / Expected Result 표 앞에 표시한다. `추가 사전 조건`으로 따로 분리하거나
   다른 TC·공통 문서 참조만으로 준비 내용을 생략하지 않는다.
 
 작성 예시(양식 예시이며 다운로드·실행 완료 증거가 아님):
 
-| Step | Steps |
+| No. | Steps |
 |---|---|
 | 1 | **Emulator 준비**<br>&nbsp;&nbsp;시험용 HPE990 Emulator의 Edger 화면 준비<br>&nbsp;&nbsp;&nbsp;&nbsp;대상: HPE990<br>&nbsp;&nbsp;&nbsp;&nbsp;화면: Edger |
 | 2 | **시험값 준비**<br>&nbsp;&nbsp;변경할 Language의 원래 값 기록<br>&nbsp;&nbsp;&nbsp;&nbsp;항목: Language<br>&nbsp;&nbsp;승인된 지원 언어 확인<br>&nbsp;&nbsp;&nbsp;&nbsp;시험값: 지원 목록 확인 후 확정 |
@@ -103,7 +107,7 @@ BODY = r"""
 
 ## 번호별 Step 묶음
 
-- TC 결과는 `Step | Steps | Expected Result` 구조로 표시한다.
+- TC 결과는 `No. | Steps | Expected Result` 구조로 표시한다.
 - 검수용 HTML도 같은 3열 표와 번호별 수행 절차를 표시한다. Gherkin 원문만 표시하거나
   Steps와 Expected Result를 별도 목록으로 분리하여 표를 대체하지 않는다.
 - Step 번호는 TC마다 1부터 시작하고 수행 순서대로 연속 부여한다.
@@ -130,8 +134,12 @@ BODY = r"""
 
 ## TC 검수 트리
 
+- 화면 내 TC 순서는 수집된 UI의 위→아래, 같은 행에서는 좌→우 배치 순서를 따른다.
+  같은 요소의 기본·경계값·잘못된 입력 TC는 함께 배치한다. 화면 전체의 진입·스크롤
+  TC는 앞에, 화면 하단 Save/Cancel TC는 뒤에 배치한다. 재배치 시 TC ID와 본문은 유지한다.
+  Gherkin·Markdown·검수 화면의 순서를 일치시키고 ID 숫자순으로 재정렬하지 않는다.
 - 계층: Test Target 모델 → 버전 → 메뉴·화면 경로 → TC.
-  예: `HPE990 → 1.22 → Setup → Preferences → General → TC-002`.
+  예: `HPE990 → 1.22 → Setup → Preferences → General → TC-030`.
 - Test Target은 모델·버전·실행 파일명을 명시적으로 분리해 관리한다.
   현재 대상은 `HPE990`, `1.22`, `HPE990_v1.22_251010.exe`다.
   새 버전 `1.23`의 TC는 같은 `HPE990` 아래 별도 버전 노드로 묶는다.

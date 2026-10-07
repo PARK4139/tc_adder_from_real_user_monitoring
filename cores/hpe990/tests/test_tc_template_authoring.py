@@ -19,7 +19,9 @@ def test_current_tc_patterns_preserve_flow_and_dictionary_wording():
         assert templates[kind]["preconditions"]
         assert templates[kind]["source_tc_ids"]
         assert templates[kind]["type_verified"] is False
-    assert templates["radio"]["related_tc_ids"] == [f"TC-{n:03d}" for n in range(3, 13)]
+    assert templates["radio"]["related_tc_ids"] == [
+        f"TC-{n:03d}" for n in (40, 50, 100, 110, 120, 130, 140, 150, 160, 200)
+    ]
     assert len(templates["button-save"]["steps"]) == 4
     assert len(templates["button-cancel"]["steps"]) == 4
     assert templates["input-field"]["source_limit"]

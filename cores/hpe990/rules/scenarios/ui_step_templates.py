@@ -10,7 +10,7 @@ BODY = """
 - Store reusable type template bodies only in configs/ui_step_templates.json;
   store verified per-element type/specification bindings in configs/ui_step_bindings.json.
   Never keep copied per-element template bodies as competing authoring authorities.
-- Use numbered Step | Steps | Expected Result groups and individual TC prerequisites.
+- Use numbered No. | Steps | Expected Result groups and individual TC prerequisites.
   Wording follows rules/scenarios/tc_up_dictionary.py; do not duplicate its rules.
 - Support window/modal/popup, selectors, inputs/numbers, checkbox/radio, buttons and
   display fields. Offer boundary, save/reopen and cancel/reopen variants separately.

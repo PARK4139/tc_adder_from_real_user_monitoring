@@ -7,6 +7,7 @@ from urllib.parse import unquote
 from gherkin.parser import Parser
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.tc_wording import normalize_expected_result
 
 TEST_TARGET = {
     "model": "HPE990",
@@ -293,6 +294,8 @@ def render_review(source: str) -> tuple[str, dict]:
             if phase == "precondition":
                 prerequisites.append((step["text"], step.get("docString", {}).get("content", "")))
             else:
+                if phase == "expected" and normalize_expected_result(step["text"]) != step["text"]:
+                    raise ValueError(f"TC up dictionary violation: {identity}: {step['text']}")
                 groups[-1][0 if phase == "action" else 1].append(step["text"])
         rows = []
         for number, (actions, expected) in enumerate(groups, 1):
@@ -317,7 +320,7 @@ def render_review(source: str) -> tuple[str, dict]:
         )
         prerequisites_html = (
             '<h3>Pre-condition</h3><div class="table-wrap"><table class="preconditions">'
-            + '<thead><tr><th scope="col">Step</th><th scope="col">Steps</th></tr></thead><tbody>'
+            + '<thead><tr><th scope="col">No.</th><th scope="col">Steps</th></tr></thead><tbody>'
             + "".join(
                 f"<tr><td>{number}</td><td><strong>{escape(title)}</strong>"
                 + f'<div class="precondition-details">{escape(details)}</div></td></tr>'
@@ -335,7 +338,7 @@ def render_review(source: str) -> tuple[str, dict]:
             + chips_html
             + "</div></div></div>"
             + prerequisites_html
-            + '<div class="table-wrap"><table><thead><tr><th>Step</th><th>Steps</th>'
+            + '<div class="table-wrap"><table><thead><tr><th>No.</th><th>Steps</th>'
             + "<th>Expected Result</th></tr></thead><tbody>"
             + "".join(rows)
             + "</tbody></table></div></article>"

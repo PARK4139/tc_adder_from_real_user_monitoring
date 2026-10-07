@@ -53,12 +53,12 @@ TC 작성 규칙과 예시는 [tc_format.py](cores/hpe990/rules/scenarios/tc_for
 따릅니다. General TC 작성 결과는 [preferences_general.md](cores/hpe990/docs/bdd/preferences_general.md)에서 확인합니다.
 `uv run python -m cores.hpe990.scripts.render_tc_review`는 같은 Gherkin 초안으로
 `{D_TEMP}/hpe990/evidence/093ca349/preferences-general-tc-review.html`을 생성합니다.
-TC별 Step / Steps / Expected Result 표와 입력 즉시 반영되는 퍼지 검색을 제공합니다.
+TC별 No. / Steps / Expected Result 표와 입력 즉시 반영되는 퍼지 검색을 제공합니다.
 TC ID·제목·Steps·Expected Result를 검색하며 공백으로 구분한 검색어는 모두 일치해야 합니다.
 예: `lng`는 Language, `beep off`는 Beep Sound의 OFF 관련 TC를 조회합니다.
 관련도 순으로 정렬하며 검색창에서 ↑/↓로 선택하고 Enter로 해당 TC에 이동합니다.
 좌측 목록은 경로 → 입력유형 → 입력요소 → TC 트리로 표시하며 같은 요소의 여러 TC를 묶습니다.
-그룹별 개수와 접기·펼치기를 제공하고, TC 제목 아래 `TC-022` 형식의 ID를 표시합니다.
+그룹별 개수와 접기·펼치기를 제공하고, TC 제목 아래 `TC-020` 형식의 ID를 표시합니다.
 TC ID는 경로와 독립적으로 관리하며 Gherkin의 `@path-Setup/Preferences/General` 태그가 트리 경로를 지정합니다.
 검색 시 일치하는 가지를 펼쳐 검색어를 강조하고, 선택 항목을 강조합니다.
 미확정 사항은 `지원 언어 미확정`, `최소·최대값 미확정`, `입력유형 미확정` 등의 구체적인 칩으로 표시합니다.
@@ -158,7 +158,7 @@ TC 제목·사전조건·Steps·Expected Result의 문구 정본은
 TC 구조·ID·검수 표시 규칙은 `tc_format.py`, 유형별 단계 본문은 템플릿 파일에서 관리합니다.
 
 `hpe990_tc_templates(session_id, ui_ids=None)`는 수집된 각 UI ID에 연결한
-`Step | Steps | Expected Result` 초안과 JSON/HTML 검수 파일을 생성합니다.
+`No. | Steps | Expected Result` 초안과 JSON/HTML 검수 파일을 생성합니다.
 수집 시에도 자동 갱신되며, 반환된 `step_template_sync`에서 위치를 확인합니다.
 화면·모달·팝업·선택기·입력란·숫자·체크박스·라디오·버튼·표시 필드와 유형 미확정을
 지원합니다. 숫자 경계값, 저장/취소 후 재진입은 별도 템플릿입니다.

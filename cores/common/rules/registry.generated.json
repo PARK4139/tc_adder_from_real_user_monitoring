@@ -23,21 +23,21 @@
       "TITLE": "TC 번호별 Steps / Expected Result 작성 및 표시",
       "SOURCE": "cores/hpe990/rules/scenarios/tc_format.py",
       "STATUS": "active",
-      "body_sha256": "9d23c4be7070e0b96bd095fc521f213dfa296389089379bc79208f4b90e3412e"
+      "body_sha256": "86eee01986d984d5e3b162ed0d9507ad51cb43a5ea2f1bc18c9e3c2f3b7f43cc"
     },
     {
       "RULE_ID": "HPE990_TC_UP_DICTIONARY",
       "TITLE": "TC up dictionary: TC 문구 작성",
       "SOURCE": "cores/hpe990/rules/scenarios/tc_up_dictionary.py",
       "STATUS": "active",
-      "body_sha256": "23c300d689df77f669fb98a4130b7437d8134ec28e40b9398dcc9caf92eafb29"
+      "body_sha256": "551c18afc7cf4d52587d63d5df32f41ef7a10a688e000b27ef9806469caf936a"
     },
     {
       "RULE_ID": "HPE990_UI_STEP_TEMPLATES",
       "TITLE": "Generate UI element step drafts from reusable type templates",
       "SOURCE": "cores/hpe990/rules/scenarios/ui_step_templates.py",
       "STATUS": "active",
-      "body_sha256": "0bdfbbc5ce74d441362a98f9279b35f5a270f348e8c8b2f8611a75c191a6ba94"
+      "body_sha256": "8bf7d923ce9fc919a62fadc0fb993a8cf794782163ede3cc6f53e3564871e873"
     },
     {
       "RULE_ID": "HPE990_UI_IDENTITY_SSOT",

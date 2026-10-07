@@ -8,7 +8,7 @@ from cores.hpe990.common.paths import hpe990_folders
 from cores.hpe990.scripts.render_tc_review import TEST_TARGET, render_review
 
 
-def draft(identity="TC-022", scenario_path="", feature_path="Setup/Preferences/General"):
+def draft(identity="TC-020", scenario_path="", feature_path="Setup/Preferences/General"):
     return f"""@path-{feature_path}
 Feature: Review
   @{identity} @type-number {scenario_path}
@@ -23,8 +23,8 @@ def test_tc_identity_survives_tree_move():
     original, _ = render_review(draft())
     moved, _ = render_review(draft(scenario_path="@path-Setup/Export%20Options"))
     for document in (original, moved):
-        assert 'id="TC-022"' in document
-        assert 'href="#TC-022"' in document
+        assert 'id="TC-020"' in document
+        assert 'href="#TC-020"' in document
     target_path = f"/{TEST_TARGET['model']}/{TEST_TARGET['version']}"
     assert f'data-node="{target_path}/Setup/Preferences/General"' in original
     assert f'data-node="{target_path}/Setup/Export Options"' in moved
@@ -41,7 +41,7 @@ def test_duplicate_id_across_paths_is_rejected():
     source = (
         draft()
         + """
-  @TC-022 @path-Setup/Other
+  @TC-020 @path-Setup/Other
   Scenario: Another
     When Select
     Then Visible
@@ -59,7 +59,10 @@ def test_actual_drafts_match_issued_ids():
     ids = ledger["issued_ids"]
     assert len(ids) == len(set(ids)) == summary["tc_count"] == 24
     assert summary["step_groups"] == 117
-    assert ledger["next_number"] == 50
+    assert ledger["next_number"] == 250
+    assert ids == [f"TC-{n:03d}" for n in range(10, 250, 10)]
+    assert not set(ledger["retired_ids"]) & set(ids)
+    assert len(ledger["renumber_migrations"][-1]["mapping"]) == 24
     for identity in ids:
         assert document.count(f'id="{identity}"') == 1
         assert document.count(f'href="#{identity}"') == 1
@@ -71,3 +74,9 @@ def test_four_digit_id_and_explicit_path_required():
     assert 'id="TC-1000"' in document
     with pytest.raises(ValueError, match="@path-"):
         render_review(draft().replace("@path-Setup/Preferences/General", ""))
+
+
+def test_dictionary_violation_is_rejected_before_review_export():
+    with pytest.raises(ValueError, match="TC up dictionary violation"):
+        render_review(draft().replace("Then Visible", "Then 설정값이 표시된다"))
+    render_review(draft().replace("Then Visible", "Then 설정값이 보여야 합니다."))
