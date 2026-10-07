@@ -29,8 +29,8 @@ nav details{margin:3px 0}nav summary{display:flex;align-items:center;gap:7px;cur
 nav summary::-webkit-details-marker{display:none}nav summary:before{content:"›";color:#8298ae;transition:transform .12s}nav details[open]>summary:before{transform:rotate(90deg)}
 nav summary:hover{background:#f0f5fa}.tree-count{margin-left:auto;color:#7b8fa3;font-size:11px;font-weight:400;white-space:nowrap}.tree-children{margin-left:9px;padding-left:8px;border-left:1px solid #e1e9f2}
 nav a{display:block;padding:9px 7px;text-decoration:none;color:#315b82;font-size:12px;border-left:3px solid transparent;border-bottom:1px solid #edf1f6;border-radius:5px;scroll-margin-block:16px}
-nav a:hover{background:#f0f5fa}nav a[aria-current="true"]{background:#eaf3ff;border-left-color:#3074bd}.tree-leaf-top{display:flex;align-items:flex-start;gap:6px}.tree-title{flex:1;min-width:max-content;font-size:13px;line-height:1.5;white-space:nowrap}
-.tree-id{display:block;color:#8091a3;font-size:10px;line-height:1.5;margin-top:4px;overflow-wrap:anywhere}.tree-chips{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:3px;flex-shrink:0}.tree-chip{white-space:nowrap;font-size:10px;line-height:1.5;padding:2px 5px;background:#fde8e8;color:#a12626;border-radius:4px}mark{background:#ffdf7d;color:inherit;border-radius:2px}
+nav a:hover{background:#f0f5fa}nav a[aria-current="true"]{background:#eaf3ff;border-left-color:#3074bd}.tree-leaf-top{display:flex;align-items:center;gap:6px}.tree-title{flex:1;min-width:max-content;font-size:13px;line-height:1.5;white-space:nowrap}
+.tree-id{display:inline-block;flex-shrink:0;color:#8091a3;font-size:10px;line-height:1.5;white-space:nowrap}.tree-chips{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:3px;flex-shrink:0}.tree-chip{white-space:nowrap;font-size:10px;line-height:1.5;padding:2px 5px;background:#fde8e8;color:#a12626;border-radius:4px}mark{background:#ffdf7d;color:inherit;border-radius:2px}
 article,.intro{background:white;border:1px solid #dae4ee;border-radius:10px;padding:22px;margin-bottom:22px}
 article{scroll-margin-top:95px}h2{font-size:18px;margin:0 0 10px;overflow-wrap:anywhere}h3{font-size:15px}
 .tc-heading{display:flex;align-items:flex-start;gap:16px;margin-bottom:10px}.tc-title{flex:1;min-width:0}.tc-meta{font-size:12px;color:#66788a;line-height:1.5;margin-bottom:6px;overflow-wrap:anywhere}.tc-heading h2{font-size:21px;font-weight:700;line-height:1.5;margin:0}.tc-chips{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;max-width:40%}
@@ -225,8 +225,8 @@ def render_navigation(entries: list[dict]) -> str:
         )
         return (
             f'<a href="#{identity}" title="{escape(entry["title"], quote=True)}">'
-            f'<span class="tree-leaf-top"><span class="tree-title">{escape(label)}</span>{chip}</span>'
-            f'<span class="tree-id">{escape(entry["id"])}</span></a>'
+            f'<span class="tree-leaf-top"><span class="tree-id">{escape(entry["id"])}</span>'
+            f'<span class="tree-title">{escape(label)}</span>{chip}</span></a>'
         )
 
     def branch(label, contents, key):
@@ -242,20 +242,7 @@ def render_navigation(entries: list[dict]) -> str:
             branch(label, render(child, key + "/" + label), key + "/" + label)
             for label, child in node["children"].items()
         ]
-        elements = {}
-        for entry in node["entries"]:
-            match = re.match(
-                r"^(.*?) (?:선택 및|체크 상태|숫자 입력|잘못된 숫자 입력|입력 및|버튼의|항목 표시|스크롤|화면 진입)",
-                entry["title"],
-            )
-            element = match[1] if match else entry["title"]
-            elements.setdefault(element, []).append(entry)
-        for element, cases in elements.items():
-            contents = "".join(
-                leaf(case, case["title"].removeprefix(element).strip()) for case in cases
-            )
-            label = "화면 표시 및 스크롤" if element == "General" else element
-            parts.append(branch(label, contents, key + "/" + label))
+        parts.extend(leaf(entry, entry["title"]) for entry in node["entries"])
         return "".join(parts)
 
     return render(root)
@@ -355,7 +342,6 @@ def render_review(source: str) -> tuple[str, dict]:
         )
         kind = next((tag[6:] for tag in tags if tag.startswith("@type-")), "other")
         title = scenario["name"].removeprefix(identity + " ")
-        title = title.removesuffix(f" ({TYPE_LABELS.get(kind, '')})")
         navigation.append(
             {
                 "id": identity,
@@ -381,7 +367,7 @@ def render_review(source: str) -> tuple[str, dict]:
 <p>{len(cards)}개 TC · {total_groups}개 Step 묶음 · 시나리오 작성 초안 · 실행 결과 없음</p></header>
 <div class="toolbar"><input id="search" type="text" aria-label="TC 퍼지 검색" autocomplete="off" autofocus placeholder="TC 검색기">
 <span id="count" role="status" aria-live="polite"></span></div>
-<div class="layout"><aside class="tree-panel"><h2 id="tc-tree-title" class="review-heading">TC 검수 트리</h2><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
+<div class="layout"><aside class="tree-panel"><h2 id="tc-tree-title" class="review-heading">TC 검수 스위트 트리</h2><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
 <h2 class="review-heading">TC 검수 본문</h2>
 <p id="empty" class="empty" hidden>검색 결과가 없습니다.</p><div id="results">{"".join(cards)}</div>
 <section class="intro"><h2>검수 범위</h2><ul>

@@ -23,7 +23,7 @@
       "TITLE": "TC 번호별 Steps / Expected Result 작성 및 표시",
       "SOURCE": "cores/hpe990/rules/scenarios/tc_format.py",
       "STATUS": "active",
-      "body_sha256": "7cf860f0fe7daf69ac0f5d723e1324e133b6b114030502ed6ac1ed02978db763"
+      "body_sha256": "4dcb0fe121a7573f5f6f71252b1ee64820cecdf858fd0ae3179226bd24717078"
     },
     {
       "RULE_ID": "HPE990_UI_IDENTITY_SSOT",
