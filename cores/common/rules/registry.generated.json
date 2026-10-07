@@ -1,0 +1,36 @@
+{
+  "summary": {
+    "rule_count": 4,
+    "verdict": "PASS"
+  },
+  "rules": [
+    {
+      "RULE_ID": "HPE990_MCP_FUNCTION_COVERAGE",
+      "TITLE": "Expose every Emulator operation through MCP",
+      "SOURCE": "cores/hpe990/rules/mcp_function_coverage.py",
+      "STATUS": "active",
+      "body_sha256": "30e775be708423019ff784c044f6d68fe52c5f72da0a6447fd5599940f480111"
+    },
+    {
+      "RULE_ID": "HPE990_ONE_SHOT_OUTPUT",
+      "TITLE": "auto_emulator one-shot output",
+      "SOURCE": "cores/hpe990/rules/one_shot_output.py",
+      "STATUS": "active",
+      "body_sha256": "1982bcee4b9df5ce37769b025d4265eb61557f3d9007808f2e903fd58c9d5771"
+    },
+    {
+      "RULE_ID": "HPE990_TC_FORMAT",
+      "TITLE": "TC 번호별 Steps / Expected Result 작성 및 표시",
+      "SOURCE": "cores/hpe990/rules/scenarios/tc_format.py",
+      "STATUS": "active",
+      "body_sha256": "7cf860f0fe7daf69ac0f5d723e1324e133b6b114030502ed6ac1ed02978db763"
+    },
+    {
+      "RULE_ID": "HPE990_UI_IDENTITY_SSOT",
+      "TITLE": "Manage all collected UI identities in one registry",
+      "SOURCE": "cores/hpe990/rules/ui_identity.py",
+      "STATUS": "active",
+      "body_sha256": "6e48857155a8113dd52994de51621235de155c0b9e8358e7cc762f8c151f5e4e"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "status": "REQUIRED",
+  "family": "hpe990",
+  "features": ["tests/bdd/scenarios/features/ram.feature", "tests/bdd/scenarios/features/telemetry.feature", "tests/bdd/scenarios/features/analysis.feature", "tests/bdd/scenarios/features/workflow.feature", "tests/bdd/scenarios/features/control.feature", "tests/bdd/scenarios/features/visualization.feature"],
+  "bindings": ["tests/bdd/scenarios/test_bdd_ram.py"],
+  "expected_tests": 6
+}

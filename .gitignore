@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.agent_temp/
+*.pyc
+target/
+/auto_emulator*.exe

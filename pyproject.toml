@@ -1,0 +1,39 @@
+[project]
+name = "auto-emulator"
+version = "0.1.0"
+description = "Family-owned HPE990 Emulator automation over MCP"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "comtypes>=1.4.17",
+    "filelock>=4.0.12",
+    "mcp>=1.26,<2",
+    "pillow>=12.3.0",
+    "psutil>=7.2.2",
+    "pywin32>=312",
+    "pywinauto>=0.6.9",
+    "winrt-windows-foundation>=3.2.1",
+    "winrt-windows-foundation-collections>=3.2.1",
+    "winrt-windows-globalization>=3.2.1",
+    "winrt-windows-graphics-imaging>=3.2.1",
+    "winrt-windows-media-ocr>=3.2.1",
+    "winrt-windows-storage>=3.2.1",
+    "winrt-windows-storage-streams>=3.2.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["cores/hpe990/tests"]
+markers = ["integration: requires the installed HPE990 and an interactive Windows desktop"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.22.3",
+    "pytest>=9.1.1",
+    "pytest-bdd>=9.0.0",
+    "ruff>=0.16.10",
+]

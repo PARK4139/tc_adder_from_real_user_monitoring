@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "pk-hpe990-mcp": {
+      "command": "uv",
+      "args": ["run", "--no-sync", "python", "cores/hpe990/mcp/server.py"]
+    }
+  }
+}

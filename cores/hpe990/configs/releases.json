@@ -1,0 +1,87 @@
+{
+    "policy":  "Start at 0.1; increment minor by one for each reserved release without rollover. A major change requires an explicit policy update; reset minor to zero only when major increases.",
+    "next_major":  0,
+    "next_minor":  8,
+    "attempts":  [
+                     {
+                         "version":  "0.1",
+                         "run_id":  "20261006T085214Z-fbe3c8d1",
+                         "status":  "released",
+                         "internal_version":  "0.1.0",
+                         "source_commit":  null,
+                         "source_commit_reason":  "project has no Git metadata",
+                         "deployment_path":  "C:\\Users\\Huvitz\\Downloads\\CavemanDrive\\3rd_party\\auto_emulator\\auto_emulator_0.1.exe",
+                         "runtime_path":  "C:\\Users\\Huvitz\\Downloads\\CavemanDrive\\3rd_party\\auto_emulator\\auto_emulator.exe",
+                         "sha256":  "786b18f48733c1395eadd6c52910cf87c3dda5af85a31850399d81129930c567",
+                         "size_bytes":  20466866,
+                         "evidence":  "C:\\Users\\Huvitz\\Desktop\\Temp\\hpe990\\evidence\\c35e84d2\\20261006T085214Z-fbe3c8d1"
+                     },
+                     {
+                         "version":  "0.2",
+                         "run_id":  "20261006T091030Z-6ea74fe5",
+                         "status":  "withdrawn",
+                         "internal_version":  "0.1.0",
+                         "source_commit":  null,
+                         "source_commit_reason":  "project has no Git metadata",
+                         "deployment_path":  "C:\\Users\\Huvitz\\Downloads\\CavemanDrive\\3rd_party\\auto_emulator\\auto_emulator_0.2.exe",
+                         "runtime_path":  "C:\\Users\\Huvitz\\Downloads\\CavemanDrive\\3rd_party\\auto_emulator\\auto_emulator.exe",
+                         "sha256":  "37416c966b2850546d5860b396d675d20a2474c748585b9cf2878679e6591db7",
+                         "size_bytes":  27842595,
+                         "evidence":  "C:\\Users\\Huvitz\\Desktop\\Temp\\hpe990\\evidence\\c35e84d2\\20261006T091030Z-6ea74fe5",
+                         "withdrawal_reason":  "Fresh-launch Continue verification failed: Qt alien widgets were not exposed. Fixed by per-launch QT_USE_NATIVE_WINDOWS=1; preserved this immutable version and reserved the next version."
+                     },
+                     {
+                         "version":  "0.3",
+                         "run_id":  "20261006T091455Z-8354dd2f",
+                         "status":  "released",
+                         "internal_version":  "0.1.0",
+                         "source_commit":  null,
+                         "source_commit_reason":  "project has no Git metadata",
+                         "deployment_path":  "C:\\Users\\Huvitz\\Downloads\\CavemanDrive\\3rd_party\\auto_emulator\\auto_emulator_0.3.exe",
+                         "runtime_path":  "C:\\Users\\Huvitz\\Downloads\\CavemanDrive\\3rd_party\\auto_emulator\\auto_emulator.exe",
+                         "sha256":  "d5b032b1a14a09160b63294712c551c8454e839f285a393081ee73f47e2ed1ad",
+                         "size_bytes":  27839547,
+                         "evidence":  "C:\\Users\\Huvitz\\Desktop\\Temp\\hpe990\\evidence\\c35e84d2\\20261006T091455Z-8354dd2f"
+                     },
+                     {
+                         "version":  "0.4",
+                         "run_id":  "20261006T104214Z-ad790156",
+                         "status":  "failed",
+                         "internal_version":  "0.1.0",
+                         "source_commit":  null,
+                         "source_commit_reason":  "project has no Git metadata",
+                         "error":  "ExceptionGroup: unhandled errors in a TaskGroup (1 sub-exception)"
+                     },
+                     {
+                         "version":  "0.5",
+                         "run_id":  "20261006T104509Z-239228b0",
+                         "status":  "released",
+                         "internal_version":  "0.1.0",
+                         "source_commit":  null,
+                         "source_commit_reason":  "project has no Git metadata",
+                         "deployment_path":  "C:\\Users\\Huvitz\\Downloads\\CavemanDrive\\3rd_party\\auto_emulator\\auto_emulator_0.5.exe",
+                         "runtime_path":  "C:\\Users\\Huvitz\\Downloads\\CavemanDrive\\3rd_party\\auto_emulator\\auto_emulator.exe",
+                         "sha256":  "a7560e99f9a1e89f1e4ab6181deee48e24dce6fdb0dd7cda5f5a8c927773f325",
+                         "size_bytes":  29458052,
+                         "evidence":  "C:\\Users\\Huvitz\\Desktop\\Temp\\hpe990\\evidence\\5488b646\\20261006T104509Z-239228b0"
+                     },
+                     {
+                         "version":  "0.6",
+                         "run_id":  "20261007T001615Z-2ad8c08f",
+                         "status":  "failed",
+                         "internal_version":  "0.1.0",
+                         "source_commit":  null,
+                         "source_commit_reason":  "project has no Git metadata",
+                         "error":  "RuntimeError: Incomplete BDD gate: {\u0027tests\u0027: 6, \u0027skipped\u0027: 0, \u0027failures\u0027: 2, \u0027errors\u0027: 0}; evidence=C:\\Users\\Huvitz\\Desktop\\Temp\\hpe990\\evidence\\5488b646\\20261007T001615Z-2ad8c08f\\candidate-bdd"
+                     },
+                     {
+                         "version":  "0.7",
+                         "run_id":  "20261007T002252Z-46a75211",
+                         "status":  "withdrawn",
+                         "internal_version":  "0.1.0",
+                         "source_commit":  null,
+                         "source_commit_reason":  "project has no Git metadata",
+                         "reason":  "User redirected work to improving the existing ui-gallery.html before final publication validation completed."
+                     }
+                 ]
+}
