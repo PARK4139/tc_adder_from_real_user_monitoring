@@ -33,7 +33,7 @@ nav a:hover{background:#f0f5fa}nav a[aria-current="true"]{background:#eaf3ff;bor
 .tree-id{display:inline-block;flex-shrink:0;color:#8091a3;font-size:10px;line-height:1.5;white-space:nowrap}.tree-chips{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:3px;flex-shrink:0}.tree-chip{white-space:nowrap;font-size:10px;line-height:1.5;padding:2px 5px;background:#fde8e8;color:#a12626;border-radius:4px}mark{background:#ffdf7d;color:inherit;border-radius:2px}
 article,.intro{background:white;border:1px solid #dae4ee;border-radius:10px;padding:22px;margin-bottom:22px}
 article{scroll-margin-top:95px}h2{font-size:18px;margin:0 0 10px;overflow-wrap:anywhere}h3{font-size:15px}
-.tc-heading{display:flex;align-items:flex-start;gap:16px;margin-bottom:10px}.tc-title{flex:1;min-width:0;overflow-x:auto}.tc-meta{font-size:12px;color:#66788a;line-height:1.5;margin-bottom:6px;overflow-wrap:anywhere}.tc-heading h2{font-size:21px;font-weight:700;line-height:1.5;margin:0;white-space:nowrap}.tc-id{font-size:12px;font-weight:400;color:#8091a3;margin-right:6px}.tc-chips{display:flex;flex:0 0 auto;justify-content:flex-end;flex-wrap:nowrap;gap:6px;max-width:40%;overflow-x:auto}.tc-chips .badge{flex:0 0 auto;white-space:nowrap}
+.tc-heading{margin-bottom:10px}.tc-title{min-width:0}.tc-meta{font-size:12px;color:#66788a;line-height:1.5;margin-bottom:6px;overflow-wrap:anywhere}.tc-title-line{display:flex;align-items:center;gap:16px;min-width:0}.tc-title-line h2{flex:1;min-width:0;font-size:21px;font-weight:700;line-height:1.5;margin:0;white-space:nowrap;overflow-x:auto}.tc-id{font-size:12px;font-weight:400;color:#8091a3;margin-right:6px}.tc-chips{display:flex;flex:0 0 auto;justify-content:flex-end;flex-wrap:nowrap;gap:6px;max-width:40%;overflow-x:auto}.tc-chips .badge{flex:0 0 auto;white-space:nowrap}
 .badge{display:inline-block;font-size:12px;background:#edf4fa;color:#4f6780;border-radius:5px;padding:5px 8px}
 .legend-items{display:flex;flex-direction:column;gap:8px}.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#66788a}
 .pending{background:#fde8e8;color:#a12626}p,li{font-size:14px;line-height:1.7}.table-wrap{overflow:auto;margin-top:16px}
@@ -331,9 +331,9 @@ def render_review(source: str) -> tuple[str, dict]:
             f'<article class="tc" id="{escape(identity, quote=True)}">'
             f'<div class="tc-heading"><div class="tc-title">'
             f'<div class="tc-meta">{escape(tc_path)}</div>'
-            f'<h2><span class="tc-id">{escape(tc_label)}</span> {escape(title)}</h2></div>'
+            f'<div class="tc-title-line"><h2><span class="tc-id">{escape(tc_label)}</span> {escape(title)}</h2>'
             + chips_html
-            + "</div>"
+            + "</div></div></div>"
             + prerequisites_html
             + '<div class="table-wrap"><table><thead><tr><th>Step</th><th>Steps</th>'
             + "<th>Expected Result</th></tr></thead><tbody>"
