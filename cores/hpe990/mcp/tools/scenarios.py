@@ -4,6 +4,18 @@ import anyio
 
 from cores.common.functions.run_family_bdd import run_family_bdd
 from cores.hpe990.functions.scenarios import scenario_catalog
+from cores.hpe990.functions.step_templates import template_catalog
+
+
+def hpe990_tc_templates(session_id: str, ui_ids: list[str] | None = None) -> dict:
+    """Generate per-UI-ID draft Step/Steps/Expected Result groups and JSON/HTML review.
+
+    Covers collected screens, modals/popups and child controls using shared templates.
+    Optional ui_ids limits output to observed IDs. Unverified types and absent values,
+    ranges/options/outcomes are explicitly pending. No UI actions or TC allocation;
+    this does not register executable BDD scenarios or report a test PASS.
+    """
+    return template_catalog(session_id, ui_ids)
 
 
 def hpe990_bdd_catalog(session_id: str | None = None) -> dict:

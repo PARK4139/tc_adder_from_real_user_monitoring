@@ -17,7 +17,7 @@ from cores.hpe990.mcp.tools.monitoring import (
     hpe990_telemetry_export,
     hpe990_telemetry_read,
 )
-from cores.hpe990.mcp.tools.scenarios import hpe990_bdd_catalog, hpe990_bdd_run
+from cores.hpe990.mcp.tools.scenarios import hpe990_bdd_catalog, hpe990_bdd_run, hpe990_tc_templates
 from cores.hpe990.mcp.tools.ui import (
     hpe990_ui_catalog,
     hpe990_ui_collect,
@@ -47,6 +47,7 @@ for tool in (
     hpe990_ui_analyze,
     hpe990_bdd_catalog,
     hpe990_bdd_run,
+    hpe990_tc_templates,
 ):
     mcp.tool()(tool)
 

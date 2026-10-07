@@ -19,4 +19,5 @@ OPERATION_TO_TOOL = {
     "observed_state_transition_analysis": "hpe990_ui_analyze",
     "registered_scenarios_traceability": "hpe990_bdd_catalog",
     "execute_real_bdd_with_ram": "hpe990_bdd_run",
+    "ui_id_bound_step_template_drafts": "hpe990_tc_templates",
 }

@@ -12,6 +12,7 @@ class Hpe990Folders:
         self.D_HPE990 = Path(__file__).resolve().parents[1]
         self.D_HPE990_RULES = self.D_HPE990 / "rules"
         self.D_HPE990_ISSUES = self.D_HPE990 / "issues"
+        self.D_HPE990_CONFIGS = self.D_HPE990 / "configs"
         self.D_HPE990_RUNTIME = D_TEMP / "hpe990" / "runtime"
         self.D_HPE990_BUILD = D_TEMP / "hpe990" / "build"
         self.D_HPE990_VISUAL_BUILD = self.D_HPE990_BUILD / "visual"
@@ -19,6 +20,8 @@ class Hpe990Folders:
         self.D_AUTO_EMULATOR_OUTPUT = D_ROOT
         self.F_HPE990_VISUAL = self.D_HPE990_VISUAL_BUILD / "release/hpe990-visual.exe"
         self.F_HPE990_UI_REGISTRY = self.D_HPE990_RUNTIME / "ui-elements.sqlite3"
+        self.F_HPE990_STEP_TEMPLATES = self.D_HPE990_CONFIGS / "ui_step_templates.json"
+        self.F_HPE990_STEP_BINDINGS = self.D_HPE990_CONFIGS / "ui_step_bindings.json"
 
 
 hpe990_folders = Hpe990Folders()

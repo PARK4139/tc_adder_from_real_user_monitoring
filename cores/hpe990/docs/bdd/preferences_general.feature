@@ -4,7 +4,7 @@ Feature: Preferences > General 번호별 Steps / Expected Result TC
   When과 이어지는 And는 수행 절차이며 Then과 이어지는 And는 해당 묶음의 기대 결과다.
   이 파일은 시나리오 초안으로 자동화 구현 및 실행 등록은 포함하지 않는다.
 
-  @TC-001 @type-navigation
+  @TC-001 @type-navigation @expected-collected-General
   Scenario: TC-001 General 화면 진입 및 입력요소 표시
     Given 설정값 복구 준비
       """
@@ -15,8 +15,74 @@ Feature: Preferences > General 번호별 Steps / Expected Result TC
     Then General 탭이 선택되어 표시된다
     And Language, Sleep Mode, 숫자 입력 및 라디오 선택 그룹이 표시된다
     # Step 2
-    When General 설정 영역을 아래로 스크롤
-    Then 설정 영역의 아래쪽 내용이 표시된다
+    When General 설정 영역을 위에서 아래까지 스크롤하며 입력요소 확인
+    # BEGIN collected General elements
+    Then 스크롤 전후 해당 위치에서 다음 수집 요소가 각각 표시된다
+    # UI reference: UI-000111
+    And Backup Date 항목이 표시된다
+    # UI reference: UI-000108
+    And Backup Filename 항목이 표시된다
+    # UI reference: UI-000089
+    And Beep Sound 항목이 표시된다
+    # UI reference: UI-000093
+    And Config DB History 항목이 표시된다
+    # UI reference: UI-000029
+    And Default File Type 항목이 표시된다
+    # UI reference: UI-000069
+    And Digital Designer Mode 항목이 표시된다
+    # UI reference: UI-000049
+    And Easy Click Mode 항목이 표시된다
+    # UI reference: UI-000054
+    And Eccentricity Check 항목이 표시된다
+    # UI reference: UI-000077
+    And Edit Processed Job 항목이 표시된다
+    # UI reference: UI-000024
+    And Export Options 항목이 표시된다
+    # UI reference: UI-000095
+    And Factory Reset Date 항목이 표시된다
+    # UI reference: UI-000037
+    And Fast Processing with Lens Diameter 항목이 표시된다
+    # UI reference: UI-000045
+    And Font 항목이 표시된다
+    # UI reference: UI-000025
+    And Format 항목이 표시된다
+    # UI reference: UI-000085
+    And Frame Fitting Mode 항목이 표시된다
+    # UI reference: UI-000062
+    And Grid 항목이 표시된다
+    # UI reference: UI-000064
+    And Horizontal Space (mm) 항목이 표시된다
+    # UI reference: UI-000114
+    And Language 항목이 표시된다
+    # UI reference: UI-000041
+    And LED Notification 항목이 표시된다
+    # UI reference: UI-000031
+    And Line Ending 항목이 표시된다
+    # UI reference: UI-000047
+    And Message Box Font Size 항목이 표시된다
+    # UI reference: UI-000058
+    And R/L Shape Mirroring 항목이 표시된다
+    # UI reference: UI-000026
+    And Radius Mode 항목이 표시된다
+    # UI reference: UI-000103
+    And Restore Date 항목이 표시된다
+    # UI reference: UI-000100
+    And Restore Filename 항목이 표시된다
+    # UI reference: UI-000053
+    And Safety Check 항목이 표시된다
+    # UI reference: UI-000065
+    And Show Grid 항목이 표시된다
+    # UI reference: UI-000073
+    And Show Tip Message 항목이 표시된다
+    # UI reference: UI-000081
+    And Sleep Mode 항목이 표시된다
+    # UI reference: UI-000027
+    And The Number of Radii(OMA) 항목이 표시된다
+    # UI reference: UI-000063
+    And Vertical Space (mm) 항목이 표시된다
+    # UI reference: UI-000083
+    And Wait (minutes) 항목이 표시된다
+    # END collected General elements
     # Step 3
     When General 설정 영역을 맨 위로 스크롤
     Then Language 입력요소가 다시 표시된다

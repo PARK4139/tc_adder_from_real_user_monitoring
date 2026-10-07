@@ -1,6 +1,6 @@
 {
   "summary": {
-    "rule_count": 4,
+    "rule_count": 5,
     "verdict": "PASS"
   },
   "rules": [
@@ -23,7 +23,14 @@
       "TITLE": "TC 번호별 Steps / Expected Result 작성 및 표시",
       "SOURCE": "cores/hpe990/rules/scenarios/tc_format.py",
       "STATUS": "active",
-      "body_sha256": "4dcb0fe121a7573f5f6f71252b1ee64820cecdf858fd0ae3179226bd24717078"
+      "body_sha256": "a2b563207c7e711d33a2ff8a50e73b8fd21b4f7128d2b26e602cd4de4f5ed518"
+    },
+    {
+      "RULE_ID": "HPE990_UI_STEP_TEMPLATES",
+      "TITLE": "Generate UI element step drafts from reusable type templates",
+      "SOURCE": "cores/hpe990/rules/scenarios/ui_step_templates.py",
+      "STATUS": "active",
+      "body_sha256": "cc001cd401c1eb539a76581afba56710d3ffe209de96606652ec705186f1384c"
     },
     {
       "RULE_ID": "HPE990_UI_IDENTITY_SSOT",

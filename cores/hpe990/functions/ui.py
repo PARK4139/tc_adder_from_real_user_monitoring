@@ -16,6 +16,7 @@ from cores.hpe990.common.paths import hpe990_folders
 from cores.hpe990.functions.accessibility import collect_accessibility
 from cores.hpe990.functions.lifecycle import _windows, log_event
 from cores.hpe990.functions.monitoring import action_marker, ram_status, session_guard, start_ram
+from cores.hpe990.functions.tc_dynamic import sync_general_expected
 from cores.hpe990.functions.ui_identity import assign_ui_ids
 from cores.hpe990.functions.visual_elements import collect_visual_elements
 
@@ -171,6 +172,22 @@ def collect_ui(
         "evidence": str(directory / "inventory.json"),
     }
     result["ui_registry"] = assign_ui_ids(result)
+    try:
+        result["tc_sync"] = sync_general_expected()
+    except Exception as error:
+        result["tc_sync"] = {"updated": False, "error": str(error), "executed": False}
+    (directory / "inventory.json").write_text(
+        json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    from cores.hpe990.functions.step_templates import template_catalog
+
+    try:
+        templates = template_catalog(session_id)
+        result["step_template_sync"] = {
+            key: templates[key] for key in ("element_count", "case_count", "json", "html")
+        }
+    except Exception as error:
+        result["step_template_sync"] = {"error": str(error), "bdd_executed": False}
     (directory / "inventory.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"
     )

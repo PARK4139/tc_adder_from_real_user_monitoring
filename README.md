@@ -145,6 +145,30 @@ ID 중복 발급을 방지합니다. TC ID와 별도로 관리하고 번호를 �
 카탈로그에서 원장에 연결합니다. 원장 파일도 증거와 함께 백업해야 ID 연속성이 유지됩니다.
 정본 규칙은 `cores/hpe990/rules/ui_identity.py`입니다.
 
+TC-001의 General 표시 Expected Result는 UI 원장의 관찰된 항목명으로 자동 생성합니다.
+`hpe990_ui_collect` 호출 시 `@expected-collected-General` 생성 영역과 파생 Markdown을
+갱신하며, 기존 공유 검수 HTML에도 서버 재시작 없이 반영됩니다. `tc_sync`가 생성 상태를
+반환합니다. 현재 원장의 이름이 확인된 항목을 누적 반영하며 미수집 요소나 이름 없는
+요소의 의미는 추정하지 않습니다. 자동 생성으로 시험 실행 또는 PASS가 부여되지 않습니다.
+
+### UI 유형별 Step 템플릿
+
+`hpe990_tc_templates(session_id, ui_ids=None)`는 수집된 각 UI ID에 연결한
+`Step | Steps | Expected Result` 초안과 JSON/HTML 검수 파일을 생성합니다.
+수집 시에도 자동 갱신되며, 반환된 `step_template_sync`에서 위치를 확인합니다.
+화면·모달·팝업·선택기·입력란·숫자·체크박스·라디오·버튼·표시 필드와 유형 미확정을
+지원합니다. 숫자 경계값, 저장/취소 후 재진입은 별도 템플릿입니다.
+
+본문 정본은 `configs/ui_step_templates.json`, UI별 명세는
+`configs/ui_step_bindings.json`입니다. 예를 들어 `bindings["UI-000114"]`에
+`ui_type: "option-selector"`, `type_verified: true`, `parameters`의
+`options`와 `value`를 지정하면 Language의 목록 펼치기/선택 단계를 생성합니다.
+유형 힌트는 확인 전까지 미확정으로 표시하고, Backup Date 같은 STATIC_DATA에는
+입력 단계를 생성하지 않습니다. `[선택 목록 미확정]`, `[최소값 미확정]` 등으로
+누락 명세를 표시합니다. 각 초안에 개별 사전조건과 증거를 포함합니다.
+기존 TC 번호·본문은 유지하고, 새 초안 검수 후 기존 TC ID 규칙으로 승격합니다.
+이 도구는 UI 조작이나 BDD 실행을 수행하지 않습니다.
+
 Telemetry는 `schema_version`, `session_id`, `run_id`, `sequence`로 연결한 로컬 JSONL입니다.
 원격 전송은 후속 범위입니다. WinEvent와 주기적인 HWND 상태·RGB 해시를 함께 사용하며 실제
 수집 간격·스캔 시간·이벤트 지연을 보고합니다. 화면 가림이나 샘플 사이의 미보고 순간 변화는

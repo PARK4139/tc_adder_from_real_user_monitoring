@@ -5,7 +5,7 @@ import json
 import pytest
 
 from cores.hpe990.common.paths import hpe990_folders
-from cores.hpe990.scripts.render_tc_review import render_review
+from cores.hpe990.scripts.render_tc_review import TEST_TARGET, render_review
 
 
 def draft(identity="TC-022", scenario_path="", feature_path="Setup/Preferences/General"):
@@ -25,8 +25,9 @@ def test_tc_identity_survives_tree_move():
     for document in (original, moved):
         assert 'id="TC-022"' in document
         assert 'href="#TC-022"' in document
-    assert 'data-node="/Setup/Preferences/General"' in original
-    assert 'data-node="/Setup/Export Options"' in moved
+    target_path = f"/{TEST_TARGET['model']}/{TEST_TARGET['version']}"
+    assert f'data-node="{target_path}/Setup/Preferences/General"' in original
+    assert f'data-node="{target_path}/Setup/Export Options"' in moved
     assert "Setup &gt; Export Options" in moved
 
 

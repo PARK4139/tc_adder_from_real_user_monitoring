@@ -33,7 +33,7 @@ nav a:hover{background:#f0f5fa}nav a[aria-current="true"]{background:#eaf3ff;bor
 .tree-id{display:inline-block;flex-shrink:0;color:#8091a3;font-size:10px;line-height:1.5;white-space:nowrap}.tree-chips{display:flex;flex-direction:row;flex-wrap:nowrap;align-items:center;gap:3px;flex-shrink:0}.tree-chip{white-space:nowrap;font-size:10px;line-height:1.5;padding:2px 5px;background:#fde8e8;color:#a12626;border-radius:4px}mark{background:#ffdf7d;color:inherit;border-radius:2px}
 article,.intro{background:white;border:1px solid #dae4ee;border-radius:10px;padding:22px;margin-bottom:22px}
 article{scroll-margin-top:95px}h2{font-size:18px;margin:0 0 10px;overflow-wrap:anywhere}h3{font-size:15px}
-.tc-heading{display:flex;align-items:flex-start;gap:16px;margin-bottom:10px}.tc-title{flex:1;min-width:0}.tc-meta{font-size:12px;color:#66788a;line-height:1.5;margin-bottom:6px;overflow-wrap:anywhere}.tc-heading h2{font-size:21px;font-weight:700;line-height:1.5;margin:0}.tc-chips{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;max-width:40%}
+.tc-heading{display:flex;align-items:flex-start;gap:16px;margin-bottom:10px}.tc-title{flex:1;min-width:0;overflow-x:auto}.tc-meta{font-size:12px;color:#66788a;line-height:1.5;margin-bottom:6px;overflow-wrap:anywhere}.tc-heading h2{font-size:21px;font-weight:700;line-height:1.5;margin:0;white-space:nowrap}.tc-id{font-size:12px;font-weight:400;color:#8091a3;margin-right:6px}.tc-chips{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:6px;max-width:40%}
 .badge{display:inline-block;font-size:12px;background:#edf4fa;color:#4f6780;border-radius:5px;padding:5px 8px}
 .legend-items{display:flex;flex-direction:column;gap:8px}.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#66788a}
 .pending{background:#fde8e8;color:#a12626}p,li{font-size:14px;line-height:1.7}.table-wrap{overflow:auto;margin-top:16px}
@@ -145,7 +145,7 @@ function filter(){
  const scores=new Map(matches.map(record=>[record.link,record.score]));
  function best(node){const links=node.tagName==="A"?[node]:[...node.querySelectorAll("a")];return Math.max(-Infinity,...links.map(link=>scores.get(link)??-Infinity));}
  containers.forEach(({node,children})=>{const sorted=terms.length?[...children].sort((a,b)=>{const left=best(a),right=best(b);return left===right?0:right-left;}):children;node.append(...sorted);});
- [...branches].reverse().forEach(node=>{const total=node.querySelectorAll("a").length,count=node.querySelectorAll("a:not([hidden])").length;node.hidden=count===0;node.querySelector(":scope > summary .tree-count").textContent=terms.length?count+" / "+total:total+"개";if(terms.length&&count)node.open=true;else if(!terms.length&&searching)node.open=previousOpen.get(node)??node.open;});
+ [...branches].reverse().forEach(node=>{const total=node.querySelectorAll("a").length,count=node.querySelectorAll("a:not([hidden])").length;node.hidden=count===0;node.querySelector(":scope > summary .tree-count").textContent=total+"개";if(terms.length&&count)node.open=true;else if(!terms.length&&searching)node.open=previousOpen.get(node)??node.open;});
  highlights.forEach(({node,text})=>highlight(node,text,terms));
  document.getElementById('count').textContent=matches.length+' / '+cards.length+'개 TC';
  document.getElementById('empty').hidden=matches.length>0;
@@ -330,8 +330,8 @@ def render_review(source: str) -> tuple[str, dict]:
         cards.append(
             f'<article class="tc" id="{escape(identity, quote=True)}">'
             f'<div class="tc-heading"><div class="tc-title">'
-            f'<div class="tc-meta">{escape(tc_label)}<br>{escape(tc_path)}</div>'
-            f"<h2>{escape(title)}</h2></div>"
+            f'<div class="tc-meta">{escape(tc_path)}</div>'
+            f'<h2><span class="tc-id">{escape(tc_label)}</span> {escape(title)}</h2></div>'
             + chips_html
             + "</div>"
             + prerequisites_html
@@ -367,7 +367,7 @@ def render_review(source: str) -> tuple[str, dict]:
 <p>{len(cards)}개 TC · {total_groups}개 Step 묶음 · 시나리오 작성 초안 · 실행 결과 없음</p></header>
 <div class="toolbar"><input id="search" type="text" aria-label="TC 퍼지 검색" autocomplete="off" autofocus placeholder="TC 검색기">
 <span id="count" role="status" aria-live="polite"></span></div>
-<div class="layout"><aside class="tree-panel"><h2 id="tc-tree-title" class="review-heading">TC 검수 스위트 트리</h2><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
+<div class="layout"><aside class="tree-panel"><h2 id="tc-tree-title" class="review-heading">TC 검수 트리(스위트)</h2><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
 <h2 class="review-heading">TC 검수 본문</h2>
 <p id="empty" class="empty" hidden>검색 결과가 없습니다.</p><div id="results">{"".join(cards)}</div>
 <section class="intro"><h2>검수 범위</h2><ul>

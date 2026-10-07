@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "templates": {
+    "window": {
+      "title": "{name} 화면 표시",
+      "steps": [
+        {"Steps": ["{path}"], "Expected Result": ["{name} 화면이 표시된다", "수집 목록의 해당 화면 UI 요소가 표시된다"]}
+      ]
+    },
+    "modal": {
+      "title": "{name} 모달 표시 및 닫기",
+      "steps": [
+        {"Steps": ["{open_action}"], "Expected Result": ["{name} 모달과 내부 요소가 표시된다"]},
+        {"Steps": ["{close_action}"], "Expected Result": ["{name} 모달이 닫히고 호출 화면이 표시된다"]}
+      ]
+    },
+    "popup": {
+      "title": "{name} 팝업 표시 및 닫기",
+      "steps": [
+        {"Steps": ["{open_action}"], "Expected Result": ["{name} 팝업과 내부 요소가 표시된다"]},
+        {"Steps": ["{close_action}"], "Expected Result": ["{name} 팝업이 닫히고 호출 화면이 표시된다"]}
+      ]
+    },
+    "option-selector": {
+      "title": "{name} 선택 (선택기)",
+      "steps": [
+        {"Steps": ["{path}", "{name} 클릭"], "Expected Result": ["{name} 선택 목록이 펼쳐진다", "{options} 항목이 표시된다"]},
+        {"Steps": ["{value} 선택"], "Expected Result": ["{name}에 {value}가 표시된다"]}
+      ]
+    },
+    "input-field": {
+      "title": "{name} 입력 (입력란)",
+      "steps": [
+        {"Steps": ["{path}", "{name}에 {value} 입력"], "Expected Result": ["{expected_input_result}"]}
+      ]
+    },
+    "number": {
+      "title": "{name} 숫자 입력 (숫자 입력란)",
+      "steps": [
+        {"Steps": ["{path}", "{name}에 {value} 입력"], "Expected Result": ["{expected_input_result}"]}
+      ]
+    },
+    "checkbox": {
+      "title": "{name} 체크 상태 변경 (체크박스)",
+      "steps": [
+        {"Steps": ["{path}", "{name} 선택"], "Expected Result": ["{name}이 체크 상태로 표시된다"]},
+        {"Steps": ["{name} 선택 해제"], "Expected Result": ["{name}이 체크 해제 상태로 표시된다"]}
+      ]
+    },
+    "radio": {
+      "title": "{name} 항목 선택 (라디오 버튼)",
+      "steps": [
+        {"Steps": ["{path}", "{name}의 {value} 선택"], "Expected Result": ["{value} 항목이 선택되어 표시된다", "같은 그룹의 다른 항목은 선택 해제되어 표시된다"]}
+      ]
+    },
+    "button": {
+      "title": "{name} 버튼 동작 (버튼)",
+      "steps": [
+        {"Steps": ["{path}", "{name} 클릭"], "Expected Result": ["{expected_action_result}"]}
+      ]
+    },
+    "display": {
+      "title": "{name} 표시값 확인 (표시 필드)",
+      "steps": [
+        {"Steps": ["{path}", "{name} 표시값 확인"], "Expected Result": ["{name}에 {expected_display_value}가 표시된다"]}
+      ]
+    },
+    "unknown": {
+      "title": "{name} 표시 및 유형 확인",
+      "steps": [
+        {"Steps": ["{path}", "{name} 표시 및 입력유형 확인"], "Expected Result": ["{name} 요소가 표시된다", "입력유형과 동작 명세 확인 필요"]}
+      ]
+    },
+    "number-boundary": {
+      "title": "{name} 숫자 입력 경계값 (숫자 입력란)",
+      "steps": [
+        {"Steps": ["{path}", "{name}에 최소값 {minimum} 입력"], "Expected Result": ["{minimum_result}"]},
+        {"Steps": ["{name}에 최대값 {maximum} 입력"], "Expected Result": ["{maximum_result}"]},
+        {"Steps": ["{name}에 최소값 미만 {below_minimum} 입력"], "Expected Result": ["{below_minimum_result}"]},
+        {"Steps": ["{name}에 최대값 초과 {above_maximum} 입력"], "Expected Result": ["{above_maximum_result}"]},
+        {"Steps": ["{name}에 최소값 이상 {at_or_above_minimum} 입력"], "Expected Result": ["{at_or_above_minimum_result}"]},
+        {"Steps": ["{name}에 최대값 이하 {at_or_below_maximum} 입력"], "Expected Result": ["{at_or_below_maximum_result}"]}
+      ]
+    },
+    "save-reopen": {
+      "title": "{name} 저장 및 재진입 확인",
+      "steps": [
+        {"Steps": ["{change_action}", "{save_action}"], "Expected Result": ["{expected_save_result}"]},
+        {"Steps": ["{reopen_action}"], "Expected Result": ["{name}에 저장한 {value}가 표시된다"]},
+        {"Steps": ["{restore_action}"], "Expected Result": ["{name}이 시험 전 값으로 표시된다"]}
+      ]
+    },
+    "cancel-reopen": {
+      "title": "{name} 변경 취소 및 재진입 확인",
+      "steps": [
+        {"Steps": ["{change_action}", "{cancel_action}"], "Expected Result": ["{expected_cancel_result}"]},
+        {"Steps": ["{reopen_action}"], "Expected Result": ["{name}이 시험 전 값으로 표시된다"]}
+      ]
+    }
+  }
+}

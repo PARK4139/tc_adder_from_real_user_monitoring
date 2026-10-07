@@ -31,7 +31,7 @@ Save 묶음의 “Preferences 창이 열려 있으면 닫기 후 재진입”은
 | Step | Steps | Expected Result |
 |---|---|---|
 | 1 | 1. Setup > Preferences > General 탭 선택 | General 탭이 선택되어 표시된다<br>Language, Sleep Mode, 숫자 입력 및 라디오 선택 그룹이 표시된다 |
-| 2 | 1. General 설정 영역을 아래로 스크롤 | 설정 영역의 아래쪽 내용이 표시된다 |
+| 2 | 1. General 설정 영역을 위에서 아래까지 스크롤하며 입력요소 확인 | 스크롤 전후 해당 위치에서 다음 수집 요소가 각각 표시된다<br>Backup Date 항목이 표시된다<br>Backup Filename 항목이 표시된다<br>Beep Sound 항목이 표시된다<br>Config DB History 항목이 표시된다<br>Default File Type 항목이 표시된다<br>Digital Designer Mode 항목이 표시된다<br>Easy Click Mode 항목이 표시된다<br>Eccentricity Check 항목이 표시된다<br>Edit Processed Job 항목이 표시된다<br>Export Options 항목이 표시된다<br>Factory Reset Date 항목이 표시된다<br>Fast Processing with Lens Diameter 항목이 표시된다<br>Font 항목이 표시된다<br>Format 항목이 표시된다<br>Frame Fitting Mode 항목이 표시된다<br>Grid 항목이 표시된다<br>Horizontal Space (mm) 항목이 표시된다<br>Language 항목이 표시된다<br>LED Notification 항목이 표시된다<br>Line Ending 항목이 표시된다<br>Message Box Font Size 항목이 표시된다<br>R/L Shape Mirroring 항목이 표시된다<br>Radius Mode 항목이 표시된다<br>Restore Date 항목이 표시된다<br>Restore Filename 항목이 표시된다<br>Safety Check 항목이 표시된다<br>Show Grid 항목이 표시된다<br>Show Tip Message 항목이 표시된다<br>Sleep Mode 항목이 표시된다<br>The Number of Radii(OMA) 항목이 표시된다<br>Vertical Space (mm) 항목이 표시된다<br>Wait (minutes) 항목이 표시된다 |
 | 3 | 1. General 설정 영역을 맨 위로 스크롤 | Language 입력요소가 다시 표시된다 |
 
 ### TC-002 Language 선택 및 저장값 확인 (선택기)
