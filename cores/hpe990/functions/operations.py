@@ -1,6 +1,10 @@
 """Implemented public Emulator operations, independently audited against MCP discovery."""
 
 OPERATION_TO_TOOL = {
+    "start_pixel_text_value_ram": "hpe990_ram_semantic_start",
+    "pixel_text_value_ram_health": "hpe990_ram_semantic_status",
+    "stop_pixel_text_value_ram": "hpe990_ram_semantic_stop",
+    "read_pixel_text_value_changes": "hpe990_ram_semantic_read",
     "launch_continue_ready": "hpe990_launch",
     "process_and_window_status": "hpe990_status",
     "normal_close_request": "hpe990_close",

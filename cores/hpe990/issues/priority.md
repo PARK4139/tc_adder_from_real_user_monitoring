@@ -1,6 +1,7 @@
 # Active (backlog / working)
 | 우선순위 | UUID | 근거 |
 |---|---|---|
+| High | da25b476 | 사용자 요구: timestamp 기반 별도 활동 로그를 RAM 수집과 병행 기록 |
 
 # Blocked (not scheduled)
 | 우선순위 | UUID | 근거 |

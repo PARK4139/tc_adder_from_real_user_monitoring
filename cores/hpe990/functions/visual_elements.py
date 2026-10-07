@@ -102,13 +102,13 @@ def link_frames(lines: list[dict], frames: list[list[int]]) -> list[dict]:
     return fields
 
 
-def worker_collect_visual(captures: list[dict], roots: list[dict]) -> dict:
+def worker_collect_visual(captures: list[dict], roots: list[dict], include_disabled=False) -> dict:
     binary = hpe990_folders.F_HPE990_VISUAL
     elements, observations, errors = [], [], []
     by_handle = {root["hwnd"]: root for root in roots}
     for capture in captures:
         root = by_handle[capture["hwnd"]]
-        if not root["enabled"]:
+        if not root["enabled"] and not include_disabled:
             continue
         try:
             ocr_path = str(Path(capture["path"]).with_suffix(".ocr.png"))
@@ -177,7 +177,9 @@ def worker_collect_visual(captures: list[dict], roots: list[dict]) -> dict:
     }
 
 
-def collect_visual_elements(captures: list[dict], roots: list[dict]) -> dict:
+def collect_visual_elements(
+    captures: list[dict], roots: list[dict], include_disabled=False
+) -> dict:
     if not captures:
         return {"backend": "visual", "elements": [], "observations": [], "errors": []}
     try:
@@ -188,6 +190,7 @@ def collect_visual_elements(captures: list[dict], roots: list[dict]) -> dict:
                 "cores.hpe990.functions.visual_elements",
                 json.dumps(captures),
                 json.dumps(roots),
+                json.dumps(include_disabled),
             ],
             capture_output=True,
             check=True,
@@ -208,7 +211,11 @@ def collect_visual_elements(captures: list[dict], roots: list[dict]) -> dict:
 if __name__ == "__main__":
     sys.stdout.buffer.write(
         json.dumps(
-            worker_collect_visual(json.loads(sys.argv[1]), json.loads(sys.argv[2])),
+            worker_collect_visual(
+                json.loads(sys.argv[1]),
+                json.loads(sys.argv[2]),
+                json.loads(sys.argv[3]) if len(sys.argv) > 3 else False,
+            ),
             ensure_ascii=False,
         ).encode("utf-8")
     )

@@ -44,7 +44,7 @@ Feature: Preferences > General 번호별 Steps / Expected Result TC
     And Fast Processing with Lens Diameter
     # UI reference: UI-000045
     And Font
-    # UI reference: UI-000025
+    # UI reference: UI-002263
     And Format
     # UI reference: UI-000085
     And Frame Fitting Mode
@@ -62,7 +62,7 @@ Feature: Preferences > General 번호별 Steps / Expected Result TC
     And Message Box Font Size
     # UI reference: UI-000058
     And R/L Shape Mirroring
-    # UI reference: UI-000026
+    # UI reference: UI-002266
     And Radius Mode
     # UI reference: UI-000103
     And Restore Date
@@ -76,7 +76,7 @@ Feature: Preferences > General 번호별 Steps / Expected Result TC
     And Show Tip Message
     # UI reference: UI-000081
     And Sleep Mode
-    # UI reference: UI-000027
+    # UI reference: UI-002269
     And The Number of Radii(OMA)
     # UI reference: UI-000063
     And Vertical Space (mm)

@@ -28,6 +28,7 @@ Qt의 `QT_USE_NATIVE_WINDOWS=1`을 실행 자식에 적용해 컨트롤을 식�
 |---|---|
 | 실행 / 상태 / 정상 종료 요청 / 명시적 앱 종료 | `hpe990_launch`, `hpe990_status`, `hpe990_close`, `hpe990_stop` |
 | RAM 시작 / 상태 / 정리 | `hpe990_ram_start`, `hpe990_ram_status`, `hpe990_ram_stop` |
+| 입력값·문구·RGB 변화 RAM (소스 MCP) | `hpe990_ram_semantic_start`, `hpe990_ram_semantic_status`, `hpe990_ram_semantic_read`, `hpe990_ram_semantic_stop` |
 | 창·모달·컨트롤·스크린샷 / 수집 목록 | `hpe990_ui_collect`, `hpe990_ui_catalog` |
 | BDD 시나리오 화면 / 뷰어 서버 정리 | `hpe990_ui_visualize`, `hpe990_ui_viewer_stop` |
 | 식별한 컨트롤 입력 / 창 이동·크기 | `hpe990_ui_control`, `hpe990_window_geometry` |

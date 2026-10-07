@@ -31,7 +31,7 @@ def ram_executable() -> Path:
 
 
 def request_backend(kind: str, payload: dict) -> dict:
-    if kind not in ("launch", "ram", "ui_viewer"):
+    if kind not in ("launch", "ram", "semantic_ram", "ui_viewer"):
         raise ValueError("Unsupported backend operation")
     requests = hpe990_folders.D_HPE990_RUNTIME / "requests"
     requests.mkdir(parents=True, exist_ok=True)
@@ -116,6 +116,30 @@ def run_backend(token: str) -> None:
                         str(directory),
                         str(data["interval_ms"]),
                     ],
+                    stdout=subprocess.DEVNULL,
+                    stderr=errors,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+                result = {
+                    "pid": child.pid,
+                    "create_time": psutil.Process(child.pid).create_time(),
+                    "backend_pid": os.getpid(),
+                }
+                response.write_text(json.dumps(result), encoding="utf-8")
+                child.wait()
+                return
+        elif data["kind"] == "semantic_ram":
+            if getattr(sys, "frozen", False):
+                raise RuntimeError("Semantic RAM requires the updated source uv environment")
+            directory = Path(data["directory"]).resolve()
+            directory.relative_to(hpe990_folders.D_HPE990_SEMANTIC_RAM.resolve())
+            process = psutil.Process(data["pid"])
+            if process.create_time() != data["create_time"]:
+                raise ValueError("Stale process identity")
+            with (directory / "worker-stderr.log").open("wb") as errors:
+                child = subprocess.Popen(
+                    [sys.executable, "-m", "cores.hpe990.functions.semantic_ram", str(directory)],
+                    stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL,
                     stderr=errors,
                     creationflags=subprocess.CREATE_NO_WINDOW,

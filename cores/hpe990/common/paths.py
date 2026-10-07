@@ -14,6 +14,7 @@ class Hpe990Folders:
         self.D_HPE990_ISSUES = self.D_HPE990 / "issues"
         self.D_HPE990_CONFIGS = self.D_HPE990 / "configs"
         self.D_HPE990_RUNTIME = D_TEMP / "hpe990" / "runtime"
+        self.D_HPE990_SEMANTIC_RAM = self.D_HPE990_RUNTIME / "semantic-ram"
         self.D_HPE990_BUILD = D_TEMP / "hpe990" / "build"
         self.D_HPE990_VISUAL_BUILD = self.D_HPE990_BUILD / "visual"
         self.D_HPE990_EVIDENCE = D_TEMP / "hpe990" / "evidence"

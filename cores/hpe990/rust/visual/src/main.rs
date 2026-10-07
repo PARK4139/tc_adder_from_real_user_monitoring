@@ -57,6 +57,14 @@ fn frames(image: &RgbImage) -> Vec<[u32; 4]> {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let started = Instant::now();
+    if env::args().nth(1).as_deref() == Some("--diff") {
+        let before = image::open(env::args().nth(2).ok_or("Before PNG required")?)?.to_rgb8();
+        let after = image::open(env::args().nth(3).ok_or("After PNG required")?)?.to_rgb8();
+        let mut result = pixel_diff(&before, &after);
+        result["elapsed_ms"] = json!(started.elapsed().as_secs_f64() * 1000.0);
+        println!("{result}");
+        return Ok(());
+    }
     let image = image::open(env::args().nth(1).ok_or("PNG path required")?)?.to_rgb8();
     if let Some(ocr_path) = env::args().nth(2) {
         image::imageops::resize(
@@ -74,9 +82,73 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+fn pixel_diff(before: &RgbImage, after: &RgbImage) -> serde_json::Value {
+    if before.dimensions() != after.dimensions() {
+        return json!({"changed":true,"dimension_changed":true,
+            "before_size":[before.width(),before.height()],
+            "after_size":[after.width(),after.height()],"regions":[]});
+    }
+    let (width, height) = after.dimensions();
+    let mut regions = Vec::new();
+    let mut total = 0_u64;
+    for top in (0..height).step_by(32) {
+        for left in (0..width).step_by(32) {
+            let mut count = 0_u64;
+            let mut bounds = [width, height, 0, 0];
+            let mut example = None;
+            let mut max_delta = 0_u8;
+            for y in top..(top + 32).min(height) {
+                for x in left..(left + 32).min(width) {
+                    let a = before.get_pixel(x, y).0;
+                    let b = after.get_pixel(x, y).0;
+                    if a != b {
+                        count += 1;
+                        bounds[0] = bounds[0].min(x);
+                        bounds[1] = bounds[1].min(y);
+                        bounds[2] = bounds[2].max(x + 1);
+                        bounds[3] = bounds[3].max(y + 1);
+                        if example.is_none() {
+                            example = Some(json!({"position":[x,y],"before_rgb":a,"after_rgb":b}));
+                        }
+                        for channel in 0..3 {
+                            max_delta = max_delta.max(a[channel].abs_diff(b[channel]));
+                        }
+                    }
+                }
+            }
+            if count != 0 {
+                total += count;
+                regions.push(json!({"rect":bounds,"changed_pixels":count,
+                    "max_channel_delta":max_delta,"example":example}));
+            }
+        }
+    }
+    json!({"changed":total!=0,"dimension_changed":false,"changed_pixels":total,
+        "total_pixels":u64::from(width)*u64::from(height),"regions":regions,
+        "threshold":0,"rect_space":"root_screenshot_pixels"})
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn detects_single_channel_single_pixel_without_threshold() {
+        let before = RgbImage::from_pixel(70, 70, Rgb([50, 60, 70]));
+        let mut after = before.clone();
+        assert_eq!(pixel_diff(&before, &after)["changed"], false);
+        after.put_pixel(40, 50, Rgb([50, 61, 70]));
+        let diff = pixel_diff(&before, &after);
+        assert_eq!(diff["changed_pixels"], 1);
+        assert_eq!(diff["regions"][0]["rect"], json!([40, 50, 41, 51]));
+        assert_eq!(diff["regions"][0]["max_channel_delta"], 1);
+    }
+    #[test]
+    fn records_resize_instead_of_comparing_misaligned_pixels() {
+        assert_eq!(
+            pixel_diff(&RgbImage::new(2, 2), &RgbImage::new(3, 2))["dimension_changed"],
+            true
+        );
+    }
     #[test]
     fn accepts_closed_frame_and_rejects_open_lines() {
         let mut image = RgbImage::from_pixel(400, 100, Rgb([255, 255, 255]));
