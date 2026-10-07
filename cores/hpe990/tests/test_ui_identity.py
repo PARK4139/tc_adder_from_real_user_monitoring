@@ -124,3 +124,53 @@ def test_catalog_indexes_legacy_evidence_without_rewriting(monkeypatch, tmp_path
     assert result["ui_registry"]["unique_elements"] == 2
     assert all(len(c["observations"]) == 2 for c in result["controls"])
     assert all(path.read_bytes() == content for path, content in originals.items())
+
+
+def test_catalog_reuses_registered_snapshot_without_reallocating_ids(monkeypatch, tmp_path):
+    import json
+
+    from cores.hpe990.functions import ui
+
+    monkeypatch.setattr(ui, "session_guard", lambda *args: None)
+    monkeypatch.setattr(ui.hpe990_folders, "D_HPE990_EVIDENCE", tmp_path)
+    monkeypatch.setattr(ui.hpe990_folders, "F_HPE990_UI_REGISTRY", tmp_path / "ids.sqlite3")
+    path = tmp_path / "ui" / "test-session" / "registered" / "inventory.json"
+    path.parent.mkdir(parents=True)
+    record = snapshot("test-session", str(path), 1)
+    record.update(observed_unix_ms=1, screenshots=[])
+    record["ui_registry"] = assign_ui_ids(record, tmp_path / "ids.sqlite3")
+    path.write_text(json.dumps(record), encoding="utf-8")
+    original = path.read_bytes()
+
+    def unexpected_registration(_):
+        raise AssertionError("Historical registered snapshots must not repeat SSOT writes")
+
+    monkeypatch.setattr(ui, "assign_ui_ids", unexpected_registration)
+    result = ui.ui_catalog("test-session")
+    assert result["unique_native_controls"] == 2
+    assert result["ui_registry"]["elements"] == record["ui_registry"]["elements"]
+    assert path.read_bytes() == original
+    assert result["registry_reuse"] == {"reused_snapshots": 1, "indexed_snapshots": 0}
+
+
+def test_catalog_rechecks_snapshot_definitions_against_current_ssot(monkeypatch, tmp_path):
+    import json
+
+    from cores.hpe990.functions import ui
+
+    monkeypatch.setattr(ui, "session_guard", lambda *args: None)
+    monkeypatch.setattr(ui.hpe990_folders, "D_HPE990_EVIDENCE", tmp_path)
+    monkeypatch.setattr(ui.hpe990_folders, "F_HPE990_UI_REGISTRY", tmp_path / "ids.sqlite3")
+    path = tmp_path / "ui" / "test-session" / "changed" / "inventory.json"
+    path.parent.mkdir(parents=True)
+    record = snapshot("test-session", str(path), 1)
+    record.update(observed_unix_ms=1, screenshots=[])
+    correct = assign_ui_ids(record, tmp_path / "ids.sqlite3")
+    record["ui_registry"] = json.loads(json.dumps(correct))
+    record["ui_registry"]["elements"][0]["selector"] = ["incorrect"]
+    path.write_text(json.dumps(record), encoding="utf-8")
+    original = path.read_bytes()
+    result = ui.ui_catalog("test-session")
+    assert result["ui_registry"]["elements"] == correct["elements"]
+    assert result["registry_reuse"] == {"reused_snapshots": 0, "indexed_snapshots": 1}
+    assert path.read_bytes() == original

@@ -14,7 +14,7 @@ def test_current_tc_patterns_preserve_flow_and_dictionary_wording():
     assert compiled["authored_template_count"] == 9
     templates = compiled["templates"]
     for kind in ("option-selector", "radio", "checkbox", "number"):
-        assert len(templates[kind]["steps"]) == 5
+        assert len(templates[kind]["steps"]) == (7 if kind == "option-selector" else 5)
         assert templates[kind]["preconditions"]
         assert templates[kind]["source_tc_ids"]
         assert templates[kind]["type_verified"] is False

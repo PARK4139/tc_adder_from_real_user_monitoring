@@ -27,6 +27,7 @@ class Hpe990Folders:
         self.F_HPE990_STEP_TEMPLATES = self.D_HPE990_CONFIGS / "ui_step_templates.json"
         self.F_HPE990_STEP_BINDINGS = self.D_HPE990_CONFIGS / "ui_step_bindings.json"
         self.F_HPE990_TC_REVIEW = self.D_HPE990_CONFIGS / "tc_review.json"
+        self.F_HPE990_UI_SEMANTICS = self.D_HPE990_CONFIGS / "ui_semantics.json"
 
 
 hpe990_folders = Hpe990Folders()

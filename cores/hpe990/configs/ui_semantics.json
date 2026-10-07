@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "definitions": [
+    {"semantic_id": "HPE990.Setup.Preferences", "internal_name": null, "root_names": ["Preferences", "환경 설정"], "ancestor_names": [], "class_name": "QWidget", "kind": "window"},
+    {"semantic_id": "HPE990.Setup.Preferences.General", "internal_name": "tab_general", "root_names": ["Preferences", "환경 설정"], "ancestor_names": ["tabWidget", "qt_tabwidget_stackedwidget"], "class_name": "QWidget", "kind": "tab"},
+    {"semantic_id": "HPE990.Setup.Preferences.General.Language", "internal_name": "UI_GENERAL::COMBO::Language", "root_names": ["Preferences", "환경 설정"], "ancestor_names": ["tab_general", "UI_GENERAL::WIDGET::Language"], "class_name": "QWidget", "kind": "combo"},
+    {"semantic_id": "HPE990.Setup.Preferences.Save", "internal_name": "pushButton_ok", "root_names": ["Preferences", "환경 설정"], "ancestor_names": [], "class_name": "QWidget", "kind": "button"},
+    {"semantic_id": "HPE990.Setup.Preferences.Cancel", "internal_name": "pushButton_cancel", "root_names": ["Preferences", "환경 설정"], "ancestor_names": [], "class_name": "QWidget", "kind": "button"}
+  ]
+}

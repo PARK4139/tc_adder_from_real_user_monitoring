@@ -75,3 +75,47 @@ def test_native_match_is_scoped_to_root_and_preserves_ocr():
     assert element["ocr_name"] == "Backup FiIename"
     assert element["matching_native_nodes"] == [{"hwnd": 2, "name": field["name"]}]
     assert element["hwnd"] is None
+
+
+def test_collection_keeps_popup_tool_and_modal_images_and_capture_errors(monkeypatch, tmp_path):
+    """Regression: Edger lens menus exist as QPopup, not QWidget."""
+    from cores.hpe990.functions import step_templates, ui, ui_mapping
+
+    nodes = [
+        {"hwnd": index, "parent": 0, "visible": visible, "class_name": cls}
+        for index, (cls, visible) in enumerate(
+            [
+                ("QWidget", True),
+                ("QPopup", True),
+                ("QTool", True),
+                ("#32770", True),
+                ("QPopup", False),
+            ],
+            start=1,
+        )
+    ]
+    attempted = []
+
+    def capture(hwnd, destination):
+        attempted.append(hwnd)
+        if hwnd == 4:
+            raise OSError("Modal capture unavailable")
+        return {"hwnd": hwnd, "path": str(destination)}
+
+    monkeypatch.setattr(ui, "session_guard", lambda _: {})
+    monkeypatch.setattr(ui, "_native_tree", lambda _: nodes)
+    monkeypatch.setattr(ui, "_capture", capture)
+    monkeypatch.setattr(ui.hpe990_folders, "D_HPE990_EVIDENCE", tmp_path)
+    monkeypatch.setattr(ui, "collect_visual_elements", lambda *a: {"elements": []})
+    monkeypatch.setattr(ui, "collect_accessibility", lambda *a, **k: {})
+    monkeypatch.setattr(ui, "assign_ui_ids", lambda _: {})
+    monkeypatch.setattr(ui_mapping, "target_identity", lambda _: {})
+    monkeypatch.setattr(ui_mapping, "inspect_record", lambda *a: {})
+    monkeypatch.setattr(ui, "sync_general_expected", lambda: {})
+    monkeypatch.setattr(ui, "log_event", lambda *a, **k: None)
+    monkeypatch.setattr(step_templates, "template_catalog", lambda _: {})
+    result = ui.collect_ui("test", accessibility_backend="none")
+    assert attempted == [1, 2, 3, 4]
+    assert [capture["hwnd"] for capture in result["screenshots"]] == [1, 2, 3]
+    assert result["capture_errors"] == [{"hwnd": 4, "error": "Modal capture unavailable"}]
+    assert len(result["nodes"]) == 5

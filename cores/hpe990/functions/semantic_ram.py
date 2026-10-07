@@ -24,7 +24,17 @@ SCOPE = (
 def _write(path: Path, data: dict) -> None:
     pending = path.with_suffix(".pending")
     pending.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-    pending.replace(path)
+    deadline = time.monotonic() + 1
+    while True:
+        try:
+            pending.replace(path)
+            break
+        except PermissionError:
+            # Windows readers can briefly prevent atomic replacement. Preserve the
+            # previous complete JSON while waiting; do not suppress permanent errors.
+            if time.monotonic() >= deadline:
+                raise
+            time.sleep(0.01)
 
 
 def _manifest(session_id: str) -> Path:

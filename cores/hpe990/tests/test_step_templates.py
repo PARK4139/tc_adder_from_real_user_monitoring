@@ -49,9 +49,10 @@ def test_selector_exact_numbered_groups_use_supplied_specs_and_no_new_tc_id():
     draft = generate_drafts([element], definitions(), binding)[0]
     case = draft["cases"][0]
     assert case["steps"][0]["Steps"] == ["Setup > Preferences > General 탭 선택"]
-    assert case["steps"][1]["Steps"] == ["Language 선택기의 화살표 조작 후 English 선택"]
-    assert case["steps"][1]["Expected Result"] == ["Language에 English가 보여야 합니다."]
-    assert [s["No."] for s in case["steps"]] == [1, 2, 3, 4, 5]
+    assert case["steps"][1]["Steps"] == ["Language 클릭"]
+    assert case["steps"][2]["Steps"] == ["Korean 선택"]
+    assert case["steps"][2]["Expected Result"][0] == "Language에 Korean이 보여야 합니다."
+    assert [s["No."] for s in case["steps"]] == list(range(1, 8))
     assert case["pending_specifications"] == []
     assert case["status"] == "draft" and not case["executable"]
     assert "tc_id" not in draft

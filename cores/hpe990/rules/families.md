@@ -5,6 +5,7 @@
 | lifecycle | HPE990 실행 대상 식별과 세션 실행·종료 | `cores/hpe990/functions/`, `cores/hpe990/wrapper/` |
 | activity_monitoring | Real Activity Monitoring | `cores/hpe990/functions/`, `cores/hpe990/rust/` |
 | ui_collection | 창·모달·컨트롤 UI 수집 | `cores/hpe990/functions/`, `cores/hpe990/rust/` |
+| ui_mapping | 버전별 내부 UI 이름·의미 ID·세션 ID 매핑 및 검증 | `cores/hpe990/functions/`, `cores/hpe990/configs/`, `cores/hpe990/mcp/`, `cores/hpe990/tests/` |
 | ui_control | 식별된 UI의 마우스·키보드·입력값·OCR 기반 조작과 유지보수 기능 제어 | `cores/hpe990/functions/`, `cores/hpe990/rust/`, `cores/hpe990/mcp/`, `cores/hpe990/tests/` |
 | telemetry | 창/UI 변화의 구조화된 이벤트 기록 | `cores/hpe990/functions/`, `cores/hpe990/rust/` |
 | ui_analysis | UI 상태·전이 및 제어 식별자 분석 | `cores/hpe990/docs/`, `cores/hpe990/functions/` |

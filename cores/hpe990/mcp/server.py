@@ -10,6 +10,11 @@ from mcp.server.fastmcp import FastMCP
 from cores.hpe990.functions.lifecycle import log_event
 from cores.hpe990.mcp.tools.analysis import hpe990_ui_analyze
 from cores.hpe990.mcp.tools.lifecycle import hpe990_close, hpe990_launch, hpe990_status, hpe990_stop
+from cores.hpe990.mcp.tools.mapping import (
+    hpe990_ui_control_semantic,
+    hpe990_ui_map,
+    hpe990_ui_resolve,
+)
 from cores.hpe990.mcp.tools.monitoring import (
     hpe990_ram_semantic_read,
     hpe990_ram_semantic_start,
@@ -34,6 +39,9 @@ from cores.hpe990.mcp.tools.ui import (
 
 mcp = FastMCP("auto_emulator MCP")
 for tool in (
+    hpe990_ui_map,
+    hpe990_ui_resolve,
+    hpe990_ui_control_semantic,
     hpe990_ram_semantic_start,
     hpe990_ram_semantic_status,
     hpe990_ram_semantic_stop,

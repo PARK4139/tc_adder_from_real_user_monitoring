@@ -3,6 +3,7 @@
 import ctypes
 import hashlib
 import json
+import sqlite3
 import time
 import uuid
 
@@ -150,7 +151,7 @@ def collect_ui(
     errors = []
     if screenshots:
         for root in roots:
-            if root["visible"] and root["class_name"] == "QWidget":
+            if root["visible"]:
                 try:
                     captures.append(_capture(root["hwnd"], directory / f"{root['hwnd']}.png"))
                 except Exception as error:
@@ -172,6 +173,12 @@ def collect_ui(
         "evidence": str(directory / "inventory.json"),
     }
     result["ui_registry"] = assign_ui_ids(result)
+    from cores.hpe990.functions.ui_mapping import inspect_record, target_identity
+
+    try:
+        result["ui_map"] = inspect_record(result, target_identity(session))
+    except (OSError, ValueError) as error:
+        result["ui_map_error"] = str(error)
     try:
         result["tc_sync"] = sync_general_expected()
     except Exception as error:
@@ -203,6 +210,8 @@ def control_ui(
     text: str | None = None,
     hwnd: int | None = None,
     point_fraction: list[float] | None = None,
+    *,
+    expected_native_path: list[list[str]] | None = None,
 ) -> dict:
     session = session_guard(session_id)
     nodes = _native_tree(session)
@@ -268,6 +277,16 @@ def control_ui(
     before = collect_ui(session_id)
     observed = next(n for n in before["nodes"] if n["hwnd"] == hwnd)
     node.update(ui_id=observed["ui_id"], identity_scope=observed["identity_scope"])
+    if expected_native_path is not None:
+        from cores.hpe990.functions.ui_mapping import ancestry, interactable
+
+        fresh = {n["hwnd"]: n for n in _native_tree(session_guard(session_id))}
+        current = fresh.get(hwnd)
+        if current is None or not interactable(current, fresh):
+            raise ValueError("Semantic target no longer interactable")
+        actual_path = [[n["class_name"], n["name"]] for n in ancestry(current, fresh)]
+        if actual_path != expected_native_path:
+            raise ValueError("Semantic native ancestry changed before control")
     action_marker(
         session_id,
         action_id,
@@ -393,9 +412,41 @@ def ui_catalog(session_id: str) -> dict:
     supplemental_errors = []
     registry_elements = {}
     observation_controls = {}
+    reused_snapshots = 0
+    indexed_snapshots = 0
+    canonical = {}
+    if hpe990_folders.F_HPE990_UI_REGISTRY.exists():
+        with sqlite3.connect(hpe990_folders.F_HPE990_UI_REGISTRY, timeout=30) as db:
+            if db.execute("SELECT 1 FROM sqlite_master WHERE name='elements'").fetchone():
+                canonical = {
+                    f"UI-{number:06d}": {
+                        "ui_id": f"UI-{number:06d}",
+                        "identity_scope": scope,
+                        "selector": json.loads(selector),
+                    }
+                    for number, scope, selector in db.execute(
+                        "SELECT number,scope,selector FROM elements"
+                    )
+                }
     for path in sorted(root.glob("*/inventory.json")):
         record = json.loads(path.read_text(encoding="utf-8"))
-        registry = assign_ui_ids(record)
+        registry = record.get("ui_registry", {})
+        registered = {e.get("ui_id") for e in registry.get("elements", [])}
+        observed = record["nodes"] + [
+            e
+            for backend in ("accessibility", "visual")
+            for e in record.get(backend, {}).get("elements", [])
+        ]
+        if (
+            registry.get("database") != str(hpe990_folders.F_HPE990_UI_REGISTRY)
+            or not all(canonical.get(e.get("ui_id")) == e for e in registry.get("elements", []))
+            or not all(e.get("ui_id") in registered and e.get("identity_scope") for e in observed)
+        ):
+            registry = assign_ui_ids(record)
+            canonical.update({e["ui_id"]: e for e in registry["elements"]})
+            indexed_snapshots += 1
+        else:
+            reused_snapshots += 1
         registry_elements.update({e["ui_id"]: e for e in registry["elements"]})
         observation_controls[str(path)] = {n["hwnd"]: n["ui_id"] for n in record["nodes"]}
         for backend in ("accessibility", "visual"):
@@ -476,6 +527,10 @@ def ui_catalog(session_id: str) -> dict:
             ),
         },
         "observations": observations,
+        "registry_reuse": {
+            "reused_snapshots": reused_snapshots,
+            "indexed_snapshots": indexed_snapshots,
+        },
         "controls": list(controls.values()),
         "unique_native_controls": len(controls),
         "supplemental_elements": list(supplemental.values()),

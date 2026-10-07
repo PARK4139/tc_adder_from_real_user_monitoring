@@ -48,6 +48,7 @@ def compile_tc_templates(source: str, existing: dict) -> dict:
             "시험 전 언어": "시험 전 선택값",
             "지원 언어": "{value_description}",
             "English": "{first_value}",
+            "Korean": "{second_value}",
             "OFF": "{first_value}",
             "ON": "{second_value}",
             "승인된 시험값": "{value}",
@@ -122,6 +123,11 @@ def compile_tc_templates(source: str, existing: dict) -> dict:
             if same_type:
                 related.append(candidate_id)
         document["templates"][kind]["related_tc_ids"] = related
+        if kind == "option-selector":
+            document["templates"][kind]["source_limit"] = (
+                "TC-030 Language의 English/Korean 관찰 기반. 언어별 메뉴 문구와 적용 흐름은 "
+                "다른 선택기의 요구사항이 아니며 재사용 전 대상별 기대 결과를 검토해야 함."
+            )
         if kind == "input-field":
             document["templates"][kind]["source_limit"] = (
                 "TC-030의 편집 가능 가정은 미검증. STATIC_DATA에는 적용하지 않고 표시 템플릿 사용."

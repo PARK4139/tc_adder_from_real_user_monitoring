@@ -1,6 +1,6 @@
 {
   "summary": {
-    "rule_count": 6,
+    "rule_count": 7,
     "verdict": "PASS"
   },
   "rules": [
@@ -45,6 +45,13 @@
       "SOURCE": "cores/hpe990/rules/ui_identity.py",
       "STATUS": "active",
       "body_sha256": "6e48857155a8113dd52994de51621235de155c0b9e8358e7cc762f8c151f5e4e"
+    },
+    {
+      "RULE_ID": "HPE990_VERSIONED_UI_MAPPING",
+      "TITLE": "Version-aware internal UI names and semantic ID mappings",
+      "SOURCE": "cores/hpe990/rules/versioned_ui_mapping.py",
+      "STATUS": "active",
+      "body_sha256": "ab67b2e49d467a89eab87b8afa41ef811e4aa34deeded984119a7054fa8e1ea3"
     }
   ]
 }
