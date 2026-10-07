@@ -64,8 +64,8 @@ def sync_general_expected(database=None, source=None) -> dict:
         # Require author opt-in; do not rewrite arbitrary scenarios.
         if "@expected-collected-General" not in content or START not in content:
             return {"updated": False, "reason": "No marked dynamic expectation"}
-        expected = ["스크롤 전후 해당 위치에서 다음 수집 요소가 각각 표시된다"]
-        expected += [f"{element['name']} 항목이 표시된다" for element in elements]
+        expected = ["하기 수집 요소가 각각 보여야 합니다."]
+        expected += [element["name"] for element in elements]
         lines = [START, "    Then " + expected[0]]
         for element, text in zip(elements, expected[1:]):
             lines += [f"    # UI reference: {element['ui_id']}", "    And " + text]

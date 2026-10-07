@@ -17,71 +17,71 @@ Feature: Preferences > General 번호별 Steps / Expected Result TC
     # Step 2
     When General 설정 영역을 위에서 아래까지 스크롤하며 입력요소 확인
     # BEGIN collected General elements
-    Then 스크롤 전후 해당 위치에서 다음 수집 요소가 각각 표시된다
+    Then 하기 수집 요소가 각각 보여야 합니다.
     # UI reference: UI-000111
-    And Backup Date 항목이 표시된다
+    And Backup Date
     # UI reference: UI-000108
-    And Backup Filename 항목이 표시된다
+    And Backup Filename
     # UI reference: UI-000089
-    And Beep Sound 항목이 표시된다
+    And Beep Sound
     # UI reference: UI-000093
-    And Config DB History 항목이 표시된다
+    And Config DB History
     # UI reference: UI-000029
-    And Default File Type 항목이 표시된다
+    And Default File Type
     # UI reference: UI-000069
-    And Digital Designer Mode 항목이 표시된다
+    And Digital Designer Mode
     # UI reference: UI-000049
-    And Easy Click Mode 항목이 표시된다
+    And Easy Click Mode
     # UI reference: UI-000054
-    And Eccentricity Check 항목이 표시된다
+    And Eccentricity Check
     # UI reference: UI-000077
-    And Edit Processed Job 항목이 표시된다
+    And Edit Processed Job
     # UI reference: UI-000024
-    And Export Options 항목이 표시된다
+    And Export Options
     # UI reference: UI-000095
-    And Factory Reset Date 항목이 표시된다
+    And Factory Reset Date
     # UI reference: UI-000037
-    And Fast Processing with Lens Diameter 항목이 표시된다
+    And Fast Processing with Lens Diameter
     # UI reference: UI-000045
-    And Font 항목이 표시된다
+    And Font
     # UI reference: UI-000025
-    And Format 항목이 표시된다
+    And Format
     # UI reference: UI-000085
-    And Frame Fitting Mode 항목이 표시된다
+    And Frame Fitting Mode
     # UI reference: UI-000062
-    And Grid 항목이 표시된다
+    And Grid
     # UI reference: UI-000064
-    And Horizontal Space (mm) 항목이 표시된다
+    And Horizontal Space (mm)
     # UI reference: UI-000114
-    And Language 항목이 표시된다
+    And Language
     # UI reference: UI-000041
-    And LED Notification 항목이 표시된다
+    And LED Notification
     # UI reference: UI-000031
-    And Line Ending 항목이 표시된다
+    And Line Ending
     # UI reference: UI-000047
-    And Message Box Font Size 항목이 표시된다
+    And Message Box Font Size
     # UI reference: UI-000058
-    And R/L Shape Mirroring 항목이 표시된다
+    And R/L Shape Mirroring
     # UI reference: UI-000026
-    And Radius Mode 항목이 표시된다
+    And Radius Mode
     # UI reference: UI-000103
-    And Restore Date 항목이 표시된다
+    And Restore Date
     # UI reference: UI-000100
-    And Restore Filename 항목이 표시된다
+    And Restore Filename
     # UI reference: UI-000053
-    And Safety Check 항목이 표시된다
+    And Safety Check
     # UI reference: UI-000065
-    And Show Grid 항목이 표시된다
+    And Show Grid
     # UI reference: UI-000073
-    And Show Tip Message 항목이 표시된다
+    And Show Tip Message
     # UI reference: UI-000081
-    And Sleep Mode 항목이 표시된다
+    And Sleep Mode
     # UI reference: UI-000027
-    And The Number of Radii(OMA) 항목이 표시된다
+    And The Number of Radii(OMA)
     # UI reference: UI-000063
-    And Vertical Space (mm) 항목이 표시된다
+    And Vertical Space (mm)
     # UI reference: UI-000083
-    And Wait (minutes) 항목이 표시된다
+    And Wait (minutes)
     # END collected General elements
     # Step 3
     When General 설정 영역을 맨 위로 스크롤

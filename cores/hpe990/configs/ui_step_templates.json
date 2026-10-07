@@ -1,101 +1,859 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "templates": {
     "window": {
       "title": "{name} 화면 표시",
       "steps": [
-        {"Steps": ["{path}"], "Expected Result": ["{name} 화면이 표시된다", "수집 목록의 해당 화면 UI 요소가 표시된다"]}
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{name} 화면이 보여야 합니다.",
+            "수집 목록의 해당 화면 UI 요소가 보여야 합니다."
+          ]
+        }
       ]
     },
     "modal": {
       "title": "{name} 모달 표시 및 닫기",
       "steps": [
-        {"Steps": ["{open_action}"], "Expected Result": ["{name} 모달과 내부 요소가 표시된다"]},
-        {"Steps": ["{close_action}"], "Expected Result": ["{name} 모달이 닫히고 호출 화면이 표시된다"]}
+        {
+          "Steps": [
+            "{open_action}"
+          ],
+          "Expected Result": [
+            "{name} 모달과 내부 요소가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{close_action}"
+          ],
+          "Expected Result": [
+            "{name} 모달이 닫히고 호출 화면이 보여야 합니다."
+          ]
+        }
       ]
     },
     "popup": {
       "title": "{name} 팝업 표시 및 닫기",
       "steps": [
-        {"Steps": ["{open_action}"], "Expected Result": ["{name} 팝업과 내부 요소가 표시된다"]},
-        {"Steps": ["{close_action}"], "Expected Result": ["{name} 팝업이 닫히고 호출 화면이 표시된다"]}
+        {
+          "Steps": [
+            "{open_action}"
+          ],
+          "Expected Result": [
+            "{name} 팝업과 내부 요소가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{close_action}"
+          ],
+          "Expected Result": [
+            "{name} 팝업이 닫히고 호출 화면이 보여야 합니다."
+          ]
+        }
       ]
     },
     "option-selector": {
-      "title": "{name} 선택 (선택기)",
+      "title": "{name} 선택 및 저장값 확인 (선택기)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "원래 설정값과 복구 방법 기록"
+          ]
+        },
+        {
+          "Steps": [
+            "{value_description} 준비",
+            "{first_value} 및 {second_value} 제공"
+          ]
+        }
+      ],
       "steps": [
-        {"Steps": ["{path}", "{name} 클릭"], "Expected Result": ["{name} 선택 목록이 펼쳐진다", "{options} 항목이 표시된다"]},
-        {"Steps": ["{value} 선택"], "Expected Result": ["{name}에 {value}가 표시된다"]}
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name} 선택기의 화살표 조작 후 {first_value} 선택"
+          ],
+          "Expected Result": [
+            "{name}에 {first_value}가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name} 선택기의 화살표 조작 후 {second_value} 선택"
+          ],
+          "Expected Result": [
+            "{name}에 {second_value}가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}에 {second_value}가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}를 기록한 원래 선택값로 복원",
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}가 시험 전 선택값로 보여야 합니다."
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-002"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": [
+        "TC-002"
       ]
     },
     "input-field": {
-      "title": "{name} 입력 (입력란)",
+      "title": "{name} 입력 및 저장값 확인 (입력란)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "{name}의 원래 값 기록",
+            "시험 후 복구 방법 기록"
+          ]
+        },
+        {
+          "Steps": [
+            "{name} 시험값 및 처리 규칙 준비",
+            "입력 가능 여부와 실제 입력유형 확인 후 확정",
+            "허용 형식 및 범위와 저장 후 재표시 규칙 확인 후 확정",
+            "  시험값: 시험 전 값과 다른 승인된 유효 값으로 확정"
+          ]
+        }
+      ],
       "steps": [
-        {"Steps": ["{path}", "{name}에 {value} 입력"], "Expected Result": ["{expected_input_result}"]}
-      ]
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{scroll_to_element}"
+          ],
+          "Expected Result": [
+            "{name} 항목과 입력란이 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name} 입력란 선택"
+          ],
+          "Expected Result": [
+            "{name} 값을 편집할 수 있는 입력 상태가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 {value} 입력",
+            "입력 확정"
+          ],
+          "Expected Result": [
+            "{name} 입력란에 입력한 시험값이 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}",
+            "{scroll_to_element}"
+          ],
+          "Expected Result": [
+            "{name} 입력란에 저장한 시험값이 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name} 입력값을 기록한 원래 값으로 복원",
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}",
+            "{scroll_to_element}"
+          ],
+          "Expected Result": [
+            "{name} 값이 시험 전 값과 일치한다"
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-030"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": [
+        "TC-030"
+      ],
+      "source_limit": "TC-030의 편집 가능 가정은 미검증. STATIC_DATA에는 적용하지 않고 표시 템플릿 사용."
     },
     "number": {
-      "title": "{name} 숫자 입력 (숫자 입력란)",
+      "title": "{name} 숫자 입력 및 저장값 확인 (숫자 입력란)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "원래 설정값과 복구 방법 기록"
+          ]
+        },
+        {
+          "Steps": [
+            "시험값 및 처리 규칙 준비",
+            "{name} 입력 가능, 원래 값과 다른 유효 시험값 승인"
+          ]
+        }
+      ],
       "steps": [
-        {"Steps": ["{path}", "{name}에 {value} 입력"], "Expected Result": ["{expected_input_result}"]}
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name} 입력요소 선택"
+          ],
+          "Expected Result": [
+            "{name}의 값을 편집할 수 있는 입력 상태가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 {value} 입력",
+            "입력 확정"
+          ],
+          "Expected Result": [
+            "{name}에 입력한 시험값이 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}에 저장한 시험값이 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}의 입력값을 기록한 원래 값으로 복원",
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}의 값이 시험 전 값과 일치한다"
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-014"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": [
+        "TC-014",
+        "TC-017"
       ]
     },
     "checkbox": {
-      "title": "{name} 체크 상태 변경 (체크박스)",
+      "title": "{name} 체크 상태 변경 및 저장값 확인 (체크박스)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "원래 설정값과 복구 방법 기록"
+          ]
+        }
+      ],
       "steps": [
-        {"Steps": ["{path}", "{name} 선택"], "Expected Result": ["{name}이 체크 상태로 표시된다"]},
-        {"Steps": ["{name} 선택 해제"], "Expected Result": ["{name}이 체크 해제 상태로 표시된다"]}
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}의 체크 해제"
+          ],
+          "Expected Result": [
+            "{name}가 체크 해제 상태로 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name} 체크"
+          ],
+          "Expected Result": [
+            "{name}가 체크 상태로 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}가 체크 상태로 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}를 기록한 원래 체크 상태로 복원",
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}의 체크 상태가 시험 전 값과 일치한다"
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-013"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": [
+        "TC-013"
       ]
     },
     "radio": {
-      "title": "{name} 항목 선택 (라디오 버튼)",
+      "title": "{name} 선택 및 저장값 확인 (라디오 버튼)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "원래 설정값과 복구 방법 기록"
+          ]
+        }
+      ],
       "steps": [
-        {"Steps": ["{path}", "{name}의 {value} 선택"], "Expected Result": ["{value} 항목이 선택되어 표시된다", "같은 그룹의 다른 항목은 선택 해제되어 표시된다"]}
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에서 {first_value} 항목 선택"
+          ],
+          "Expected Result": [
+            "{name}의 {first_value} 항목이 선택되어 보여야 합니다.",
+            "{second_value} 항목은 선택 해제되어 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에서 {second_value} 항목 선택"
+          ],
+          "Expected Result": [
+            "{name}의 {second_value} 항목이 선택되어 보여야 합니다.",
+            "{first_value} 항목은 선택 해제되어 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}의 {second_value} 항목이 저장된 선택으로 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}의 선택을 기록한 원래 선택으로 복원",
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}의 선택이 시험 전 값과 일치한다"
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-003"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": [
+        "TC-003",
+        "TC-004",
+        "TC-005",
+        "TC-006",
+        "TC-007",
+        "TC-008",
+        "TC-009",
+        "TC-010",
+        "TC-011",
+        "TC-012"
       ]
     },
     "button": {
       "title": "{name} 버튼 동작 (버튼)",
       "steps": [
-        {"Steps": ["{path}", "{name} 클릭"], "Expected Result": ["{expected_action_result}"]}
+        {
+          "Steps": [
+            "{path}",
+            "{name} 클릭"
+          ],
+          "Expected Result": [
+            "{expected_action_result}"
+          ]
+        }
       ]
     },
     "display": {
       "title": "{name} 표시값 확인 (표시 필드)",
       "steps": [
-        {"Steps": ["{path}", "{name} 표시값 확인"], "Expected Result": ["{name}에 {expected_display_value}가 표시된다"]}
+        {
+          "Steps": [
+            "{path}",
+            "{name} 표시값 확인"
+          ],
+          "Expected Result": [
+            "{name}에 {expected_display_value}가 보여야 합니다."
+          ]
+        }
       ]
     },
     "unknown": {
       "title": "{name} 표시 및 유형 확인",
       "steps": [
-        {"Steps": ["{path}", "{name} 표시 및 입력유형 확인"], "Expected Result": ["{name} 요소가 표시된다", "입력유형과 동작 명세 확인 필요"]}
+        {
+          "Steps": [
+            "{path}",
+            "{name} 표시 및 입력유형 확인"
+          ],
+          "Expected Result": [
+            "{name} 요소가 보여야 합니다.",
+            "입력유형과 동작 명세 확인 필요"
+          ]
+        }
       ]
     },
     "number-boundary": {
       "title": "{name} 숫자 입력 경계값 (숫자 입력란)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "원래 설정값과 복구 방법 기록"
+          ]
+        },
+        {
+          "Steps": [
+            "시험값 및 처리 규칙 준비",
+            "{name} 허용 최솟값·최댓값 확정"
+          ]
+        }
+      ],
       "steps": [
-        {"Steps": ["{path}", "{name}에 최소값 {minimum} 입력"], "Expected Result": ["{minimum_result}"]},
-        {"Steps": ["{name}에 최대값 {maximum} 입력"], "Expected Result": ["{maximum_result}"]},
-        {"Steps": ["{name}에 최소값 미만 {below_minimum} 입력"], "Expected Result": ["{below_minimum_result}"]},
-        {"Steps": ["{name}에 최대값 초과 {above_maximum} 입력"], "Expected Result": ["{above_maximum_result}"]},
-        {"Steps": ["{name}에 최소값 이상 {at_or_above_minimum} 입력"], "Expected Result": ["{at_or_above_minimum_result}"]},
-        {"Steps": ["{name}에 최대값 이하 {at_or_below_maximum} 입력"], "Expected Result": ["{at_or_below_maximum_result}"]}
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 승인된 최솟값 입력",
+            "입력 확정"
+          ],
+          "Expected Result": [
+            "{name}에 승인된 최솟값이 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 승인된 최댓값 입력",
+            "입력 확정"
+          ],
+          "Expected Result": [
+            "{name}에 승인된 최댓값이 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}의 입력값을 기록한 원래 값으로 복원",
+            "{cancel_action}"
+          ],
+          "Expected Result": [
+            "{close_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}의 값이 시험 전 값과 일치한다"
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-015"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": [
+        "TC-015",
+        "TC-018"
       ]
     },
     "save-reopen": {
       "title": "{name} 저장 및 재진입 확인",
       "steps": [
-        {"Steps": ["{change_action}", "{save_action}"], "Expected Result": ["{expected_save_result}"]},
-        {"Steps": ["{reopen_action}"], "Expected Result": ["{name}에 저장한 {value}가 표시된다"]},
-        {"Steps": ["{restore_action}"], "Expected Result": ["{name}이 시험 전 값으로 표시된다"]}
+        {
+          "Steps": [
+            "{change_action}",
+            "{save_action}"
+          ],
+          "Expected Result": [
+            "{expected_save_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{reopen_action}"
+          ],
+          "Expected Result": [
+            "{name}에 저장한 {value}가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{restore_action}"
+          ],
+          "Expected Result": [
+            "{name}이 시험 전 값으로 보여야 합니다."
+          ]
+        }
       ]
     },
     "cancel-reopen": {
       "title": "{name} 변경 취소 및 재진입 확인",
       "steps": [
-        {"Steps": ["{change_action}", "{cancel_action}"], "Expected Result": ["{expected_cancel_result}"]},
-        {"Steps": ["{reopen_action}"], "Expected Result": ["{name}이 시험 전 값으로 표시된다"]}
+        {
+          "Steps": [
+            "{change_action}",
+            "{cancel_action}"
+          ],
+          "Expected Result": [
+            "{expected_cancel_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{reopen_action}"
+          ],
+          "Expected Result": [
+            "{name}이 시험 전 값으로 보여야 합니다."
+          ]
+        }
+      ]
+    },
+    "number-invalid": {
+      "title": "{name} 잘못된 숫자 입력 (숫자 입력란)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "원래 설정값과 복구 방법 기록"
+          ]
+        },
+        {
+          "Steps": [
+            "시험값 및 처리 규칙 준비",
+            "{name} 오류별 입력값·기대 결과 확정"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 {empty_value} 입력 시도",
+            "입력 확정 시도"
+          ],
+          "Expected Result": [
+            "{name}의 {empty_value}에 대해 {empty_value_result}가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 {non_numeric_value} 입력 시도",
+            "입력 확정 시도"
+          ],
+          "Expected Result": [
+            "{name}의 {non_numeric_value}에 대해 {non_numeric_value_result}가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 {below_minimum} 입력 시도",
+            "입력 확정 시도"
+          ],
+          "Expected Result": [
+            "{name}의 {below_minimum}에 대해 {below_minimum_result}가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 {above_maximum} 입력 시도",
+            "입력 확정 시도"
+          ],
+          "Expected Result": [
+            "{name}의 {above_maximum}에 대해 {above_maximum_result}가 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{name}의 입력값을 기록한 원래 값으로 복원",
+            "{cancel_action}"
+          ],
+          "Expected Result": [
+            "{close_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{name}의 값이 시험 전 값과 일치한다"
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-016"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": [
+        "TC-016",
+        "TC-019"
+      ]
+    },
+    "button-save": {
+      "title": "{name} 버튼의 설정 저장 (버튼)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "원래 설정값과 복구 방법 기록"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{setting_name}에서 {value} 선택"
+          ],
+          "Expected Result": [
+            "{setting_name}에 {value}가 선택 상태로 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{setting_name}에 {value}가 저장되어 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{setting_name}를 기록한 원래 선택으로 복원",
+            "{save_action}",
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{setting_name}의 선택이 시험 전 값과 일치한다"
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-020"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": []
+    },
+    "button-cancel": {
+      "title": "{name} 버튼의 설정 변경 취소 (버튼)",
+      "preconditions": [
+        {
+          "Steps": [
+            "설정값 복구 준비",
+            "원래 설정값과 복구 방법 기록"
+          ]
+        }
+      ],
+      "steps": [
+        {
+          "Steps": [
+            "{path}"
+          ],
+          "Expected Result": [
+            "{screen_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{setting_name}에서 {value} 선택"
+          ],
+          "Expected Result": [
+            "{setting_name}에 {value}가 선택 상태로 보여야 합니다."
+          ]
+        },
+        {
+          "Steps": [
+            "{cancel_action}"
+          ],
+          "Expected Result": [
+            "{close_expected_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{reopen_action}",
+            "{tab_select_action}"
+          ],
+          "Expected Result": [
+            "{setting_name}의 선택이 시험 전 값과 일치한다"
+          ]
+        }
+      ],
+      "source_tc_ids": [
+        "TC-021"
+      ],
+      "type_verified": false,
+      "source_status": "authored_draft",
+      "related_tc_ids": []
+    },
+    "number-boundary-extended": {
+      "title": "{name} 숫자 입력 경계값 (숫자 입력란)",
+      "steps": [
+        {
+          "Steps": [
+            "{path}",
+            "{name}에 최소값 {minimum} 입력"
+          ],
+          "Expected Result": [
+            "{minimum_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 최대값 {maximum} 입력"
+          ],
+          "Expected Result": [
+            "{maximum_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 최소값 미만 {below_minimum} 입력"
+          ],
+          "Expected Result": [
+            "{below_minimum_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 최대값 초과 {above_maximum} 입력"
+          ],
+          "Expected Result": [
+            "{above_maximum_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 최소값 이상 {at_or_above_minimum} 입력"
+          ],
+          "Expected Result": [
+            "{at_or_above_minimum_result}"
+          ]
+        },
+        {
+          "Steps": [
+            "{name}에 최대값 이하 {at_or_below_maximum} 입력"
+          ],
+          "Expected Result": [
+            "{at_or_below_maximum_result}"
+          ]
+        }
       ]
     }
-  }
+  },
+  "derived_from": "cores/hpe990/docs/bdd/preferences_general.feature",
+  "source_sha256": "622c7744b021f99a64a63f44e5eccb6f0ca6810f3d9150ec4adf1cc137182115",
+  "authored_template_count": 9
 }

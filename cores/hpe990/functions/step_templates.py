@@ -34,6 +34,16 @@ def _pending_label(field):
         "restore_action": "복구 방법",
         "expected_save_result": "저장 기대 결과",
         "expected_cancel_result": "취소 기대 결과",
+        "first_value": "첫 번째 선택값",
+        "second_value": "두 번째 선택값",
+        "value_description": "선택값 설명",
+        "screen_expected_result": "진입 화면 기대 결과",
+        "tab_select_action": "재진입 탭 선택 방법",
+        "scroll_to_element": "요소까지 스크롤 방법",
+        "close_expected_result": "창 닫기 기대 결과",
+        "setting_name": "검증할 설정 요소",
+        "empty_value": "빈 값 시험 입력",
+        "non_numeric_value": "비숫자 시험 입력",
     }
     if field.endswith("_result") and field[:-7] in labels:
         return labels[field[:-7]] + " 처리 결과 미확정"
@@ -119,6 +129,12 @@ def generate_drafts(elements, templates, bindings, authored=None):
         selected = [kind] + binding.get("variants", [])
         if kind == "number" and "number-boundary" not in selected:
             selected.append("number-boundary")
+        if kind == "number":
+            selected += [
+                variant
+                for variant in ("number-invalid", "number-boundary-extended")
+                if variant in templates and variant not in selected
+            ]
         cases = []
         for template_id in dict.fromkeys(selected):
             if template_id not in templates:
@@ -156,8 +172,14 @@ def generate_drafts(elements, templates, bindings, authored=None):
             cases.append(
                 {
                     "template_id": template_id,
+                    "source_tc_ids": definition.get("source_tc_ids", []),
+                    "source_limit": definition.get("source_limit"),
                     "title": title,
                     "preconditions": [
+                        {"Step": index, "Steps": [resolve(text) for text in row["Steps"]]}
+                        for index, row in enumerate(definition.get("preconditions", []), 1)
+                    ]
+                    or [
                         {
                             "Step": 1,
                             "Steps": [
@@ -205,6 +227,8 @@ def _review_html(drafts):
                 + "</small>",
                 "<h3>Pre-condition</h3><table><tr><th>Step</th><th>Steps</th></tr>",
             ]
+            if case.get("source_limit"):
+                parts.append("<p>" + escape(case["source_limit"]) + "</p>")
             for row in case["preconditions"]:
                 parts.append(
                     f"<tr><td>{row['Step']}</td><td>"

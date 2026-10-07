@@ -153,6 +153,10 @@ TC-001의 General 표시 Expected Result는 UI 원장의 관찰된 항목명으�
 
 ### UI 유형별 Step 템플릿
 
+TC 제목·사전조건·Steps·Expected Result의 문구 정본은
+`cores/hpe990/rules/scenarios/tc_up_dictionary.py`(TC up dictionary)입니다.
+TC 구조·ID·검수 표시 규칙은 `tc_format.py`, 유형별 단계 본문은 템플릿 파일에서 관리합니다.
+
 `hpe990_tc_templates(session_id, ui_ids=None)`는 수집된 각 UI ID에 연결한
 `Step | Steps | Expected Result` 초안과 JSON/HTML 검수 파일을 생성합니다.
 수집 시에도 자동 갱신되며, 반환된 `step_template_sync`에서 위치를 확인합니다.
@@ -168,6 +172,12 @@ TC-001의 General 표시 Expected Result는 UI 원장의 관찰된 항목명으�
 누락 명세를 표시합니다. 각 초안에 개별 사전조건과 증거를 포함합니다.
 기존 TC 번호·본문은 유지하고, 새 초안 검수 후 기존 TC ID 규칙으로 승격합니다.
 이 도구는 UI 조작이나 BDD 실행을 수행하지 않습니다.
+
+`hpe990_tc_templates(..., refresh_from_tcs=true)`는 현재 General TC에서
+입력유형별 전체 단계 흐름과 개별 사전조건을 다시 추출합니다. 선택기·라디오·체크박스·
+숫자 입력의 저장/재진입/복구, 경계값·잘못된 입력, Save/Cancel 및 입력란 패턴을
+매개변수화하고 근거 TC ID를 기록합니다. 검수 문서는 `docs/bdd/ui_step_templates.md`입니다.
+현재 TC에서 추출한 명세도 초안이며, 미검증 편집성이나 값·범위를 확정하지 않습니다.
 
 Telemetry는 `schema_version`, `session_id`, `run_id`, `sequence`로 연결한 로컬 JSONL입니다.
 원격 전송은 후속 범위입니다. WinEvent와 주기적인 HWND 상태·RGB 해시를 함께 사용하며 실제

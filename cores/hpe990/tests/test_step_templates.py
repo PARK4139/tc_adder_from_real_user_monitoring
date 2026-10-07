@@ -35,15 +35,23 @@ def test_selector_exact_numbered_groups_use_supplied_specs_and_no_new_tc_id():
         "UI-000114": {
             "ui_type": "option-selector",
             "type_verified": True,
-            "parameters": {"options": "English, Korean", "value": "English"},
+            "parameters": {
+                "first_value": "English",
+                "second_value": "Korean",
+                "value_description": "지원 언어",
+                "screen_expected_result": "설정 영역이 보여야 합니다.",
+                "save_action": "Save 클릭",
+                "reopen_action": "Preferences 재진입",
+                "tab_select_action": "General 탭 선택",
+            },
         }
     }
     draft = generate_drafts([element], definitions(), binding)[0]
     case = draft["cases"][0]
-    assert case["steps"][0]["Steps"] == ["Setup > Preferences > General 탭 선택", "Language 클릭"]
-    assert case["steps"][1]["Steps"] == ["English 선택"]
-    assert case["steps"][1]["Expected Result"] == ["Language에 English가 표시된다"]
-    assert [s["Step"] for s in case["steps"]] == [1, 2]
+    assert case["steps"][0]["Steps"] == ["Setup > Preferences > General 탭 선택"]
+    assert case["steps"][1]["Steps"] == ["Language 선택기의 화살표 조작 후 English 선택"]
+    assert case["steps"][1]["Expected Result"] == ["Language에 English가 보여야 합니다."]
+    assert [s["Step"] for s in case["steps"]] == [1, 2, 3, 4, 5]
     assert case["pending_specifications"] == []
     assert case["status"] == "draft" and not case["executable"]
     assert "tc_id" not in draft
@@ -57,6 +65,11 @@ def test_boundary_cases_keep_min_max_inclusive_and_exclusive_pending():
     assert draft["ui_type"] == "number" and not draft["type_verified"]
     boundary = draft["cases"][1]
     assert boundary["template_id"] == "number-boundary"
+    assert len(boundary["steps"]) == 5
+    assert boundary["source_tc_ids"] == ["TC-015"]
+    boundary = next(
+        case for case in draft["cases"] if case["template_id"] == "number-boundary-extended"
+    )
     assert len(boundary["steps"]) == 6
     assert {
         "minimum",

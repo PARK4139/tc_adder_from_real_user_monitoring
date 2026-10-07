@@ -5,17 +5,26 @@ import anyio
 from cores.common.functions.run_family_bdd import run_family_bdd
 from cores.hpe990.functions.scenarios import scenario_catalog
 from cores.hpe990.functions.step_templates import template_catalog
+from cores.hpe990.functions.tc_template_authoring import refresh_templates_from_tcs
 
 
-def hpe990_tc_templates(session_id: str, ui_ids: list[str] | None = None) -> dict:
+def hpe990_tc_templates(
+    session_id: str, ui_ids: list[str] | None = None, refresh_from_tcs: bool = False
+) -> dict:
     """Generate per-UI-ID draft Step/Steps/Expected Result groups and JSON/HTML review.
 
     Covers collected screens, modals/popups and child controls using shared templates.
     Optional ui_ids limits output to observed IDs. Unverified types and absent values,
     ranges/options/outcomes are explicitly pending. No UI actions or TC allocation;
     this does not register executable BDD scenarios or report a test PASS.
+    refresh_from_tcs=true regenerates type templates from current authored General TCs
+    including save/reopen/restore and invalid-number workflows, then regenerates drafts.
     """
-    return template_catalog(session_id, ui_ids)
+    refreshed = refresh_templates_from_tcs() if refresh_from_tcs else None
+    result = template_catalog(session_id, ui_ids)
+    if refreshed:
+        result["authored_template_refresh"] = refreshed
+    return result
 
 
 def hpe990_bdd_catalog(session_id: str | None = None) -> dict:

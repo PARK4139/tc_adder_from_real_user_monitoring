@@ -48,14 +48,16 @@ Feature: Dynamic
     assert result["element_count"] == 2
     assert result["executed"] is False
     content = source.read_text(encoding="utf-8")
-    assert content.count("Language 항목이 표시된다") == 1
-    assert "Sleep Mode 항목이 표시된다" in content
+    assert "Then 하기 수집 요소가 각각 보여야 합니다." in content
+    assert content.count("    And Language\n") == 1
+    assert "    And Sleep Mode\n" in content
+    assert "항목이 표시된다" not in content
     assert "Foreign field" not in content
     with sqlite3.connect(database) as db:
         insert(db, "UI_GENERAL::STATIC_DATA::Backup Date")
     assert sync_general_expected(database, source)["element_count"] == 3
-    assert "Backup Date 항목이 표시된다" in source.read_text(encoding="utf-8")
-    assert "Backup Date 항목이 표시된다" in markdown.read_text(encoding="utf-8")
+    assert "    And Backup Date\n" in source.read_text(encoding="utf-8")
+    assert "<br>Backup Date<br>" in markdown.read_text(encoding="utf-8")
     assert "Then Authored result" in source.read_text(encoding="utf-8")
     assert markdown.read_text(encoding="utf-8").endswith("### TC-002 Unchanged\nKeep me\n")
     assert sync_general_expected(database, source)["updated"] is False
