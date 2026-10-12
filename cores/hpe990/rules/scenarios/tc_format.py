@@ -125,16 +125,28 @@ BODY = r"""
   같은 요소의 기본·경계값·잘못된 입력 TC는 함께 배치한다. 화면 전체의 진입·스크롤
   TC는 앞에, 화면 하단 Save/Cancel TC는 뒤에 배치한다. 재배치 시 TC ID와 본문은 유지한다.
   Gherkin·Markdown·검수 화면의 순서를 일치시키고 ID 숫자순으로 재정렬하지 않는다.
-- 계층: Test Target 모델 → 버전 → 메뉴·화면 경로 → TC.
-  예: `HPE990 → 1.22 → Setup → Preferences → General → TC-030`.
+- 버전 아래에 `Functions`와 `Basic Scenarios` 최상위 노드를 둔다.
+  `Functions`는 화면 suite 경로를 포함한 평면 TC 목록이고, `Basic Scenarios`는 Job별 Tester 수행 순서 트리다.
+  예: `HPE990 → 1.22 → Functions → Setup → Preferences → General → TC-030`.
 - Test Target은 모델·버전·실행 파일명을 명시적으로 분리해 관리한다.
   현재 대상은 `HPE990`, `1.22`, `HPE990_v1.22_251010.exe`다.
   새 버전 `1.23`의 TC는 같은 `HPE990` 아래 별도 버전 노드로 묶는다.
-- 화면 단위를 Suite로 보고 바로 아래에 TC를 표시한다.
+- Functions에서는 화면 단위를 Suite로 보고 바로 아래에 TC를 표시한다.
   기능명·UI 유형으로 추가 하위 Suite나 중간 그룹을 만들지 않는다.
-- 트리의 각 TC 항목은 TC ID와 본문과 동일한 전체 TC title을 가로 한 줄로 표시한다.
-  기능명·UI 유형 표기를 생략하거나 제목을 축약하지 않는다. ID는 제목과 분리하고 링크에 사용한다.
-- 트리는 Gherkin의 경로·제목·태그에서 생성한다. 별도 TC 목록 사본을 관리하지 않는다.
+- Basic Scenarios에서는 Job별 Suite를 표시한다. Job에는 Tester가 수행할 순서,
+  해당 Job의 Setup, 종료·복구 상태와 순서에 대응하는 정본 TC 링크를 둔다.
+  이 트리 순서는 Tester 실행 순서다.
+- Basic Scenario와 Function TC는 별도 본문을 복제하지 않고 상호 링크한다.
+  Job의 각 단계에서 정본 TC로 이동할 수 있고, Function TC에서는 이를 사용하는
+  Basic Scenario로 이동할 수 있어야 한다. 참조 관계만으로 다른 관점의 실행 PASS를 추정하지 않는다.
+- Functions의 각 TC 항목은 `TC-ID 화면 suite 경로 — 전체 TC title` 형식으로 한 줄에 표시한다.
+  기능명·UI 유형 표기를 생략하거나 제목을 축약하지 않는다. Basic Scenario의 각 순서 단계는 정본 TC에 링크한다.
+- Job 단위 Basic Scenario도 정본 `TC-*`다. 해당 Gherkin 파일은 다른 TC와 같은 개별
+  Pre-condition과 `No. | Steps | Expected Result` 표를 사용한다. Job 순서 TC 참조는
+  `basic_scenarios.json`에서 관리하며 TC 본문이나 HTML에 별도 `BS-*` 테스트 항목을 만들지 않는다.
+- Functions 트리는 Gherkin의 경로·제목·태그에서 생성한다. 별도 TC 목록 사본을 관리하지 않는다.
+  Basic Scenario의 Job 분류·순서·TC ID 연결과 Basic 전용 TC는
+  `cores/hpe990/configs/basic_scenarios.json`에서 관리하고 유효한 TC ID만 참조한다.
 - 좌측 트리 패널 폭은 경계 드래그와 좌우 방향키로 조절하고 선택한 폭을 유지한다.
   TC 제목은 한 줄로 표시한다. 폭이 부족하면 가로 스크롤로 확인한다.
 - 미확정 정보 chip은 연한 붉은 배경·진한 붉은 글씨로 가로 한 줄에 표시한다.

@@ -5,38 +5,34 @@ TITLE = "검수 TC의 화면·기능 혼합 Suite"
 SOURCE = "cores/hpe990/rules/scenarios/suite_hierarchy.py"
 STATUS = "active"
 BODY = r"""
-# 화면·기능 혼합 Suite
+# Functions와 Basic Scenarios의 양방향 검수 트리
 
-- 상위 Suite는 실제 화면·탭 이름과 기존 경로를 유지한다. 실제 UI 명칭은 임의로
-  번역하거나 약자로 줄이지 않는다. Edger가 메인 화면인 HPE990 1.22에서는
-  Setup을 Edger 하위에 둔다. 예: Edger > Setup > Preferences > General.
-- 같은 기능을 검증하는 TC가 여러 개이면 해당 화면 아래에 기능 Suite로 묶는다.
-  여러 화면에 걸친 연속 흐름도 기능 묶음 아래 실제 화면을 배치할 수 있다.
-  기능 묶음은 검수 분류이며 실제 메뉴·화면이 존재한다고 설명하지 않는다.
-- 단일 TC만 있는 기능은 가장 가까운 화면 또는 기능 묶음에 바로 배치한다.
-  초기 상태·선택·저장·복귀 같은 검증 단계마다 단일 TC 폴더를 만들지 않는다.
-- 실제 화면과 기능을 혼합해도 같은 TC는 한 경로에만 둔다. Suite 이동으로
-  TC를 복제하거나 재번호하지 않는다. ID 발급과 경로 태그 형식은 tc_format.py를 따른다.
-- Suite는 검수 탐색 구조이고 Steps는 실제 조작 경로다. 기능 분류명을 실제 UI 클릭
-  대상으로 Steps에 넣지 않는다. 생성·템플릿 소비자도 이 두 경로를 구분한다.
-- 검수 정본 경로는 개별 TC의 @path 태그로 관리한다. 독립적인 Suite 제목·TC 사본
-  카탈로그를 만들지 않으며 HTML 트리는 해당 태그에서 생성한다.
-
-예시:
-
-```text
-Edger > Setup > Preferences > General
-  Sleep Mode             # 체크 및 Wait 입력·경계값·오류 TC 묶음
-  Message Box Font Size  # 입력·경계값·오류 TC 묶음
-  TC-030 Language 설정 및 적용 확인 (선택기)  # 단일 TC는 바로 배치
-Edger > 작업 불러오기
-  TC-250 작업 미선택 상태의 UI 확인
-  Job Manager
-    TC-260 Job Manager 진입 및 설치 샘플 목록 확인
-    TC-270 CIRCLE 샘플 선택 및 작업 불러오기
-  TC-280 작업 불러오기 후 UI 활성화 확인
-```
-
-예시의 기능 묶음은 검수용이며 Steps에는 `Edger의 폴더 버튼 클릭`처럼 실제 화면에서
-관찰된 대상을 사용한다. 미래 화면은 TC 근거가 확보될 때 추가하고 빈 Suite는 표시하지 않는다.
+- 제품 버전 아래 두 개의 최상위 노드를 제공한다: `Functions`와 `Basic Scenarios`.
+  `Basic Scenarios`는 Job 기반 Tester 수행 시나리오를 담는다.
+  HPE990 1.22의 기존 화면·탭 TC 트리는 기본적으로 `Functions` 아래에 보존하되,
+  Job 흐름 전체의 기준·결과 확인 TC는 `Basic` 전용으로 분류한다.
+- `Functions`는 명시적인 독립 기능 검증을 제공한다. 기존 UI 경로와 명칭을 유지하며,
+  Edger > Setup > Preferences > General 같은 실제 화면 계층으로 탐색한다.
+  기능 TC는 하나의 검증 목적을 가지며 자체 Setup과 기대 결과를 포함한다.
+- `Basic Scenarios`는 Tester가 수행하는 Job 흐름을 제공한다. 각 Job은 실행 순서,
+  Job별 Setup, 필요한 TC 참조, 종료 상태와 결과를 기술한다.
+  순서는 Tester가 따를 순서이며 앞 단계의 실패·미수행은 후속 단계 실행에 영향을 준다.
+- 한쪽 관점의 TC 본문을 다른 쪽에 복사하지 않는다. Basic Scenario의 각 단계는 정본
+  TC ID를 참조한다. TC 본문에는 Basic Scenario로 돌아가는 추가 문구나 링크를 넣지 않는다.
+  두 관점은 같은 검증 정본을 사용하며 독립적인 결과를 만들어내지 않는다.
+- Job Setup은 그 Job을 독립적으로 시작하는 데 필요한 데이터를 명시한다. 시험 Job 식별자,
+  기대 속성, 기존 사용자 데이터 보호, 시작 화면, 종료·복구 상태를 포함한다.
+  Function TC 자체의 사전조건은 기능 단독 검증에 계속 사용한다.
+- TC의 순차 실행이 상태를 공유한다면 이를 Basic Scenario의 단계와 상태 전이로 명시한다.
+  각 Function TC의 독립 실행 경로와 Basic Scenario의 연속 실행 경로를 혼동하지 않는다.
+- 여러 화면에 걸친 기준·전후 상태나 Job 결과를 확인하는 TC는 Basic에 둘 수 있다.
+  이 항목은 `basic_only`로 표시해 Functions에서 제외하되, Job의 순서 있는 TC 단계로 유지한다.
+- 화면·기능 기준 순서는 Functions 내부에 적용하고, Tester 진행 순서는 Basic Scenarios
+  내부 Job 및 단계에 적용한다. 한 트리의 정렬 순서를 다른 관점의 순서로 해석하지 않는다.
+- Job을 포괄하는 Basic Scenario도 일반 TC다. `@TC-...` Gherkin 정본, ID 발급 기록,
+  TC별 Pre-condition 및 번호별 Steps / Expected Result 표를 사용한다. 별도 `BS-...` 식별자는
+  사용하지 않는다. configs/basic_scenarios.json은 Job 분류, 제목, 실행 순서 TC 참조,
+  `basic_only` 표시만 관리하며 Setup과 시험 본문을 복제하지 않는다.
+- 제목과 Steps는 실제로 관찰된 UI 명칭·조작을 사용한다. 미관찰 동작이나 미확정 값은
+  구현 완료처럼 표현하지 않는다. ID, 태그, wording은 관련 canonical rules를 따른다.
 """

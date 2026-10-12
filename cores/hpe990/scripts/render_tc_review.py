@@ -1,5 +1,6 @@
 """Export authored Gherkin drafts as numbered TC tables for human review."""
 
+import json
 import re
 from html import escape
 from pathlib import Path
@@ -35,6 +36,7 @@ input{font:inherit;padding:10px 14px;border:1px solid #c5d3e2;border-radius:7px;
 .tree-heading{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 0 12px;padding:4px 0 10px;border-bottom:1px solid #dae4ee}.tree-heading .review-heading{font-size:16px;white-space:nowrap;margin:0;padding:0;border:0}.tree-actions{display:flex;gap:4px;flex:0 0 auto;justify-content:flex-end}.tree-actions button{font:inherit;font-size:10px;white-space:nowrap;padding:6px;border:1px solid #c5d3e2;border-radius:6px;background:white;color:#315b82;cursor:pointer;box-shadow:0 2px 8px #20334a22}.tree-actions button:hover{background:#f0f5fa}.masthead{border-bottom-color:#cbd9e7}.masthead .tree-actions button{background:#315b82;color:#f5f9ff;border-color:#315b82;box-shadow:none}.masthead .tree-actions button:hover{background:#274b6d}
 .tree-panel{position:sticky;top:82px;align-self:start;min-width:0}nav{max-height:calc(82vh - 54px);overflow:auto;background:white;border:1px solid #dae4ee;border-radius:10px;padding:12px}
 nav.tc-collapsed>a,nav.tc-collapsed .tree-children>a{display:none}
+nav.tc-collapsed details[data-show-tcs="true"]>.tree-children>a{display:flex}
 
 .review-heading{font-size:16px;margin:0 0 16px;padding:4px 0 12px;border-bottom:1px solid #dae4ee}
 nav details{margin:3px 0}nav summary{display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;padding:8px 4px;color:#31516e;font-size:13px;font-weight:600;border-radius:5px}
@@ -136,13 +138,16 @@ ACTUAL_BEHAVIOR_LABEL = "실제 동작 확인 필요"
 
 def render_navigation(entries: list[dict]) -> str:
     """Group canonical TC identities and titles without maintaining a second catalog."""
-    root = {"children": {}, "entries": []}
+    root = {"children": {}, "order": []}
     for entry in entries:
         node = root
         target = entry.get("test_target", TEST_TARGET)
         for label in (target["model"], target["version"], *entry["path"]):
-            node = node["children"].setdefault(label, {"children": {}, "entries": []})
-        node["entries"].append(entry)
+            if label not in node["children"]:
+                node["children"][label] = {"children": {}, "order": []}
+                node["order"].append(("branch", label))
+            node = node["children"][label]
+        node["order"].append(("leaf", entry))
 
     def leaf(entry, label):
         identity = escape(entry["id"], quote=True)
@@ -159,8 +164,14 @@ def render_navigation(entries: list[dict]) -> str:
         )
         return (
             f'<a href="#{identity}" title="{escape(entry["title"], quote=True)}">'
-            f'<span class="tree-leaf-top"><span class="tree-id">{escape(entry["id"])}</span>'
-            f'<span class="tree-title">{escape(label)}</span>{chip}</span></a>'
+            f'<span class="tree-leaf-top">'
+            + (
+                f'<span class="tree-title">{escape(label)}</span>'
+                if entry.get("flat") or entry.get("kind") == "scenario"
+                else f'<span class="tree-id">{escape(entry["id"])}</span>'
+                f'<span class="tree-title">{escape(label)}</span>'
+            )
+            + f'{chip}</span></a>'
         )
 
     def branch(label, contents, key):
@@ -172,20 +183,38 @@ def render_navigation(entries: list[dict]) -> str:
         )
 
     def render(node, key=""):
-        parts = [
-            branch(label, render(child, key + "/" + label), key + "/" + label)
-            for label, child in node["children"].items()
-        ]
-        parts.extend(leaf(entry, entry["title"]) for entry in node["entries"])
+        parts = []
+        for kind, item in node["order"]:
+            if kind == "branch":
+                child_key = key + "/" + item
+                parts.append(branch(item, render(node["children"][item], child_key), child_key))
+            else:
+                parts.append(leaf(item, item.get("tree_title", item["title"])))
         return "".join(parts)
 
     return render(root)
 
 
-def render_review(source: str) -> tuple[str, dict]:
+def render_review(
+    source: str,
+    basic_scenarios: list[dict] | None = None,
+    *,
+    functions_root: bool = False,
+) -> tuple[str, dict]:
     feature = Parser().parse(source)["feature"]
     cards, navigation = [], []
     identities = set()
+    basic_only_ids = {
+        identity
+        for scenario_item in (basic_scenarios or [])
+        for identity in [scenario_item.get("id", ""), *scenario_item.get("basic_only", [])]
+        if identity
+    }
+    basic_scenario_by_id = {
+        scenario_item.get("id", ""): scenario_item
+        for scenario_item in (basic_scenarios or [])
+        if scenario_item.get("id")
+    }
     feature_paths = [
         tag["name"][6:] for tag in feature.get("tags", []) if tag["name"].startswith("@path-")
     ]
@@ -207,6 +236,14 @@ def render_review(source: str) -> tuple[str, dict]:
         if len(paths) != 1:
             raise ValueError(f"Specify one Feature or Scenario @path- tag: {identity}")
         path = [unquote(label) for label in paths[0].split("/")]
+        if functions_root:
+            if identity in basic_scenario_by_id:
+                job_scenario = basic_scenario_by_id[identity]
+                path = ["Basic Scenarios", job_scenario.get("job", "Job"), job_scenario.get("title", "Scenario")]
+            elif identity in basic_only_ids:
+                path = ["Basic Scenarios", "Job Scenario"]
+            else:
+                path.insert(0, "Functions")
         if any(not label.strip() for label in path):
             raise ValueError(f"Empty tree path segment: {identity}")
         tc_label = identity
@@ -295,9 +332,54 @@ def render_review(source: str) -> tuple[str, dict]:
                 "kind": kind,
                 "pending": pending,
                 "specifications": specifications,
-                "path": path,
+                "path": ["Functions"] if functions_root and identity not in basic_only_ids else path,
+                "flat": functions_root and identity not in basic_only_ids,
+                "tree_title": (
+                    f'{identity} {" / ".join(path[1:])} — {title}'
+                    if functions_root and identity not in basic_only_ids
+                    else title
+                ),
             }
         )
+    all_function_entries = {entry["id"]: entry for entry in navigation}
+    navigation = [entry for entry in navigation if entry["id"] not in basic_only_ids]
+    function_tc_count = len(navigation)
+    if basic_scenarios:
+        function_ids = set(all_function_entries)
+        scenario_ids = set()
+        for scenario in basic_scenarios:
+            identity = scenario.get("id", "")
+            title = scenario.get("title", "")
+            if not re.fullmatch(r"TC-\d{3,}", identity) or identity in scenario_ids:
+                raise ValueError(f"Invalid or duplicate Basic Scenario TC identity: {identity}")
+            if identity not in function_ids or identity not in basic_only_ids:
+                raise ValueError(f"Basic Scenario must be a Basic-only TC in the Gherkin source: {identity}")
+            scenario_ids.add(identity)
+            refs = scenario.get("steps", [])
+            if not refs or any(ref not in function_ids for ref in refs):
+                raise ValueError(f"Unknown or empty Function references in {identity}")
+            if not title or identity in refs:
+                raise ValueError(f"Basic Scenario requires a title and distinct ordered TC references: {identity}")
+            scenario_path = ["Basic Scenarios", scenario.get("job", "Job"), title]
+            navigation.append({
+                **all_function_entries[identity],
+                "path": scenario_path,
+                "tree_title": title,
+                "flat": False,
+            })
+            for ref in refs:
+                navigation.append({
+                    **all_function_entries[ref],
+                    "path": scenario_path,
+                })
+        referenced_steps = {
+            ref for scenario in basic_scenarios for ref in scenario.get("steps", [])
+        }
+        if basic_only_ids - (referenced_steps | scenario_ids):
+            raise ValueError(
+                f"Basic-only TCs are not referenced by a Basic Scenario: "
+                f"{sorted(basic_only_ids - referenced_steps)}"
+            )
     navigation_html = render_navigation(navigation)
     present_types = {entry["kind"] for entry in navigation}
     legend_items = "".join(
@@ -310,7 +392,7 @@ def render_review(source: str) -> tuple[str, dict]:
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TC 검수</title><style>{STYLE}</style></head><body>
 <header><div class="tree-heading masthead"><h1 class="review-heading">TC 검수</h1><div class="tree-actions"><button id="theme-toggle" type="button" aria-pressed="false">&#45796;&#53356; &#47784;&#46300;</button></div></div>
-<p>{len(cards)}개 TC · {total_groups}개 Step 묶음 · 시나리오 작성 초안 · 실행 결과 없음</p></header>
+<p>{function_tc_count}개 Function TC · {len(basic_only_ids)}개 Basic 전용 TC · {len(basic_scenarios or [])}개 Basic Scenario · {total_groups}개 Function Step 묶음 · 실행 결과 없음</p></header>
 <div class="toolbar"><input id="search" type="text" aria-label="TC 검색 표현식" autocomplete="off" autofocus placeholder="TC 검색: 예) 버튼 !검수 | 저장" title="공백 AND · !제외 · | OR · ^접두 · 접미$ · '정확 포함">
 <span id="count" role="status" aria-live="polite"></span></div>
 <div class="layout"><aside class="tree-panel"><div class="tree-heading"><h2 id="tc-tree-title" class="review-heading">TC 검수 스위트</h2><div class="tree-actions" aria-label="Suite expansion controls"><button id="tree-collapse-tcs" type="button" title="Collapse TC nodes">&#45432;&#46300;&#47564; &#51217;&#44592;</button><button id="tree-expand-all" type="button" title="Expand every suite">&#47784;&#46160; &#54204;&#52824;&#44592;</button></div></div><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
@@ -322,13 +404,24 @@ def render_review(source: str) -> tuple[str, dict]:
 <li><span class="badge pending">SQA 확인요소 · 색상 chip</span>: PASS/FAIL 기준 미확정. 값·범위·동작 확정 후 검증.</li>
 </ul><h3 id="ui-legend-title">UI 유형</h3><div class="legend-items" aria-labelledby="ui-legend-title">{legend_items}</div></section>
 </main></div><script>{SCRIPT}</script></body></html>"""
-    return document, {"tc_count": len(cards), "step_groups": total_groups}
+    return document, {
+        "tc_count": function_tc_count,
+        "basic_only_tc_count": len(basic_only_ids),
+        "basic_scenario_count": len(basic_scenarios or []),
+        "step_groups": total_groups,
+    }
+
+
+def load_basic_scenarios() -> list[dict]:
+    scenario_file = hpe990_folders.D_HPE990_CONFIGS / "basic_scenarios.json"
+    return json.loads(scenario_file.read_text(encoding="utf-8"))
 
 
 def main():
     from cores.hpe990.functions.tc_repository import load_review_source
 
-    document, summary = render_review(load_review_source())
+    source = load_review_source()
+    document, summary = render_review(source, load_basic_scenarios(), functions_root=True)
     output = hpe990_folders.D_HPE990_EVIDENCE / "093ca349/preferences-general-tc-review.html"
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(document, encoding="utf-8")

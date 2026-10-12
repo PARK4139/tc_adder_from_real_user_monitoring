@@ -30,14 +30,14 @@
       "TITLE": "검수 TC의 화면·기능 혼합 Suite",
       "SOURCE": "cores/hpe990/rules/scenarios/suite_hierarchy.py",
       "STATUS": "active",
-      "body_sha256": "56460b104b4657e1d3225f26eaab100fc566997c523b519bf09a562b138b5dee"
+      "body_sha256": "1f93c5430e8b203b54d23bd01429a955fea3e0c9bd2d098b2fcf50afebe7216b"
     },
     {
       "RULE_ID": "HPE990_TC_FORMAT",
       "TITLE": "TC 번호별 Steps / Expected Result 작성 및 표시",
       "SOURCE": "cores/hpe990/rules/scenarios/tc_format.py",
       "STATUS": "active",
-      "body_sha256": "cc6392f9a89069ab9fae8e2b7796d3c1cc1e82c6de31f488806ed20937674b0b"
+      "body_sha256": "62d7d2ea041eb5fbe31b280a7770dc1b39211c6bf55e029b3648157071adb36d"
     },
     {
       "RULE_ID": "HPE990_TC_UP_DICTIONARY",
