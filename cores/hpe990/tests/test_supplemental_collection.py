@@ -1,6 +1,8 @@
 """Verify evidence association and failure isolation without desktop input."""
 
+import json
 import subprocess
+from pathlib import Path
 
 import pytest
 
@@ -77,7 +79,10 @@ def test_native_match_is_scoped_to_root_and_preserves_ocr():
     assert element["hwnd"] is None
 
 
-def test_collection_keeps_popup_tool_and_modal_images_and_capture_errors(monkeypatch, tmp_path):
+@pytest.mark.parametrize("refresh_templates", [True, False])
+def test_collection_keeps_popup_tool_and_modal_images_and_capture_errors(
+    monkeypatch, tmp_path, refresh_templates
+):
     """Regression: Edger lens menus exist as QPopup, not QWidget."""
     from cores.hpe990.functions import step_templates, ui, ui_mapping
 
@@ -108,14 +113,33 @@ def test_collection_keeps_popup_tool_and_modal_images_and_capture_errors(monkeyp
     monkeypatch.setattr(ui.hpe990_folders, "D_HPE990_EVIDENCE", tmp_path)
     monkeypatch.setattr(ui, "collect_visual_elements", lambda *a: {"elements": []})
     monkeypatch.setattr(ui, "collect_accessibility", lambda *a, **k: {})
-    monkeypatch.setattr(ui, "assign_ui_ids", lambda _: {})
+    registered = []
+    monkeypatch.setattr(
+        ui, "assign_ui_ids", lambda record: registered.append(record) or {"registered": True}
+    )
     monkeypatch.setattr(ui_mapping, "target_identity", lambda _: {})
     monkeypatch.setattr(ui_mapping, "inspect_record", lambda *a: {})
     monkeypatch.setattr(ui, "sync_general_expected", lambda: {})
     monkeypatch.setattr(ui, "log_event", lambda *a, **k: None)
-    monkeypatch.setattr(step_templates, "template_catalog", lambda _: {})
-    result = ui.collect_ui("test", accessibility_backend="none")
+    template_calls = []
+
+    def templates(session):
+        template_calls.append(session)
+        return {"element_count": 5, "case_count": 5, "json": "catalog.json", "html": "review.html"}
+
+    monkeypatch.setattr(step_templates, "template_catalog", templates)
+    result = ui.collect_ui(
+        "test", accessibility_backend="none", refresh_templates=refresh_templates
+    )
     assert attempted == [1, 2, 3, 4]
     assert [capture["hwnd"] for capture in result["screenshots"]] == [1, 2, 3]
     assert result["capture_errors"] == [{"hwnd": 4, "error": "Modal capture unavailable"}]
     assert len(result["nodes"]) == 5
+    assert len(registered) == 1 and result["ui_registry"]["registered"]
+    assert template_calls == (["test"] if refresh_templates else [])
+    persisted = json.loads(Path(result["evidence"]).read_text())
+    assert persisted["screenshots"] == result["screenshots"]
+    assert persisted["ui_registry"] == result["ui_registry"]
+    if not refresh_templates:
+        assert result["step_template_sync"]["deferred"]
+        assert result["step_template_sync"]["next_tool"] == "hpe990_tc_templates"

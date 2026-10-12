@@ -5,7 +5,7 @@
 | High | f182f260 | 사용자 요구: 임의 단축키·키 조합 MCP 지원 및 결과 검증 |
 | High | 955a2810 | 사용자 요구: OCR 전용 요소의 직접 MCP 제어 지원 및 검증 |
 | High | 214bb297 | 사용자 요구: 모든 입력란 값 교체 MCP 지원 및 검증; 키·OCR 제어 선행 |
-| High | da25b476 | 사용자 요구: timestamp 기반 별도 활동 로그를 RAM 수집과 병행 기록 |
+| Normal | 0b577124 | 실제 입력 BDD 도구·준비 조건 검증 보완; 제품 활성화 해결은 fea44e48 |
 
 # Blocked (not scheduled)
 | 우선순위 | UUID | 근거 |

@@ -45,13 +45,43 @@ def _manifest(session_id: str) -> Path:
 def semantic_status(session_id: str) -> dict:
     path = _manifest(session_id)
     if not path.exists():
-        return {"session_id": session_id, "active": False, "scope": SCOPE}
+        result = {"session_id": session_id, "active": False, "scope": SCOPE}
+        return {**result, **observation_health(result)}
     result = json.loads(path.read_text(encoding="utf-8"))
     result["active"] = _worker_alive(result["worker"])
     status = Path(result["directory"]) / "status.json"
     if status.exists():
         result["observation"] = json.loads(status.read_text(encoding="utf-8"))
+    result.update(observation_health(result))
     return result
+
+
+def observation_health(status: dict, now_ms: int | None = None) -> dict:
+    """Worker ownership is distinct from fresh, successful sampling."""
+    now_ms = time.time_ns() // 1000000 if now_ms is None else now_ms
+    sample = status.get("observation", {})
+    timestamp = sample.get("observed_unix_ms")
+    age = max(0, now_ms - timestamp) if timestamp is not None else None
+    threshold = max(10000, 4 * status.get("interval_ms", 250))
+    if not status.get("active"):
+        state = "stopped"
+    elif timestamp is None:
+        state = "starting"
+    elif sample.get("error"):
+        state = "error"
+    elif age > threshold:
+        state = "stale"
+    else:
+        state = "observing"
+    return {
+        "sampling_healthy": state == "observing",
+        "observation_health": {
+            "state": state,
+            "observed_age_ms": age,
+            "stale_after_ms": threshold,
+            "scope": "Last observation freshness; not full temporal/UI coverage.",
+        },
+    }
 
 
 def semantic_start(
@@ -71,6 +101,9 @@ def semantic_start(
     with FileLock(str(path) + ".lock", timeout=30):
         existing = semantic_status(session_id)
         if existing["active"]:
+            from cores.hpe990.functions.activity_log import ensure_activity_log
+
+            existing["activity_log"] = ensure_activity_log(session_id)
             return existing
         ram = start_ram(session_id)
         directory = path.parent / uuid.uuid4().hex
@@ -139,6 +172,8 @@ def semantic_read(session_id: str, after_sequence: int = 0, limit: int = 200) ->
         "active": result["active"],
         "next_sequence": events[-1]["sequence"] if events else after_sequence,
         "source": str(source),
+        "sampling_healthy": result["sampling_healthy"],
+        "observation_health": result["observation_health"],
     }
 
 

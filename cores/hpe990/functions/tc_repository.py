@@ -8,6 +8,26 @@ from gherkin.parser import Parser
 
 from cores.hpe990.common.paths import hpe990_folders
 
+REVIEW_STATES = ("to_review", "reviewed")
+
+
+def review_state(path: Path) -> str | None:
+    """Resolve aliases before deciding whether an authored file is reviewed."""
+    try:
+        parts = Path(path).resolve().relative_to(hpe990_folders.D_HPE990_TC_CASES.resolve()).parts
+    except ValueError:
+        return None
+    return parts[0] if len(parts) > 1 and parts[0] in REVIEW_STATES else None
+
+
+def review_files(directory):
+    """Placement is the sole state authority; reject orphaned authoring files."""
+    files = sorted(directory.rglob("*.feature"))
+    for path in files:
+        if path.relative_to(directory).parts[0] not in REVIEW_STATES:
+            raise ValueError(f"TC must be under to_review or reviewed: {path}")
+    return files
+
 
 def review_stamp(directory=None, order_file=None):
     """Include additions, deletions, renames and changes in the watcher inventory."""
@@ -25,7 +45,7 @@ def load_review_source(directory=None, order_file=None) -> str:
     if len(order) != len(set(order)):
         raise ValueError("Duplicate TC identity in review order")
     cases = {}
-    for path in sorted(directory.rglob("*.feature")):
+    for path in review_files(directory):
         source = path.read_text(encoding="utf-8")
         feature = Parser().parse(source)["feature"]
         children = feature["children"]
@@ -45,9 +65,12 @@ def load_review_source(directory=None, order_file=None) -> str:
         lines = source.splitlines()
         body = "\n".join(lines[scenario["location"]["line"] - 1 :]).rstrip()
         inherited = [t["name"] for t in feature["tags"]]
+        if any(t.startswith("@review-") for t in inherited + tags):
+            raise ValueError(f"Review state must come from folder, not authored tags: {path}")
         if any(t.startswith("@path-") for t in tags):
             inherited = [t for t in inherited if not t.startswith("@path-")]
-        combined = list(dict.fromkeys(inherited + tags))
+        state = path.relative_to(directory).parts[0]
+        combined = list(dict.fromkeys(inherited + tags)) + [f"@review-{state}"]
         cases[identity] = "  " + " ".join(combined) + "\n" + body + "\n"
     if not cases:
         raise ValueError("No review TC files found")
@@ -58,7 +81,7 @@ def load_review_source(directory=None, order_file=None) -> str:
 
 
 def case_file(identity: str) -> Path:
-    matches = list(hpe990_folders.D_HPE990_TC_CASES.rglob(identity + ".feature"))
+    matches = [p for p in review_files(hpe990_folders.D_HPE990_TC_CASES) if p.stem == identity]
     if len(matches) != 1:
         raise ValueError(f"Expected one file for {identity}")
     return matches[0]

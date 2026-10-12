@@ -2,6 +2,7 @@
 
 import re
 from html import escape
+from pathlib import Path
 from urllib.parse import unquote
 
 from gherkin.parser import Parser
@@ -15,17 +16,27 @@ TEST_TARGET = {
     "executable": "HPE990_v1.22_251010.exe",
 }
 
+
+def chip_class(label):
+    if label == "검수 완료":
+        return "reviewed"
+    if label == "검수 대기":
+        return "awaiting"
+    return "actual" if label == ACTUAL_BEHAVIOR_LABEL else "pending"
+
+
 STYLE = """
-:root{font-family:'Segoe UI','Malgun Gothic',sans-serif;color:#20334a;background:#f3f6fa}
-*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}header{background:#172e48;color:white;padding:28px 32px}
-h1{font-size:25px;margin:0 0 10px}header p{margin:0;color:#c7d8ec;font-size:14px}
+:root{color-scheme:light;font-family:'Segoe UI','Malgun Gothic',sans-serif;color:#20334a;background:#f3f6fa}
+*{box-sizing:border-box}[hidden]{display:none!important}body{margin:0}header{background:#eaf1f8;color:#20334a;padding:28px 32px}header>p{margin:0;color:#526a82;font-size:14px}
 .toolbar{display:flex;gap:12px;align-items:center;padding:18px 30px;flex-wrap:wrap;position:sticky;top:0;background:#f3f6fa;z-index:2}
 input{font:inherit;padding:10px 14px;border:1px solid #c5d3e2;border-radius:7px;background:white;min-width:240px;flex:1}#count{font-size:13px;color:#536f8b}
 .layout{display:grid;grid-template-columns:var(--tree-width,350px) 10px minmax(0,1fr);gap:8px;padding:0 30px 32px}
 .tree-resizer{position:sticky;top:82px;align-self:start;height:82vh;cursor:col-resize;touch-action:none;border-radius:5px;display:flex;justify-content:center}.tree-resizer:before{content:"";width:3px;background:#ccd9e6;border-radius:3px}.tree-resizer:hover:before,.tree-resizer:focus-visible:before{background:#3074bd}.tree-resizer:focus-visible{outline:2px solid #3074bd;outline-offset:2px}body.resizing-tree{cursor:col-resize;user-select:none}
+.tree-heading{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:0 0 12px;padding:4px 0 10px;border-bottom:1px solid #dae4ee}.tree-heading .review-heading{font-size:16px;white-space:nowrap;margin:0;padding:0;border:0}.tree-actions{display:flex;gap:4px;flex:0 0 auto;justify-content:flex-end}.tree-actions button{font:inherit;font-size:10px;white-space:nowrap;padding:6px;border:1px solid #c5d3e2;border-radius:6px;background:white;color:#315b82;cursor:pointer;box-shadow:0 2px 8px #20334a22}.tree-actions button:hover{background:#f0f5fa}.masthead{border-bottom-color:#cbd9e7}.masthead .tree-actions button{background:#315b82;color:#f5f9ff;border-color:#315b82;box-shadow:none}.masthead .tree-actions button:hover{background:#274b6d}
 .tree-panel{position:sticky;top:82px;align-self:start;min-width:0}nav{max-height:calc(82vh - 54px);overflow:auto;background:white;border:1px solid #dae4ee;border-radius:10px;padding:12px}
+nav.tc-collapsed>a,nav.tc-collapsed .tree-children>a{display:none}
 
-.review-heading{font-size:18px;margin:0 0 16px;padding:4px 0 12px;border-bottom:1px solid #dae4ee}
+.review-heading{font-size:16px;margin:0 0 16px;padding:4px 0 12px;border-bottom:1px solid #dae4ee}
 nav details{margin:3px 0}nav summary{display:flex;align-items:center;gap:7px;cursor:pointer;list-style:none;padding:8px 4px;color:#31516e;font-size:13px;font-weight:600;border-radius:5px}
 nav summary::-webkit-details-marker{display:none}nav summary:before{content:"›";color:#8298ae;transition:transform .12s}nav details[open]>summary:before{transform:rotate(90deg)}
 nav summary:hover{background:#f0f5fa}.tree-count{margin-left:auto;color:#7b8fa3;font-size:11px;font-weight:400;white-space:nowrap}.tree-children{margin-left:9px;padding-left:8px;border-left:1px solid #e1e9f2}
@@ -42,11 +53,19 @@ table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:14px}th,t
 th{background:#eaf1f8}th:first-child{width:65px;text-align:center}th:nth-child(2){width:49%}td:first-child{text-align:center;font-weight:600;background:#f7faff}
 ol{margin:0;padding-left:22px}td p{margin:0}.intro{color:#46617b}.empty{padding:20px;color:#6b7e93}
 .preconditions th:nth-child(2){width:auto}.precondition-details{white-space:pre-wrap;line-height:1.8;padding-left:16px}
-@media(max-width:900px){.layout{grid-template-columns:1fr;padding:0 14px 20px}.tree-resizer{display:none}.tree-panel{position:static}nav{max-height:200px}.toolbar{padding:14px}article{padding:14px}}
-@media print{body{background:white}header{background:white;color:black;padding:0 0 16px}header p{color:#444}.toolbar,.tree-panel,.tree-resizer{display:none}.layout{display:block;padding:0}article,.intro{border:0;padding:0}.tc{display:block!important}table{font-size:11px}tr{break-inside:avoid}h2{break-after:avoid}.empty{display:none}}
+@media(max-width:900px){header{padding:20px 14px}.layout{grid-template-columns:1fr;padding:0 14px 20px}.tree-resizer{display:none}.tree-panel{position:static}nav{max-height:200px}.toolbar{padding:14px}article{padding:14px}}
+body.dark{color-scheme:dark;color:#e3edf7;background:#111923}body.dark header{background:#090f17;color:#e3edf7}body.dark header p{color:#a9bfd6}body.dark .masthead{border-bottom-color:#ffffff33}body.dark .masthead .tree-actions button{background:#202c3a;color:#e3edf7;border-color:#40536a}body.dark .masthead .tree-actions button:hover{background:#2b3b4d}body.dark .toolbar{background:#111923}body.dark input,body.dark button{background:#202c3a;color:#e3edf7;border-color:#40536a}body.dark #count{color:#a9bfd6}body.dark nav,body.dark article,body.dark .intro{background:#192431;border-color:#344457;color:#e3edf7}body.dark nav summary,body.dark nav a{color:#bdd4ec}body.dark nav summary:hover,body.dark nav a:hover{background:#25364a}body.dark nav a[aria-current="true"]{background:#253b55}body.dark .tree-children{border-color:#344457}body.dark .tc-meta,body.dark .tc-id,body.dark .tree-id,body.dark .tree-count,body.dark .legend-item{color:#a9bfd6}body.dark .tree-resizer:before{background:#40536a}body.dark th{background:#263547}body.dark th,body.dark td{border-color:#40536a}body.dark td:first-child{background:#202c3a}body.dark .badge{background:#29394b;color:#d0dfef}body.dark .pending{background:#593f1e;color:#ffd18a}body.dark .actual{background:#552b32;color:#ffb9be}body.dark .badge.reviewed,body.dark .tree-chip.reviewed{background:#1e4934;color:#9be0b4}body.dark .badge.awaiting,body.dark .tree-chip.awaiting{background:#233e5e;color:#b3d5ff}body.dark .intro{color:#bdd4ec}body.dark .empty{color:#a9bfd6}body.dark mark{background:#735b1d;color:#fff1b2}@media print{body{background:white}header{background:white;color:black;padding:0 0 16px}header p{color:#444}.toolbar,.tree-panel,.tree-resizer{display:none}.layout{display:block;padding:0}article,.intro{border:0;padding:0}.tc{display:block!important}table{font-size:11px}tr{break-inside:avoid}h2{break-after:avoid}.empty{display:none}}
+"""
+
+STYLE += """
+.badge.reviewed,.tree-chip.reviewed{background:#def3e6;color:#17633b}
+.badge.awaiting,.tree-chip.awaiting{background:#e4edf9;color:#24588c}
 """
 
 SCRIPT = r"""
+const themeKey='auto-emulator-dark-mode',themeButton=document.getElementById('theme-toggle');
+function setTheme(dark){document.body.classList.toggle('dark',dark);themeButton.setAttribute('aria-pressed',String(dark));themeButton.textContent=dark?'\ub77c\uc774\ud2b8 \ubaa8\ub4dc':'\ub2e4\ud06c \ubaa8\ub4dc';try{localStorage.setItem(themeKey,dark?'dark':'light')}catch{}}
+let savedTheme=null;try{savedTheme=localStorage.getItem(themeKey)}catch{}setTheme(savedTheme==='dark');themeButton.addEventListener('click',()=>setTheme(!document.body.classList.contains('dark')));
 const layout=document.querySelector('.layout'),resizer=document.getElementById('tree-resizer');
 let treeWidth=350;
 try{const saved=Number(localStorage.getItem('tc-review-tree-width'));if(Number.isFinite(saved)&&saved>=240)treeWidth=saved;}catch{}
@@ -72,100 +91,9 @@ resizer.addEventListener('keydown',event=>{
  if(!['ArrowLeft','ArrowRight','Home'].includes(event.key))return;
  event.preventDefault();setTreeWidth(event.key==='Home'?350:treeWidth+(event.key==='ArrowRight'?20:-20),true);
 });
-const search=document.getElementById('search'),cards=[...document.querySelectorAll('.tc')];
-const normalize=text=>text.normalize('NFKC').toLowerCase().replace(/\s+/g,' ').trim();
-function fuzzyScore(query,text){
- if(!query)return 0;
- let cursor=0,previous=-2,score=0;
- for(const letter of query){
-  const index=text.indexOf(letter,cursor);if(index<0)return null;
-  score+=index===previous+1?8:3;
-  if(index===0||/[\s_\-/>()]/.test(text[index-1]))score+=4;
-  previous=index;cursor=index+letter.length;
- }
- if(text.startsWith(query))score+=20;
- if(text.includes(query))score+=20;
- return score-text.length/20;
-}
-const records=cards.map((card,index)=>({card,index,
- link:document.querySelector('nav a[href="#'+card.id+'"]'),
- title:normalize(card.querySelector('h2').textContent.replace(card.id,'')),
- fields:[normalize(card.id),...[...card.querySelectorAll('h2,.tc-meta,li,td,.precondition-details')].map(element=>normalize(element.textContent.replace(card.id,'')))]}));
-const branches=[...document.querySelectorAll("nav details")];
-const containers=[...document.querySelectorAll(".tree-children")].map(node=>({node,children:[...node.children]}));
-const highlights=[];
-document.querySelectorAll("nav .tree-title,nav .tree-id,nav .tree-label").forEach(node=>highlights.push({node,text:node.textContent}));
-for(const card of cards){
- const walker=document.createTreeWalker(card,NodeFilter.SHOW_TEXT),texts=[];
- while(walker.nextNode())if(walker.currentNode.textContent.trim())texts.push(walker.currentNode);
- for(const text of texts){const node=document.createElement("span");text.replaceWith(node);node.textContent=text.textContent;highlights.push({node,text:text.textContent});}
-}
-function highlight(node,text,terms){
- if(!terms.length){node.textContent=text;return;}
- const chars=Array.from(text),folded=[],mapping=[],marked=new Set();
- chars.forEach((char,index)=>Array.from(char.normalize("NFKC").toLowerCase()).forEach(letter=>{folded.push(letter);mapping.push(index)}));
- for(const term of terms){let cursor=0,positions=[];
-  for(const letter of term){const index=folded.indexOf(letter,cursor);if(index<0){positions=[];break;}positions.push(mapping[index]);cursor=index+1;}
-  positions.forEach(index=>marked.add(index));
- }
- if(!marked.size){node.textContent=text;return;}
- const fragment=document.createDocumentFragment();let buffer="",last=false;
- function flush(){if(!buffer)return;const part=last?document.createElement("mark"):document.createTextNode("");part.textContent=buffer;fragment.append(part);buffer="";}
- chars.forEach((char,index)=>{const active=marked.has(index);if(active!==last){flush();last=active;}buffer+=char;});flush();node.replaceChildren(fragment);
-}
-try{const saved=JSON.parse(sessionStorage.getItem("tc-review-tree-open")||"{}");branches.forEach(node=>{if(node.dataset.node in saved)node.open=saved[node.dataset.node];});}catch{}
-branches.forEach(node=>node.addEventListener("toggle",()=>{
- if(!search.value.trim())sessionStorage.setItem("tc-review-tree-open",JSON.stringify(Object.fromEntries(branches.map(branch=>[branch.dataset.node,branch.open]))));
-}));
-let matches=[],selected=0,searching=false,previousOpen=new Map();
-function reveal(link){let parent=link.parentElement;while(parent){if(parent.tagName==="DETAILS")parent.open=true;parent=parent.parentElement;}}
-function selectResult(index){
- selected=Math.max(0,Math.min(index,matches.length-1));
- records.forEach(record=>record.link.removeAttribute('aria-current'));
- if(matches.length){matches[selected].link.setAttribute('aria-current','true');reveal(matches[selected].link);}
-}
-function filter(){
- const terms=normalize(search.value).split(' ').filter(Boolean);
- const active=matches[selected]?.card.id;
- if(terms.length&&!searching)previousOpen=new Map(branches.map(node=>[node,node.open]));
- matches=[];
- for(const record of records){
-  let score=0,show=true;
-  for(const term of terms){
-   const titleScore=fuzzyScore(term,record.title);
-   const scores=record.fields.map(field=>fuzzyScore(term,field)).filter(value=>value!==null);
-   if(!scores.length){show=false;break;}
-   score+=titleScore===null?Math.max(...scores):titleScore+100;
-  }
-  record.card.hidden=record.link.hidden=!show;
-  if(show)matches.push({...record,score});
- }
- matches.sort((a,b)=>b.score-a.score||a.index-b.index);
- const ordered=[...matches,...records.filter(record=>record.card.hidden)];
- const cardFragment=document.createDocumentFragment();ordered.forEach(record=>cardFragment.append(record.card));document.getElementById('results').append(cardFragment);
- const scores=new Map(matches.map(record=>[record.link,record.score]));
- function best(node){const links=node.tagName==="A"?[node]:[...node.querySelectorAll("a")];return Math.max(-Infinity,...links.map(link=>scores.get(link)??-Infinity));}
- containers.forEach(({node,children})=>{const sorted=terms.length?[...children].sort((a,b)=>{const left=best(a),right=best(b);return left===right?0:right-left;}):children;node.append(...sorted);});
- [...branches].reverse().forEach(node=>{const total=node.querySelectorAll("a").length,count=node.querySelectorAll("a:not([hidden])").length;node.hidden=count===0;node.querySelector(":scope > summary .tree-count").textContent=total+"개";if(terms.length&&count)node.open=true;else if(!terms.length&&searching)node.open=previousOpen.get(node)??node.open;});
- highlights.forEach(({node,text})=>highlight(node,text,terms));
- document.getElementById('count').textContent=matches.length+' / '+cards.length+'개 TC';
- document.getElementById('empty').hidden=matches.length>0;
- searching=terms.length>0;
- const hash=location.hash.slice(1),preferred=matches.findIndex(record=>record.card.id===(hash||active));
- selectResult(preferred<0?0:preferred);
-}
-records.forEach(record=>record.link.addEventListener("click",()=>{const index=matches.findIndex(item=>item.card.id===record.card.id);if(index>=0)selectResult(index);}));
-window.addEventListener("hashchange",()=>{const index=matches.findIndex(record=>record.card.id===location.hash.slice(1));if(index>=0)selectResult(index);});
-search.addEventListener('input',filter);
-search.addEventListener('keydown',event=>{
- if(event.isComposing)return;
- if(event.key==='ArrowDown'||event.key==='ArrowUp'){
-  event.preventDefault();selectResult(selected+(event.key==='ArrowDown'?1:-1));
-  if(matches.length)matches[selected].link.scrollIntoView({block:'nearest'});
- }else if(event.key==='Enter'&&matches.length){event.preventDefault();matches[selected].link.click();}
-});
-filter();
+
 """
+SCRIPT += Path(__file__).with_name("tc_review_search.js").read_text(encoding="utf-8")
 
 
 TYPE_LABELS = {
@@ -222,7 +150,7 @@ def render_navigation(entries: list[dict]) -> str:
         chip = (
             '<span class="tree-chips">'
             + "".join(
-                f'<span class="tree-chip {"actual" if label == ACTUAL_BEHAVIOR_LABEL else "pending"}">{escape(label)}</span>'
+                f'<span class="tree-chip {chip_class(label)}">{escape(label)}</span>'
                 for label in labels
             )
             + "</span>"
@@ -314,10 +242,19 @@ def render_review(source: str) -> tuple[str, dict]:
         specifications = [label for tag, label in SPECIFICATION_LABELS.items() if tag in tags]
         if pending and not specifications:
             specifications = ["요구사항 미확정"]
+        review_tags = [tag for tag in tags if tag.startswith("@review-")]
+        if len(review_tags) > 1 or any(
+            tag not in ("@review-to_review", "@review-reviewed") for tag in review_tags
+        ):
+            raise ValueError(f"Invalid review state: {identity}")
+        if review_tags and review_tags[0] == "@review-reviewed":
+            specifications = [
+                "검수 완료" if review_tags[0] == "@review-reviewed" else "검수 대기"
+            ] + specifications
         chips_html = (
             '<div class="tc-chips">'
             + "".join(
-                f'<span class="badge {"actual" if label == ACTUAL_BEHAVIOR_LABEL else "pending"}">{escape(label)}</span>'
+                f'<span class="badge {chip_class(label)}">{escape(label)}</span>'
                 for label in specifications
             )
             + "</div>"
@@ -372,11 +309,11 @@ def render_review(source: str) -> tuple[str, dict]:
     document = f"""<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TC 검수</title><style>{STYLE}</style></head><body>
-<header><h1>TC 검수</h1>
+<header><div class="tree-heading masthead"><h1 class="review-heading">TC 검수</h1><div class="tree-actions"><button id="theme-toggle" type="button" aria-pressed="false">&#45796;&#53356; &#47784;&#46300;</button></div></div>
 <p>{len(cards)}개 TC · {total_groups}개 Step 묶음 · 시나리오 작성 초안 · 실행 결과 없음</p></header>
-<div class="toolbar"><input id="search" type="text" aria-label="TC 퍼지 검색" autocomplete="off" autofocus placeholder="TC 검색기">
+<div class="toolbar"><input id="search" type="text" aria-label="TC 검색 표현식" autocomplete="off" autofocus placeholder="TC 검색: 예) 버튼 !검수 | 저장" title="공백 AND · !제외 · | OR · ^접두 · 접미$ · '정확 포함">
 <span id="count" role="status" aria-live="polite"></span></div>
-<div class="layout"><aside class="tree-panel"><h2 id="tc-tree-title" class="review-heading">TC 검수 스위트</h2><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
+<div class="layout"><aside class="tree-panel"><div class="tree-heading"><h2 id="tc-tree-title" class="review-heading">TC 검수 스위트</h2><div class="tree-actions" aria-label="Suite expansion controls"><button id="tree-collapse-tcs" type="button" title="Collapse TC nodes">&#45432;&#46300;&#47564; &#51217;&#44592;</button><button id="tree-expand-all" type="button" title="Expand every suite">&#47784;&#46160; &#54204;&#52824;&#44592;</button></div></div><nav id="tc-tree" aria-labelledby="tc-tree-title">{navigation_html}</nav></aside><div id="tree-resizer" class="tree-resizer" role="separator" tabindex="0" aria-label="TC 트리 폭 조절" aria-orientation="vertical" aria-controls="tc-tree" aria-valuemin="240" aria-valuenow="350" title="드래그 또는 좌우 방향키로 폭 조절"></div><main>
 <h2 class="review-heading">TC 검수 본문</h2>
 <p id="empty" class="empty" hidden>검색 결과가 없습니다.</p><div id="results">{"".join(cards)}</div>
 <section class="intro"><h2>검수 범위</h2><ul>

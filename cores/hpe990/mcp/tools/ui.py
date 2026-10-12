@@ -9,6 +9,28 @@ from cores.hpe990.functions.ui_drag import drag_ui
 from cores.hpe990.functions.ui_viewer import stop_ui_viewer, visualize_ui
 
 
+def hpe990_ui_activate(session_id: str, ui_id: str) -> dict:
+    """Activate a live native UI ID, restoring its minimized root, without sending keys.
+
+    Connects helper, foreground and target input queues for the operation only.
+    Verifies foreground and focus; unsupported/blocked targets fail with diagnostic trace.
+    Never changes system foreground policy or sends synthetic Alt/caption clicks.
+    """
+    from cores.hpe990.functions.ui_keyboard import activate_ui
+
+    return activate_ui(session_id, ui_id)
+
+
+def hpe990_window_minimize(session_id: str, ui_id: str) -> dict:
+    """Minimize an observed enabled native root without closing it; RAM remains active.
+
+    Use hpe990_ui_activate on its UI ID to restore and activate it again.
+    """
+    from cores.hpe990.functions.ui_keyboard import minimize_ui
+
+    return minimize_ui(session_id, ui_id)
+
+
 def hpe990_ui_drag(
     session_id: str,
     source_ui_id: str,
@@ -64,7 +86,10 @@ def hpe990_ui_viewer_stop() -> dict:
 
 
 def hpe990_ui_collect(
-    session_id: str, screenshots: bool = True, accessibility_backend: str = "msaa"
+    session_id: str,
+    screenshots: bool = True,
+    accessibility_backend: str = "msaa",
+    refresh_templates: bool = True,
 ) -> dict:
     """Collect HWNDs, accessibility and screenshot-derived labels/input-frame candidates.
 
@@ -75,8 +100,11 @@ def hpe990_ui_collect(
     identity_scope distinguishes reusable semantic paths from unresolved session identities.
     Successful collection refreshes TC-010's marked General display expectations from
     the identity registry; tc_sync reports generation status, never a test execution result.
+    Set refresh_templates=false during repeated collection to defer aggregate draft export;
+    screenshots, provider evidence and UI-ID registration are still retained. Finish the
+    batch with hpe990_tc_templates to regenerate bindings for all newly observed IDs.
     """
-    return collect_ui(session_id, screenshots, accessibility_backend)
+    return collect_ui(session_id, screenshots, accessibility_backend, refresh_templates)
 
 
 def hpe990_ui_control(
@@ -87,6 +115,7 @@ def hpe990_ui_control(
     text: str | None = None,
     hwnd: int | None = None,
     point_fraction: list[float] | None = None,
+    refresh_templates: bool = True,
 ) -> dict:
     """Operate one uniquely identified live control while RAM records before/after evidence.
 
@@ -94,9 +123,20 @@ def hpe990_ui_control(
     Scroll targets the observed Qt scroll-area viewport. Ambiguous, hidden,
     disabled, stale or foreign controls are rejected. root_hwnd scopes duplicate names.
     Text input is restricted to observed edit controls. No arbitrary screen coordinates.
+    refresh_templates=false defers draft export for both snapshots only; UI registration
+    and RAM evidence remain active. Complete batches with hpe990_tc_templates.
     """
     try:
-        return control_ui(session_id, name, action, root_hwnd, text, hwnd, point_fraction)
+        return control_ui(
+            session_id,
+            name,
+            action,
+            root_hwnd,
+            text,
+            hwnd,
+            point_fraction,
+            refresh_templates=refresh_templates,
+        )
     except Exception as error:
         try:
             session_guard(session_id)
@@ -128,6 +168,42 @@ def hpe990_ui_catalog(session_id: str) -> dict:
     return ui_catalog(session_id)
 
 
+def hpe990_ui_keys(session_id: str, ui_id: str, keys: list[str]) -> dict:
+    """Deliver key chords/sequences to one current native UI ID with RAM active.
+
+    Examples: ["Ctrl+A"], ["Home", "Shift+End"], ["F6", "Escape"].
+    Supports Ctrl/Alt/Shift/Win, A-Z, 0-9, F1-F24 and named navigation/edit keys.
+    Rejects stale/disabled targets, unknown keys and pre-held modifiers. System shortcuts
+    can leave the application; delivery receipts do not imply an application action.
+    """
+    from cores.hpe990.functions.ui_keyboard import keys_ui
+
+    return keys_ui(session_id, ui_id, keys)
+
+
+def hpe990_ui_control_visual(session_id: str, ui_id: str, action: str = "click") -> dict:
+    """Recollect and click an observed OCR UI ID; never reuse old screenshot coordinates.
+
+    Rebind a changed visual ID only for one unique same-root label/type. Reject missing,
+    ambiguous, minimized, stale-image, disabled-root or occluded targets. Individual
+    element editability remains unknown unless separately observed. Returns RAM evidence.
+    """
+    from cores.hpe990.functions.ui_visual_control import control_visual
+
+    return control_visual(session_id, ui_id, action)
+
+
 def hpe990_window_geometry(session_id: str, hwnd: int, rect: list[int]) -> dict:
     """Move/resize one identity-checked session window while RAM records requested/actual bounds."""
     return window_geometry(session_id, hwnd, rect)
+
+
+def hpe990_ui_input_inventory(session_id: str) -> dict:
+    """List all collected input candidates by UI ID, including hidden/readonly/unknown.
+
+    Derives evidence from this session's snapshots. Provider editability is reported
+    separately from actual replacement verification. Does not modify input values.
+    """
+    from cores.hpe990.functions.ui_inputs import input_inventory
+
+    return input_inventory(session_id)

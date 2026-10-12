@@ -73,9 +73,9 @@ def test_default_sync_updates_only_individual_tc_file(tmp_path, monkeypatch):
     from cores.hpe990.common.paths import hpe990_folders
 
     cases = tmp_path / "cases"
-    cases.mkdir()
+    (cases / "to_review").mkdir(parents=True)
     monkeypatch.setattr(hpe990_folders, "D_HPE990_TC_CASES", cases)
-    source = cases / "TC-010.feature"
+    source = cases / "to_review" / "TC-010.feature"
     source.write_text(
         "@path-Setup/Preferences/General\nFeature: General\n"
         "  @TC-010 @expected-collected-General\n  Scenario: TC-010 General\n"
@@ -83,7 +83,7 @@ def test_default_sync_updates_only_individual_tc_file(tmp_path, monkeypatch):
         "    Then Old\n    # END collected General elements\n",
         encoding="utf-8",
     )
-    other = cases / "TC-030.feature"
+    other = cases / "to_review" / "TC-030.feature"
     other.write_text("Untouched authoring file", encoding="utf-8")
     database = tmp_path / "ui.sqlite3"
     with sqlite3.connect(database) as db:
@@ -94,3 +94,41 @@ def test_default_sync_updates_only_individual_tc_file(tmp_path, monkeypatch):
     assert result["source"] == str(source)
     assert "And Language" in source.read_text(encoding="utf-8")
     assert other.read_text(encoding="utf-8") == "Untouched authoring file"
+
+
+def test_reviewed_case_and_markdown_unchanged_until_moved_back(tmp_path, monkeypatch):
+    from cores.hpe990.common.paths import hpe990_folders
+
+    cases = tmp_path / "tc"
+    reviewed = cases / "reviewed" / "setup" / "TC-010.feature"
+    reviewed.parent.mkdir(parents=True)
+    monkeypatch.setattr(hpe990_folders, "D_HPE990_TC_CASES", cases)
+    authored = (
+        "@path-Setup/Preferences/General\nFeature: General\n"
+        "  @TC-010 @expected-collected-General\n  Scenario: TC-010 General\n"
+        "    When Scroll\n    # BEGIN collected General elements\n"
+        "    Then Reviewed content\n    # END collected General elements\n"
+    ).encode()
+    reviewed.write_bytes(authored)
+    markdown = reviewed.with_suffix(".md")
+    markdown.write_text("Reviewed companion", encoding="utf-8")
+    database = tmp_path / "ui.sqlite3"
+    with sqlite3.connect(database) as db:
+        db.execute("CREATE TABLE elements(number INTEGER PRIMARY KEY,selector TEXT)")
+        insert(db, "UI_GENERAL::STATIC_DATA::Newly observed field")
+    original_mtime = reviewed.stat().st_mtime_ns
+    for explicit_source in (None, reviewed, reviewed.parent / ".." / "setup" / reviewed.name):
+        result = sync_general_expected(database, explicit_source)
+        assert result["updated"] is False
+        assert result["review_state"] == "reviewed"
+        assert "protected" in result["reason"]
+    assert reviewed.read_bytes() == authored
+    assert reviewed.stat().st_mtime_ns == original_mtime
+    assert markdown.read_text(encoding="utf-8") == "Reviewed companion"
+    assert not reviewed.with_suffix(".feature.lock").exists()
+    pending = cases / "to_review" / "setup" / reviewed.name
+    pending.parent.mkdir(parents=True)
+    reviewed.rename(pending)
+    assert sync_general_expected(database)["updated"] is True
+    assert "And Newly observed field" in pending.read_text(encoding="utf-8")
+    assert markdown.read_text(encoding="utf-8") == "Reviewed companion"

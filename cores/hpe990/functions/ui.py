@@ -22,6 +22,24 @@ from cores.hpe990.functions.ui_identity import assign_ui_ids
 from cores.hpe990.functions.visual_elements import collect_visual_elements
 
 
+def _native_node(hwnd: int) -> dict:
+    """Read one HWND for a final target check without enumerating the entire app again."""
+    _, pid = win32process.GetWindowThreadProcessId(hwnd)
+    return {
+        "hwnd": hwnd,
+        "pid": pid,
+        "name": win32gui.GetWindowText(hwnd),
+        "class_name": win32gui.GetClassName(hwnd),
+        "parent": win32gui.GetParent(hwnd)
+        if win32gui.GetWindowLong(hwnd, win32con.GWL_STYLE) & win32con.WS_CHILD
+        else 0,
+        "owner": win32gui.GetWindow(hwnd, win32con.GW_OWNER),
+        "visible": bool(win32gui.IsWindowVisible(hwnd)),
+        "enabled": bool(win32gui.IsWindowEnabled(hwnd)),
+        "rect": list(win32gui.GetWindowRect(hwnd)),
+    }
+
+
 def _native_tree(session: dict) -> list[dict]:
     pids = {p["pid"] for p in session["processes"]}
     nodes = {}
@@ -30,21 +48,9 @@ def _native_tree(session: dict) -> list[dict]:
         try:
             _, pid = win32process.GetWindowThreadProcessId(hwnd)
             if pid in pids:
-                nodes[hwnd] = {
-                    "hwnd": hwnd,
-                    "pid": pid,
-                    "name": win32gui.GetWindowText(hwnd),
-                    "class_name": win32gui.GetClassName(hwnd),
-                    "parent": (
-                        win32gui.GetParent(hwnd)
-                        if win32gui.GetWindowLong(hwnd, win32con.GWL_STYLE) & win32con.WS_CHILD
-                        else 0
-                    ),
-                    "owner": win32gui.GetWindow(hwnd, win32con.GW_OWNER),
-                    "visible": bool(win32gui.IsWindowVisible(hwnd)),
-                    "enabled": bool(win32gui.IsWindowEnabled(hwnd)),
-                    "rect": list(win32gui.GetWindowRect(hwnd)),
-                }
+                node = _native_node(hwnd)
+                if node["pid"] in pids:
+                    nodes[hwnd] = node
         except win32gui.error:
             pass
 
@@ -73,16 +79,81 @@ def _capture(hwnd: int, destination) -> dict:
         painted = ctypes.windll.user32.PrintWindow(hwnd, target.GetSafeHdc(), 0)
         if not painted:
             target.BitBlt((0, 0), (width, height), source, (0, 0), win32con.SRCCOPY)
-        image = Image.frombuffer(
-            "RGB", (width, height), bitmap.GetBitmapBits(True), "raw", "BGRX", 0, 1
-        )
+
+        def read_image():
+            return Image.frombuffer(
+                "RGB", (width, height), bitmap.GetBitmapBits(True), "raw", "BGRX", 0, 1
+            )
+
+        image = read_image()
+        method = "PrintWindow" if painted else "BitBlt"
+        diagnostics = {}
+
+        def uniform_content(candidate):
+            # Qt may paint only a thin popup frame around an empty content buffer.
+            content = (
+                candidate.crop((3, 3, width - 3, height - 3))
+                if width > 8 and height > 8
+                else candidate
+            )
+            return all(low == high for low, high in content.getextrema())
+
+        if painted and uniform_content(image):
+            # Qt can report successful painting while leaving a tool's DC entirely blank.
+            # Preserve that result and try the live window DC; never infer text from it.
+            primary = destination.with_suffix(".print-window.png")
+            image.save(primary)
+            diagnostics = {
+                "fallback_reason": "uniform_popup_print_window"
+                if win32gui.GetClassName(hwnd) in ("QTool", "QPopup")
+                else "uniform_window_print_window",
+                "primary_path": str(primary),
+                "primary_sha256": hashlib.sha256(primary.read_bytes()).hexdigest(),
+            }
+            target.BitBlt((0, 0), (width, height), source, (0, 0), win32con.SRCCOPY)
+            fallback = read_image()
+            if not uniform_content(fallback):
+                image = fallback
+                method = "BitBlt"
+                diagnostics["fallback_scope"] = "Live window DC; visually review occlusion."
+            else:
+                diagnostics["quality_flags"] = ["uniform_pixels_after_fallback"]
+                # Layered Qt notifications can have blank PrintWindow AND window DCs.
+                # Capture only their displayed rectangle; keep both failed attempts.
+                window_dc_path = destination.with_suffix(".window-dc.png")
+                fallback.save(window_dc_path)
+                diagnostics["window_dc_path"] = str(window_dc_path)
+                diagnostics["window_dc_sha256"] = hashlib.sha256(
+                    window_dc_path.read_bytes()
+                ).hexdigest()
+                screen_dc = win32gui.GetDC(0)
+                screen = None
+                try:
+                    screen = win32ui.CreateDCFromHandle(screen_dc)
+                    target.BitBlt((0, 0), (width, height), screen, (left, top), win32con.SRCCOPY)
+                    displayed = read_image()
+                    if not uniform_content(displayed):
+                        image = displayed
+                        method = "DesktopBitBlt"
+                        diagnostics["quality_flags"] = ["desktop_region_requires_visibility_review"]
+                        diagnostics["fallback_scope"] = (
+                            "Displayed desktop rectangle; occlusion or off-screen content "
+                            "can belong to another surface. Review against the live window."
+                        )
+                except Exception as error:
+                    diagnostics["desktop_fallback_error"] = str(error)
+                finally:
+                    if screen is not None:
+                        screen.DeleteDC()
+                    win32gui.ReleaseDC(0, screen_dc)
         image.save(destination)
         return {
             "hwnd": hwnd,
             "path": str(destination),
             "size": [width, height],
             "sha256": hashlib.sha256(destination.read_bytes()).hexdigest(),
-            "method": "PrintWindow" if painted else "BitBlt",
+            "method": method,
+            **diagnostics,
         }
     finally:
         win32gui.DeleteObject(bitmap.GetHandle())
@@ -137,7 +208,10 @@ def _associate_visual_nodes(visual: dict, nodes: list[dict], roots: list[dict]) 
 
 
 def collect_ui(
-    session_id: str, screenshots: bool = True, accessibility_backend: str = "msaa"
+    session_id: str,
+    screenshots: bool = True,
+    accessibility_backend: str = "msaa",
+    refresh_templates: bool = True,
 ) -> dict:
     if accessibility_backend not in ("msaa", "uia", "none"):
         raise ValueError("accessibility_backend must be msaa, uia or none")
@@ -188,13 +262,20 @@ def collect_ui(
     )
     from cores.hpe990.functions.step_templates import template_catalog
 
-    try:
-        templates = template_catalog(session_id)
+    if refresh_templates:
+        try:
+            templates = template_catalog(session_id)
+            result["step_template_sync"] = {
+                key: templates[key] for key in ("element_count", "case_count", "json", "html")
+            }
+        except Exception as error:
+            result["step_template_sync"] = {"error": str(error), "bdd_executed": False}
+    else:
         result["step_template_sync"] = {
-            key: templates[key] for key in ("element_count", "case_count", "json", "html")
+            "deferred": True,
+            "next_tool": "hpe990_tc_templates",
+            "bdd_executed": False,
         }
-    except Exception as error:
-        result["step_template_sync"] = {"error": str(error), "bdd_executed": False}
     (directory / "inventory.json").write_text(
         json.dumps(result, ensure_ascii=False, indent=2), encoding="utf-8"
     )
@@ -212,6 +293,8 @@ def control_ui(
     point_fraction: list[float] | None = None,
     *,
     expected_native_path: list[list[str]] | None = None,
+    expected_capture: dict | None = None,
+    refresh_templates: bool = True,
 ) -> dict:
     session = session_guard(session_id)
     nodes = _native_tree(session)
@@ -274,7 +357,11 @@ def control_ui(
         raise ValueError("Text requires an observed edit control and at most 4096 characters")
     monitor = start_ram(session_id)
     action_id = uuid.uuid4().hex
-    before = collect_ui(session_id)
+    before = (
+        collect_ui(session_id)
+        if refresh_templates
+        else collect_ui(session_id, refresh_templates=False)
+    )
     observed = next(n for n in before["nodes"] if n["hwnd"] == hwnd)
     node.update(ui_id=observed["ui_id"], identity_scope=observed["identity_scope"])
     if expected_native_path is not None:
@@ -293,6 +380,14 @@ def control_ui(
         "requested",
         {"control": node, "action": action, "before": before["evidence"]},
     )
+    if expected_capture is not None:
+        if list(win32gui.GetWindowRect(hwnd)) != expected_capture["rect"]:
+            raise ValueError("Visual root moved before input; recollect target")
+        guard_directory = hpe990_folders.D_HPE990_EVIDENCE / "955a2810" / action_id
+        guard_directory.mkdir(parents=True, exist_ok=True)
+        current = _capture(hwnd, guard_directory / "pre-input.png")
+        if current["sha256"] != expected_capture["sha256"]:
+            raise ValueError("Visual image changed before input; recollect target")
     if action in ("click", "double_click"):
         left, top, right, bottom = win32gui.GetClientRect(hwnd)
         if right <= left or bottom <= top:
@@ -328,7 +423,11 @@ def control_ui(
         before=before["evidence"],
     )
     time.sleep(0.3)
-    after = collect_ui(session_id)
+    after = (
+        collect_ui(session_id)
+        if refresh_templates
+        else collect_ui(session_id, refresh_templates=False)
+    )
     action_marker(
         session_id,
         action_id,

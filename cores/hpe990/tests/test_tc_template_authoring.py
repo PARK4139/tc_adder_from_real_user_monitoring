@@ -2,6 +2,8 @@
 
 import json
 
+from gherkin.parser import Parser
+
 from cores.hpe990.common.paths import hpe990_folders
 from cores.hpe990.functions.tc_repository import load_review_source
 from cores.hpe990.functions.tc_template_authoring import compile_tc_templates
@@ -18,9 +20,13 @@ def test_current_tc_patterns_preserve_flow_and_dictionary_wording():
         assert templates[kind]["preconditions"]
         assert templates[kind]["source_tc_ids"]
         assert templates[kind]["type_verified"] is False
-    assert templates["radio"]["related_tc_ids"] == [
-        f"TC-{n:03d}" for n in (40, 50, 100, 110, 120, 130, 140, 150, 160, 200)
-    ]
+    radio_ids = []
+    for child in Parser().parse(source)["feature"]["children"]:
+        tags = [tag["name"] for tag in child.get("scenario", {}).get("tags", [])]
+        if "@type-radio" in tags:
+            radio_ids.extend(tag[1:] for tag in tags if tag.startswith("@TC-"))
+    assert radio_ids
+    assert templates["radio"]["related_tc_ids"] == radio_ids
     assert len(templates["button-save"]["steps"]) == 4
     assert len(templates["button-cancel"]["steps"]) == 4
     assert templates["input-field"]["source_limit"]

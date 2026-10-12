@@ -9,6 +9,7 @@ from mcp.server.fastmcp import FastMCP
 
 from cores.hpe990.functions.lifecycle import log_event
 from cores.hpe990.mcp.tools.analysis import hpe990_ui_analyze
+from cores.hpe990.mcp.tools.identity import hpe990_ui_registry_backup
 from cores.hpe990.mcp.tools.lifecycle import hpe990_close, hpe990_launch, hpe990_status, hpe990_stop
 from cores.hpe990.mcp.tools.mapping import (
     hpe990_ui_control_semantic,
@@ -28,17 +29,23 @@ from cores.hpe990.mcp.tools.monitoring import (
 )
 from cores.hpe990.mcp.tools.scenarios import hpe990_bdd_catalog, hpe990_bdd_run, hpe990_tc_templates
 from cores.hpe990.mcp.tools.ui import (
+    hpe990_ui_activate,
     hpe990_ui_catalog,
     hpe990_ui_collect,
     hpe990_ui_control,
+    hpe990_ui_control_visual,
     hpe990_ui_drag,
+    hpe990_ui_input_inventory,
+    hpe990_ui_keys,
     hpe990_ui_viewer_stop,
     hpe990_ui_visualize,
     hpe990_window_geometry,
+    hpe990_window_minimize,
 )
 
 mcp = FastMCP("auto_emulator MCP")
 for tool in (
+    hpe990_ui_registry_backup,
     hpe990_ui_map,
     hpe990_ui_resolve,
     hpe990_ui_control_semantic,
@@ -57,8 +64,13 @@ for tool in (
     hpe990_ui_collect,
     hpe990_ui_control,
     hpe990_ui_drag,
+    hpe990_ui_keys,
+    hpe990_ui_activate,
+    hpe990_ui_input_inventory,
+    hpe990_ui_control_visual,
     hpe990_ui_catalog,
     hpe990_window_geometry,
+    hpe990_window_minimize,
     hpe990_ui_visualize,
     hpe990_ui_viewer_stop,
     hpe990_telemetry_export,

@@ -9,7 +9,10 @@ from cores.hpe990.functions.tc_template_authoring import refresh_templates_from_
 
 
 def hpe990_tc_templates(
-    session_id: str, ui_ids: list[str] | None = None, refresh_from_tcs: bool = False
+    session_id: str,
+    ui_ids: list[str] | None = None,
+    refresh_from_tcs: bool = False,
+    summary_only: bool = False,
 ) -> dict:
     """Generate per-UI-ID draft No./Steps/Expected Result groups and JSON/HTML review.
 
@@ -19,11 +22,15 @@ def hpe990_tc_templates(
     this does not register executable BDD scenarios or report a test PASS.
     refresh_from_tcs=true regenerates type templates from current authored General TCs
     including save/reopen/restore and invalid-number workflows, then regenerates drafts.
+    summary_only=true preserves complete JSON/HTML files and returns counts/paths,
+    avoiding transfer of large accumulated draft/evidence lists through MCP.
     """
     refreshed = refresh_templates_from_tcs() if refresh_from_tcs else None
     result = template_catalog(session_id, ui_ids)
     if refreshed:
         result["authored_template_refresh"] = refreshed
+    if summary_only:
+        return {key: value for key, value in result.items() if key not in ("drafts", "templates")}
     return result
 
 

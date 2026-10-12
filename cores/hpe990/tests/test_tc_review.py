@@ -58,16 +58,33 @@ def test_actual_drafts_match_issued_ids():
     ledger = json.loads((root / "configs/tc_ids.json").read_text(encoding="utf-8"))
     document, summary = render_review(source)
     ids = ledger["issued_ids"]
-    assert len(ids) == len(set(ids)) == summary["tc_count"] == 24
+    assert len(ids) == len(set(ids)) == summary["tc_count"]
     assert summary["step_groups"] >= summary["tc_count"]
-    assert ledger["next_number"] == 250
-    assert ids == [f"TC-{n:03d}" for n in range(10, 250, 10)]
+    assert ledger["next_number"] == max(int(identity[3:]) for identity in ids) + 10
+    assert ids == [f"TC-{n:03d}" for n in range(10, ledger["next_number"], 10)]
     assert not set(ledger["retired_ids"]) & set(ids)
     assert len(ledger["renumber_migrations"][-1]["mapping"]) == 24
     for identity in ids:
         assert document.count(f'id="{identity}"') == 1
         assert document.count(f'href="#{identity}"') == 1
     assert "TC-Setup-" not in document
+
+
+def test_actual_review_uses_screen_and_function_suites_without_duplicate_cases():
+    document, _ = render_review(load_review_source())
+    target = f"/{TEST_TARGET['model']}/{TEST_TARGET['version']}"
+    for path in (
+        "/Edger/Setup/Preferences/General/Sleep Mode",
+        "/Edger/Setup/Preferences/General/Message Box Font Size",
+        "/Edger/작업 불러오기",
+        "/Edger/작업 불러오기/Job Manager",
+    ):
+        assert f'data-node="{target}{path}"' in document
+    assert f'data-node="{target}/Setup"' not in document
+    assert "Sleep Mode &gt;" not in document.split('<div id="results">')[0]
+    for number in (250, 260, 270, 280):
+        assert document.count(f'id="TC-{number}"') == 1
+        assert document.count(f'href="#TC-{number}"') == 1
 
 
 def test_four_digit_id_and_explicit_path_required():

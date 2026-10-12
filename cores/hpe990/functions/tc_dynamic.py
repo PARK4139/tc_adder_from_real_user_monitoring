@@ -9,7 +9,7 @@ import tempfile
 from filelock import FileLock
 
 from cores.hpe990.common.paths import hpe990_folders
-from cores.hpe990.functions.tc_repository import case_file
+from cores.hpe990.functions.tc_repository import case_file, review_state
 
 START = "    # BEGIN collected General elements"
 END = "    # END collected General elements"
@@ -57,6 +57,14 @@ def sync_general_expected(database=None, source=None) -> dict:
     """Refresh only the explicitly marked TC-010 block and its derived Markdown row."""
     database = database or hpe990_folders.F_HPE990_UI_REGISTRY
     source = source or case_file("TC-010")
+    if review_state(source) == "reviewed":
+        return {
+            "updated": False,
+            "reason": "Reviewed TC is protected from automatic updates",
+            "review_state": "reviewed",
+            "source": str(source),
+            "executed": False,
+        }
     elements = general_elements(database)
     if not elements:
         return {"updated": False, "reason": "No observed named General elements"}

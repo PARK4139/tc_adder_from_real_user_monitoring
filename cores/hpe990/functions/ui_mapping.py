@@ -2,7 +2,6 @@
 
 import hashlib
 import json
-import sqlite3
 import time
 from functools import lru_cache
 from pathlib import Path
@@ -10,6 +9,7 @@ from pathlib import Path
 import win32api
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.identity_database import open_identity_database
 from cores.hpe990.functions.monitoring import session_guard
 
 
@@ -118,7 +118,7 @@ def interactable(node, nodes):
 
 def connect(database):
     database.parent.mkdir(parents=True, exist_ok=True)
-    db = sqlite3.connect(database, timeout=30)
+    db = open_identity_database(database)
     db.executescript("""
         CREATE TABLE IF NOT EXISTS ui_map_targets (
             target_id TEXT PRIMARY KEY, metadata TEXT NOT NULL);

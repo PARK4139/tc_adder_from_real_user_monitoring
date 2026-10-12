@@ -1,10 +1,11 @@
 """Transactional UI identity SSOT; provider identities are observation aliases only."""
 
 import json
-import sqlite3
 from collections import Counter
+from contextlib import closing
 
 from cores.hpe990.common.paths import hpe990_folders
+from cores.hpe990.functions.identity_database import open_identity_database
 
 
 def assign_ui_ids(record: dict, database=None) -> dict:
@@ -31,7 +32,7 @@ def assign_ui_ids(record: dict, database=None) -> dict:
     counts = Counter(signatures.values())
     session = record["session_id"]
     evidence = record["evidence"]
-    with sqlite3.connect(database, timeout=30) as db:
+    with closing(open_identity_database(database)) as db, db:
         db.executescript("""
             CREATE TABLE IF NOT EXISTS elements (
                 number INTEGER PRIMARY KEY AUTOINCREMENT,

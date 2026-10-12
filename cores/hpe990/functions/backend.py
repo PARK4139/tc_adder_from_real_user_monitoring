@@ -13,6 +13,7 @@ import pythoncom
 import win32api
 import win32con
 import win32process
+import win32security
 from win32com.client import Dispatch
 from win32com.shell import shell, shellcon
 
@@ -31,7 +32,7 @@ def ram_executable() -> Path:
 
 
 def request_backend(kind: str, payload: dict) -> dict:
-    if kind not in ("launch", "ram", "semantic_ram", "ui_viewer"):
+    if kind not in ("launch", "ram", "semantic_ram", "ui_viewer", "activity_log", "input"):
         raise ValueError("Unsupported backend operation")
     requests = hpe990_folders.D_HPE990_RUNTIME / "requests"
     requests.mkdir(parents=True, exist_ok=True)
@@ -139,6 +140,68 @@ def run_backend(token: str) -> None:
             with (directory / "worker-stderr.log").open("wb") as errors:
                 child = subprocess.Popen(
                     [sys.executable, "-m", "cores.hpe990.functions.semantic_ram", str(directory)],
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL,
+                    stderr=errors,
+                    creationflags=subprocess.CREATE_NO_WINDOW,
+                )
+                result = {
+                    "pid": child.pid,
+                    "create_time": psutil.Process(child.pid).create_time(),
+                    "backend_pid": os.getpid(),
+                }
+                response.write_text(json.dumps(result), encoding="utf-8")
+                child.wait()
+                return
+        elif data["kind"] == "input":
+            request_path = Path(data["request"]).resolve()
+            request_path.relative_to(hpe990_folders.D_HPE990_EVIDENCE.resolve())
+            if request_path.suffix != ".json":
+                raise ValueError("Input request must be a family evidence JSON")
+            completed = subprocess.run(
+                [str(hpe990_folders.F_HPE990_INPUT), str(request_path)],
+                capture_output=True,
+                text=True,
+                timeout=10,
+                creationflags=subprocess.CREATE_NO_WINDOW,
+            )
+            result = {"receipt": json.loads(completed.stdout)}
+            # Read-only diagnostics; missing access is reported, never treated as proof of UIPI.
+            request_data = json.loads(request_path.read_text(encoding="utf-8"))
+            integrity = {}
+            for role, pid in (("backend", os.getpid()), ("target", request_data.get("pid"))):
+                if not pid:
+                    continue
+                try:
+                    process_handle = win32api.OpenProcess(0x1000, False, pid)
+                    try:
+                        token_handle = win32security.OpenProcessToken(
+                            process_handle, win32con.TOKEN_QUERY
+                        )
+                        try:
+                            sid, _ = win32security.GetTokenInformation(
+                                token_handle, win32security.TokenIntegrityLevel
+                            )
+                            integrity[role] = sid.GetSubAuthority(sid.GetSubAuthorityCount() - 1)
+                        finally:
+                            token_handle.Close()
+                    finally:
+                        process_handle.Close()
+                except Exception as error:
+                    integrity[role] = {"diagnostic_error": type(error).__name__}
+            result["receipt"]["integrity_levels"] = integrity
+        elif data["kind"] == "activity_log":
+            from cores.hpe990.functions.activity_log import _directory
+
+            directory = _directory(data["session_id"])
+            with (directory / "worker-stderr.log").open("ab") as errors:
+                child = subprocess.Popen(
+                    [
+                        sys.executable,
+                        "-m",
+                        "cores.hpe990.functions.activity_log",
+                        data["session_id"],
+                    ],
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL,
                     stderr=errors,

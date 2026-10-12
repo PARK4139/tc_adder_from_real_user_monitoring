@@ -144,7 +144,7 @@ def compile_tc_templates(source: str, existing: dict) -> dict:
                 normalize_expected_result(text) for text in group["Expected Result"]
             ]
     document["schema_version"] = 2
-    document["derived_from"] = "cores/hpe990/docs/bdd/cases/"
+    document["derived_from"] = "sqa/tc/"
     document["source_sha256"] = hashlib.sha256(source.encode()).hexdigest()
     document["authored_template_count"] = len(representatives)
     return document

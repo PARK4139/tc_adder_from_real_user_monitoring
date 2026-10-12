@@ -42,6 +42,12 @@ def ram_status(session_id: str) -> dict:
     manifest = json.loads(path.read_text(encoding="utf-8"))
     directory = Path(manifest["directory"])
     result = {**manifest, "active": _worker_alive(manifest["worker"])}
+    from cores.hpe990.functions.activity_log import activity_status
+
+    try:
+        result["activity_log"] = activity_status(session_id)
+    except (OSError, ValueError, KeyError) as error:
+        result["activity_log"] = {"active": False, "error": str(error)}
     for name in ("snapshot", "ram-report"):
         source = directory / f"{name}.json"
         for _ in range(10):
@@ -63,6 +69,9 @@ def start_ram(session_id: str, interval_ms: int = 100) -> dict:
     with FileLock(str(path) + ".lock", timeout=30):
         existing = ram_status(session_id)
         if existing["active"]:
+            from cores.hpe990.functions.activity_log import ensure_activity_log
+
+            existing["activity_log"] = ensure_activity_log(session_id)
             return existing
         if len(session["processes"]) != 1:
             raise ValueError("RAM currently requires exactly one live target process")
@@ -92,6 +101,9 @@ def start_ram(session_id: str, interval_ms: int = 100) -> dict:
         while time.monotonic() < deadline:
             status = ram_status(session_id)
             if status.get("snapshot"):
+                from cores.hpe990.functions.activity_log import ensure_activity_log
+
+                status["activity_log"] = ensure_activity_log(session_id)
                 log_event("ram_started", session_id=session_id, directory=str(directory))
                 return status
             if not status["active"]:

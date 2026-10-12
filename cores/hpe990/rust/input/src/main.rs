@@ -1,4 +1,5 @@
 use serde_json::{json, Value};
+mod keyboard;
 use std::{
     env, fs, thread,
     time::{Duration, Instant},
@@ -134,7 +135,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let request: Value = serde_json::from_slice(&fs::read(
         env::args().nth(1).ok_or("Request JSON required")?,
     )?)?;
-    let result = drag(&request);
+    let result = if matches!(
+        request["operation"].as_str(),
+        Some("keys" | "release_keys" | "activate" | "minimize")
+    ) {
+        keyboard::execute(&request)
+    } else {
+        drag(&request)
+    };
     println!("{result}");
     if result["ok"] != true {
         std::process::exit(1);
