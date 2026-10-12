@@ -167,7 +167,7 @@ def render_navigation(entries: list[dict]) -> str:
             f'<span class="tree-leaf-top">'
             + (
                 f'<span class="tree-title">{escape(label)}</span>'
-                if entry.get("flat") or entry.get("kind") == "scenario"
+                if (entry.get("flat") or entry.get("kind") == "scenario") and not entry.get("force_tc_id")
                 else f'<span class="tree-id">{escape(entry["id"])}</span>'
                 f'<span class="tree-title">{escape(label)}</span>'
             )
@@ -366,11 +366,15 @@ def render_review(
                 "path": scenario_path,
                 "tree_title": title,
                 "flat": False,
+                "force_tc_id": True,
             })
             for ref in refs:
                 navigation.append({
                     **all_function_entries[ref],
                     "path": scenario_path,
+                    "tree_title": all_function_entries[ref]["title"].split(" — ", 1)[-1],
+                    "flat": False,
+                    "force_tc_id": True,
                 })
         referenced_steps = {
             ref for scenario in basic_scenarios for ref in scenario.get("steps", [])
