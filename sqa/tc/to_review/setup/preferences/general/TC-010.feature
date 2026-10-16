@@ -5,16 +5,10 @@ Feature: Preferences > General 번호별 Steps / Expected Result TC
   이 파일은 시나리오 초안으로 자동화 구현 및 실행 등록은 포함하지 않는다.
 
   @TC-010 @type-navigation @expected-collected-General
-  Scenario: TC-010 General 화면 진입 및 입력요소 표시
-    Given 설정값 복구 준비
-      """
-      원래 설정값과 복구 방법 기록
-      """
+  Scenario: TC-010 화면 진입 및 입력요소 표시
+    Given Edger 화면에서 Setup 버튼 클릭
+    And Setup > Preferences > General 탭 선택
     # Step 1
-    When Setup > Preferences > General 탭 선택
-    Then General 탭이 선택되어 보여야 합니다.
-    And Language, Sleep Mode, 숫자 입력 및 라디오 선택 그룹이 보여야 합니다.
-    # Step 2
     When General 설정 영역을 위에서 아래까지 스크롤하며 입력요소 확인
     # BEGIN collected General elements
     Then 하기 수집 요소가 각각 보여야 합니다.
@@ -83,6 +77,6 @@ Feature: Preferences > General 번호별 Steps / Expected Result TC
     # UI reference: UI-000083
     And Wait (minutes)
     # END collected General elements
-    # Step 3
+    # Step 2
     When General 설정 영역을 맨 위로 스크롤
     Then Language 입력요소가 다시 보여야 합니다.

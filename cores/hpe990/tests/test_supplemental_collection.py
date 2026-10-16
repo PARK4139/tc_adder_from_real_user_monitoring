@@ -11,6 +11,25 @@ from cores.hpe990.functions.ui import _associate_visual_nodes
 from cores.hpe990.functions.visual_elements import collect_visual_elements, link_frames
 
 
+def test_classic_dialog_and_popup_are_not_silently_omitted(monkeypatch):
+    calls = []
+
+    def worker(arguments, **kwargs):
+        calls.append(json.loads(arguments[2]))
+        return subprocess.CompletedProcess(
+            arguments, 0, b'{"elements": [], "errors": [], "complete": true}', b""
+        )
+
+    monkeypatch.setattr(subprocess, "run", worker)
+    roots = [
+        {"hwnd": 1, "visible": True, "enabled": True, "class_name": "#32770"},
+        {"hwnd": 2, "visible": True, "enabled": True, "class_name": "QPopup"},
+        {"hwnd": 3, "visible": False, "enabled": True, "class_name": "QTool"},
+    ]
+    collect_accessibility(roots, backend="uia")
+    assert {r["hwnd"] for r in calls[0]} == {1, 2}
+
+
 def test_frame_label_and_text_do_not_claim_semantic_value():
     lines = [
         {"text": "Group heading", "rect": [10, 10, 150, 22]},

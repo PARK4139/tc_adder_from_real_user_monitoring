@@ -64,9 +64,15 @@ try{nav.classList.toggle('tc-collapsed',sessionStorage.getItem('tc-review-tcs-co
 function updateNodeToggle(){const collapsed=nav.classList.contains('tc-collapsed');nodeToggle.textContent=collapsed?'\ub178\ub4dc\ub9cc \ud3bc\uce58\uae30':'\ub178\ub4dc\ub9cc \uc811\uae30';nodeToggle.title=collapsed?'Expand TC nodes':'Collapse TC nodes'}
 function updateAllToggle(){const expanded=branches.every(branch=>branch.node.open);allToggle.textContent=expanded?'\ubaa8\ub450 \uc811\uae30':'\ubaa8\ub450 \ud3bc\uce58\uae30';allToggle.title=expanded?'Collapse all suites to version level':'Expand all suites'}
 updateNodeToggle();updateAllToggle();
-try{const saved=JSON.parse(sessionStorage.getItem('tc-review-tree-open')||'{}');branches.forEach(({node})=>{if(node.dataset.node in saved)node.open=saved[node.dataset.node]})}catch{}
-function saveTreeState(){try{sessionStorage.setItem('tc-review-tree-open',JSON.stringify(Object.fromEntries(branches.map(({node})=>[node.dataset.node,node.open]))))}catch{}}
-branches.forEach(({node})=>node.addEventListener('toggle',()=>{if(!search.value.trim())saveTreeState();updateAllToggle()}));
+try{const saved=JSON.parse(sessionStorage.getItem('tc-review-tree-open')||'{}');branches.forEach(({node})=>{const state=saved[node.dataset.node];if(state!==undefined){node.open=typeof state==='object'?state.open:state;if(typeof state==='object'&&state.showTcs)node.dataset.showTcs='true'}})}catch{}
+function saveTreeState(){try{sessionStorage.setItem('tc-review-tree-open',JSON.stringify(Object.fromEntries(branches.map(({node})=>[node.dataset.node,{open:node.open,showTcs:node.dataset.showTcs==='true'}]))))}catch{}}
+branches.forEach(({node})=>{
+ node.addEventListener('toggle',()=>{if(!search.value.trim())saveTreeState();updateAllToggle()});
+ node.querySelector(':scope > summary').addEventListener('click',event=>{
+  if(!nav.classList.contains('tc-collapsed')||!node.querySelector(':scope > .tree-children > a'))return;
+  event.preventDefault();node.dataset.showTcs=node.dataset.showTcs==='true'?'false':'true';node.open=true;saveTreeState();
+ });
+});
 function highlight(target,terms){
  if(!terms.length){target.node.textContent=target.text;return}
  const chars=Array.from(target.text),folded=[],mapping=[],marked=new Set();
@@ -144,8 +150,8 @@ function filter(){
  search.dataset.filterMs=(performance.now()-started).toFixed(1);
 }
 function clearTreeSearch(){if(search.value.trim()){search.value='';filter()}}
-nodeToggle.addEventListener('click',()=>{clearTreeSearch();branches.forEach(({node})=>node.open=true);const collapsed=!nav.classList.contains('tc-collapsed');nav.classList.toggle('tc-collapsed',collapsed);updateNodeToggle();updateAllToggle();try{sessionStorage.setItem('tc-review-tcs-collapsed',String(collapsed))}catch{}saveTreeState()});
-allToggle.addEventListener('click',()=>{clearTreeSearch();const collapse=branches.every(({node})=>node.open);branches.forEach(({node})=>{node.open=!collapse||node.dataset.node==='/HPE990'});nav.classList.remove('tc-collapsed');updateNodeToggle();updateAllToggle();try{sessionStorage.setItem('tc-review-tcs-collapsed','false')}catch{}saveTreeState()});
+nodeToggle.addEventListener('click',()=>{clearTreeSearch();branches.forEach(({node})=>{node.open=true;delete node.dataset.showTcs});const collapsed=!nav.classList.contains('tc-collapsed');nav.classList.toggle('tc-collapsed',collapsed);updateNodeToggle();updateAllToggle();try{sessionStorage.setItem('tc-review-tcs-collapsed',String(collapsed))}catch{}saveTreeState()});
+allToggle.addEventListener('click',()=>{clearTreeSearch();const collapse=branches.every(({node})=>node.open);branches.forEach(({node})=>{node.open=!collapse||node.dataset.node==='/HPE990';delete node.dataset.showTcs});nav.classList.remove('tc-collapsed');updateNodeToggle();updateAllToggle();try{sessionStorage.setItem('tc-review-tcs-collapsed','false')}catch{}saveTreeState()});
 cardsData.forEach(record=>record.link?.addEventListener('click',()=>{const index=matches.findIndex(item=>item.id===record.id);if(index>=0)selectResult(index)}));
 window.addEventListener('hashchange',()=>{const index=matches.findIndex(record=>record.id===decodeURIComponent(location.hash.slice(1)));if(index>=0)selectResult(index)});
 let composing=false,filterTimer=null;

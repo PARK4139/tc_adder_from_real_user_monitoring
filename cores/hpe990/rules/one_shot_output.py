@@ -5,10 +5,10 @@ TITLE = "auto_emulator one-shot output"
 SOURCE = "cores/hpe990/rules/one_shot_output.py"
 STATUS = "active"
 BODY = """
-- Basis: user directive 2026-10-06; follow pk_system common one-shot rules.
+- Basis: user directive 2026-10-12; follow pk_system common one-shot rules.
 - Override the common deployment directory/basename only: publish under the
-  auto_emulator project root as auto_emulator_X.Y.exe, with two integer components.
-- The fixed runtime path is auto_emulator.exe in the same root. Keep it stable.
+  parent 3rd_party directory as auto_emulator_X.Y.exe, with two integer components.
+- The fixed runtime path is auto_emulator.exe in the same directory. Keep it stable.
 - Build intermediates live under D_TEMP/hpe990/build; issue verification evidence
   lives under D_TEMP/hpe990/evidence/{issue-id}/{run-id}.
 - Automatically reserve monotonic versions using configs/releases.json under

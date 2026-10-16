@@ -1,4 +1,4 @@
-"""Persistent, bounded image/text/value observation beside the Rust WinEvent RAM stream."""
+"""Persistent, bounded image/text/value observation beside the Rust WinEvent Real Activity Monitoring stream."""
 
 import json
 import subprocess
@@ -93,7 +93,7 @@ def semantic_start(
         raise ValueError("accessibility_backend must be msaa, uia or none")
     session = session_guard(session_id)
     if len(session["processes"]) != 1:
-        raise ValueError("Semantic RAM requires one target process")
+        raise ValueError("Semantic Real Activity Monitoring requires one target process")
     if not hpe990_folders.F_HPE990_VISUAL.is_file():
         raise FileNotFoundError("Build the Rust visual worker first")
     path = _manifest(session_id)
@@ -150,7 +150,7 @@ def semantic_read(session_id: str, after_sequence: int = 0, limit: int = 200) ->
         raise ValueError("Invalid cursor or limit")
     result = semantic_status(session_id)
     if "directory" not in result:
-        raise ValueError("Start semantic RAM first")
+        raise ValueError("Start semantic Real Activity Monitoring first")
     source = Path(result["directory"]) / "events.jsonl"
     events = []
     if source.exists():

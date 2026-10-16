@@ -102,7 +102,7 @@ def test_all_collected_controls_preserve_hidden_and_removed_elements(tmp_path, m
     assert hidden["path"] == ["Screen", "pushButton_hidden"]
 
 
-def test_identical_images_group_only_within_session_and_keep_history(tmp_path, monkeypatch):
+def test_same_screen_groups_changed_images_within_session_and_keeps_latest(tmp_path, monkeypatch):
     from PIL import Image
 
     monkeypatch.setattr(ui_viewer.hpe990_folders, "D_HPE990_EVIDENCE", tmp_path)
@@ -138,12 +138,14 @@ def test_identical_images_group_only_within_session_and_keep_history(tmp_path, m
             encoding="utf-8",
         )
     data = ui_viewer.viewer_data()
-    assert data["summary"]["windows"] == 3
-    assert data["summary"]["duplicate_screens"] == 1
-    grouped = next(w for w in data["windows"] if w["collection_count"] == 2)
+    assert data["summary"]["windows"] == 2
+    assert data["summary"]["duplicate_screens"] == 2
+    grouped = next(w for w in data["windows"] if w["session_id"] == "a" * 32)
     assert grouped["session_id"] == "a" * 32
-    assert grouped["observed_unix_ms"] == 2
-    assert {o["observed_unix_ms"] for o in grouped["occurrences"]} == {1, 2}
+    assert grouped["observed_unix_ms"] == 3
+    assert grouped["collection_count"] == 3
+    assert {o["observed_unix_ms"] for o in grouped["occurrences"]} == {1, 2, 3}
+    assert grouped["image"].endswith("/3/screen.png")
 
 
 def test_bdd_catalog_changes_revision_and_reports_invalid_registration(tmp_path, monkeypatch):
@@ -178,13 +180,20 @@ def test_bdd_catalog_changes_revision_and_reports_invalid_registration(tmp_path,
     assert invalid_data["bdd"]["scenarios"] == []
 
 
-def test_bdd_screen_has_no_gallery_and_requires_no_collected_ui(tmp_path, monkeypatch):
+def test_tabbed_dashboard_includes_bdd_and_gallery_without_collected_ui(tmp_path, monkeypatch):
     monkeypatch.setattr(ui_viewer.hpe990_folders, "D_HPE990_EVIDENCE", tmp_path)
     data = ui_viewer.bdd_viewer_data()
     assert data["summary"]["scenarios"] == len(data["bdd"]["scenarios"]) > 0
     assert not (tmp_path / "ui").exists()
     assert "windows" not in data and "all_controls" not in data
     html = ui_viewer.render_html(data, "http://127.0.0.1:1234/token/")
-    assert "BDD 시나리오 목록" in html
-    assert "전체 갤러리" not in html and "전체 수집 요소" not in html
-    assert "<img" not in html and 'id="screens"' not in html
+    assert 'data-tab="activity"' in html
+    assert 'data-tab="screens"' in html
+    assert 'data-tab="statusTab"' in html
+    assert 'data-tab="bdd"' in html
+    assert 'id="gallery"' in html and 'id="bdd-list"' in html
+    assert "BDD 시나리오" in html
+    assert 'role="tablist"' in html and html.count('role="tab"') == 4
+    assert "#f3f6fa" in html and "#eaf1f8" in html
+    assert ".event-info b" in html and "focus-visible" in html
+    assert "prefers-reduced-motion" in html

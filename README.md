@@ -3,17 +3,30 @@
 HPE990 PC Emulator를 MCP로 실행·관찰·제어합니다. Python은 uv로 관리하고,
 지속 창 이벤트·계층·화면 해시 수집은 Rust로 구현합니다.
 
+전체 기능 명칭은 **UI Automation & Observability**입니다. 책임 경계의 정본은
+[automation_observability.py](cores/hpe990/rules/automation_observability.py)입니다.
+
+| 구성 | 책임 | 현재 구현 |
+|---|---|---|
+| UI Automation | 화면·버튼 수집, 식별, 이동, 입력, 결과 확인 | MCP UI 도구; 전체 화면 커버리지는 미검증 |
+| UI observation | 창·화면 변화, 샘플링 상태·공백, 증거 기록 | 기존 Real Activity Monitoring·semantic Real Activity Monitoring·telemetry |
+| RUM | 실제 사용자 세션의 응답 시간·앱 오류·사용 경험 지표 | `NOT_IMPLEMENTED`; 실제 사용자 출처와 응답 계측 필요 |
+
+자동화 입력은 automation 출처이며, 출처를 모르는 창 이벤트는 실제 사용자 데이터로
+간주하지 않습니다. RAM의 샘플링·처리 시간은 RUM 응답 시간 지표가 아닙니다.
+기존 `hpe990_ram_*` 이름과 증거 경로는 UI 관측 구현 식별자로 유지합니다.
+
 ## 실행
 
-배포 위치는 **`auto_emulator/auto_emulator_X.Y.exe`**, 고정 실행 파일은 `auto_emulator.exe`입니다.
+배포 위치는 프로젝트 상위 **`3rd_party/auto_emulator_X.Y.exe`**, 고정 실행 파일은 `3rd_party/auto_emulator.exe`입니다.
 정식 버전과 SHA256은 `cores/hpe990/configs/releases.json`의 `released` 기록을 확인하세요.
 Python을 별도로 설치하지 않아도 배포 EXE의 MCP 서버와 내장 BDD 실행기를 사용할 수 있습니다.
 HPE990 설치, Explorer 및 Windows 대화형 데스크톱은 필요합니다.
 
 ```powershell
-.\auto_emulator.exe
-.\auto_emulator.exe status
-.\auto_emulator.exe --mcp
+..\auto_emulator.exe
+..\auto_emulator.exe status
+..\auto_emulator.exe --mcp
 ```
 
 기본 실행 범위는 **HPE990 실행 → Continue 클릭 → Edger 확인**이며 RAM도 자동으로 시작합니다.
@@ -24,11 +37,18 @@ Qt의 `QT_USE_NATIVE_WINDOWS=1`을 실행 자식에 적용해 컨트롤을 식�
 
 ## MCP 도구
 
+TC 검수 트리는 버전 아래 `Functions`와 `Basic Scenarios`로 나뉩니다. 독립 기능 TC는
+`Functions` 바로 아래 `TC-ID 화면 suite 경로 — 제목` 형식으로 표시하고, Job 흐름의
+기준·결과 TC와 Tester 수행 순서는 `Basic Scenarios > Job > Scenario`에 둡니다.
+각 Job 단계와 TC는 양방향 링크로 연결되며 TC 본문을 중복 저장하지 않습니다.
+
 | 기능 | 도구 |
 |---|---|
+| 수집 UI 식별자·화면 이미지·해시·품질 검증 | `hpe990_ui_collection_audit` |
+| 자동화·관측 책임 경계 / RUM 계측 상태 | `hpe990_automation_observability_status`, `hpe990_rum_status` |
 | 실행 / 상태 / 정상 종료 요청 / 명시적 앱 종료 | `hpe990_launch`, `hpe990_status`, `hpe990_close`, `hpe990_stop` |
-| RAM 시작 / 상태 / 정리 | `hpe990_ram_start`, `hpe990_ram_status`, `hpe990_ram_stop` |
-| 입력값·문구·RGB 변화 RAM (소스 MCP) | `hpe990_ram_semantic_start`, `hpe990_ram_semantic_status`, `hpe990_ram_semantic_read`, `hpe990_ram_semantic_stop` |
+| Real Activity Monitoring 시작 / 상태 / 정리 | `hpe990_ram_start`, `hpe990_ram_status`, `hpe990_ram_stop` |
+| 입력값·문구·RGB 변화 Real Activity Monitoring (소스 MCP) | `hpe990_ram_semantic_start`, `hpe990_ram_semantic_status`, `hpe990_ram_semantic_read`, `hpe990_ram_semantic_stop` |
 | 창·모달·컨트롤·스크린샷 / 수집 목록 | `hpe990_ui_collect`, `hpe990_ui_catalog` |
 | BDD 시나리오 화면 / 뷰어 서버 정리 | `hpe990_ui_visualize`, `hpe990_ui_viewer_stop` |
 | 식별한 컨트롤 입력 / 창 이동·크기 | `hpe990_ui_control`, `hpe990_window_geometry` |
@@ -36,10 +56,17 @@ Qt의 `QT_USE_NATIVE_WINDOWS=1`을 실행 자식에 적용해 컨트롤을 식�
 | 버전별 UI 이름·의미 ID MAP / 현재 대상 해석·제어 | `hpe990_ui_map`, `hpe990_ui_resolve`, `hpe990_ui_control_semantic` |
 | 로컬 이벤트 읽기 / 검증·내보내기 | `hpe990_telemetry_read`, `hpe990_telemetry_export` |
 | 상태·전이 분석 / 시나리오·추적표 / 실제 BDD 실행 | `hpe990_ui_analyze`, `hpe990_bdd_catalog`, `hpe990_bdd_run` |
+| HPE990 제품 BDD 목록 | `hpe990_bdd_list` |
+| HTTP MCP 서버 시작 / 종료 / 재시작 | `mcp_server_manager` |
+
+`mcp_server_manager`는 별도 loopback HTTP 서버를 관리합니다. `action`은 `start`, `kill`,
+`restart` 중 하나이며 연결 주소는 `http://127.0.0.1:8765/mcp`입니다. 기본 stdio MCP 연결은
+계속 살아 있으므로 재시작 명령도 같은 연결에서 호출할 수 있습니다. `--mcp-http`를 직접 실행해도
+같은 HTTP 엔드포인트를 제공합니다.
 
 컨트롤은 현재 세션의 이름·HWND·부모 창으로 지정합니다. 중복 이름은 `root_hwnd` 또는 `hwnd`로
 구분하고, 화면 좌표 대신 필요시 컨트롤 내부 `point_fraction`을 사용합니다. 모든 입력 전후에
-RAM 승인 기록과 화면 증거를 남깁니다. 텍스트 원문은 제어 로그에 저장하지 않습니다.
+Real Activity Monitoring 승인 기록과 화면 증거를 남깁니다. 텍스트 원문은 제어 로그에 저장하지 않습니다.
 
 `hpe990_bdd_run`의 `allow_desktop_input: true`는 실제 앱을 실행·제어·종료합니다.
 외부에서 실행한 세션의 종료는 거부합니다. Edger는 WM_CLOSE를 무시하므로 `hpe990_close`가
@@ -51,6 +78,22 @@ RAM 승인 기록과 화면 증거를 남깁니다. 텍스트 원문은 제어 �
 지정하세요. 배포 EXE를 연결하려면 `auto_emulator.exe`의 절대 경로와 `--mcp` 인자를 사용하세요.
 
 ## 개발·검증·one shot
+
+시나리오는 검증 대상별로 구분합니다.
+
+| 검증 대상 | 정본 위치 | 상태 |
+|---|---|---|
+| auto_emulator 도구 기능 | `cores/auto_emulator/tests/bdd/` | 8개 BDD와 바인딩을 `cores/auto_emulator/configs/one_shot_bdd.json`에 실행 등록 |
+| HPE990 제품 기능 | `sqa/tc/to_review/`, `sqa/tc/reviewed/` | 화면 계층별 TC와 검수 상태 관리 |
+
+도구 검증은 HPE990을 실행 대상으로 사용합니다. 기존 `hpe990_bdd_catalog`와
+`hpe990_bdd_run` MCP 도구는 `auto_emulator` family의 등록 목록과 실행기를 연결합니다.
+
+`hpe990_bdd_list {}`는 HPE990 제품 BDD를 실행 없이 조회합니다. 등록된 Gherkin의
+`@product-hpe990` 태그로 Workflow를 분류하고, 같은 검수 웹의 TC 원본을 함께 읽습니다.
+각 항목은 단계와 태그를 포함하며, `automation_status`는 실행 바인딩이 있는 `bound`와
+검수 TC의 `unbound`를 구분합니다. 검수 상태는 실행 결과가 아니며 조회 결과의
+`execution_status`는 `NOT_RUN`입니다. Workflow 실행 바인딩은 기존 실행 suite에 유지합니다.
 
 TC 작성 규칙과 예시는 [tc_format.py](cores/hpe990/rules/scenarios/tc_format.py)의 `BODY`를
 따릅니다. General TC 작성 결과는 [preferences_general.md](cores/hpe990/docs/bdd/preferences_general.md)에서 확인합니다.
@@ -67,6 +110,16 @@ TC ID는 경로와 독립적으로 관리하며 Gherkin의 `@path-Setup/Preferen
 미확정 사항은 `지원 언어 미확정`, `최소·최대값 미확정`, `입력유형 미확정` 등의 구체적인 칩으로 표시합니다.
 칩은 Gherkin의 `@spec-*` 태그에서 생성하며 좌측 트리와 TC 제목 우측에 동일하게 표시합니다.
 검색 초기화·인쇄/PDF 버튼은 제공하지 않습니다. 초안 변경 후 다시 생성합니다.
+`scripts\tc-review.cmd`를 더블 클릭하거나 단독 실행하면 검증 웹 서버를 재시작하고 기본 브라우저에서 클라이언트 페이지를 엽니다.
+기본 동작은 `--restart`이며, 이전 실행 기록이 없을 때의 주소는 `http://172.20.13.185:9999/tc-up-validation/`입니다.
+서버는 실행한 콘솔에서 동작합니다. 다른 콘솔에서 `scripts\tc-review.cmd --stop`으로 종료합니다.
+`scripts\tc-review.cmd --restart`는 기록된 서버의 PID·생성 시각·실행 파일을 확인하고 정상 종료를 최대 10초 기다린 뒤 다시 시작합니다.
+이전 주소·포트·추가 공유 경로를 복원하며 `--bind`, `--port`, `--token`으로 변경할 수 있습니다.
+정상 종료 후에도 마지막 설정은 보관합니다. 이전 실행 기록이 없으면 기본 주소로 시작합니다.
+IP·포트를 변경하려면 `scripts\tc-review.cmd --bind <LAN-IP> --port <PORT>`를 사용합니다.
+어느 작업 디렉터리에서도 실행할 수 있습니다. uv는 `UV_EXE`, PATH, 사용자 `.local\bin`, 형제 `pk_system\uv.exe` 순서로 찾습니다.
+이 실행기는 HPE990 제품 TC 검수 웹을 제공하며 자동화 테스트를 실행하지 않습니다.
+
 같은 망에 공유할 때는 `uv run python -m cores.hpe990.scripts.share_tc_review --bind <LAN-IP> --port 9999`를
 사용합니다. 생성한 HTML 한 파일만 `/tc-up-validation/`에서 제공하며 폴더 목록·다른 파일은 제공하지 않습니다.
 주소는 `{D_TEMP}/hpe990/runtime/tc-review-share.json`에 기록됩니다. 접속 허용은 해당 IP·포트·같은 서브넷으로
@@ -115,8 +168,8 @@ MCP 연결 종료 후에도 서버가 유지되며 `hpe990_ui_viewer_stop`으로
 uv sync --locked
 uv run ruff check cores
 uv run ruff format --check cores
-uv run python -m pytest --ignore=cores/hpe990/tests/bdd
-uv run python -m pytest cores/hpe990/tests/bdd --allow-desktop-input
+uv run python -m pytest --ignore=cores/auto_emulator/tests/bdd
+uv run python -m pytest cores/auto_emulator/tests/bdd --allow-desktop-input
 .\cores\hpe990\scripts\one-shot-pipeline.cmd --allow-desktop-input
 ```
 
@@ -128,7 +181,7 @@ skip/xfail/실패는 통과로 인정하지 않습니다. 실패한 버전 번�
 
 중간 빌드는 `{D_TEMP}/hpe990/build/`, 증거는 `{D_TEMP}/hpe990/evidence/{issue-id}/`,
 실행 상태는 `{D_TEMP}/hpe990/runtime/`에 저장합니다. D_TEMP는 실제 Windows Desktop/Temp입니다.
-BDD의 JUnit, MCP 계약, 화면, 분석, 제어와 RAM 동시 실행 보고서를 해당 이슈 증거에서 확인하세요.
+BDD의 JUnit, MCP 계약, 화면, 분석, 제어와 Real Activity Monitoring 동시 실행 보고서를 해당 이슈 증거에서 확인하세요.
 
 ## 관찰 범위
 

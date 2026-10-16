@@ -2,15 +2,59 @@
 
 import json
 from pathlib import Path
+from urllib.parse import unquote
+
+from gherkin.parser import Parser
 
 from cores.common.functions.run_family_bdd import bdd_registry
 from cores.hpe990.common.paths import hpe990_folders
 from cores.hpe990.functions.analysis import analyze_ui
 from cores.hpe990.functions.lifecycle import log_event
+from cores.hpe990.functions.tc_repository import load_review_source
+
+
+def product_bdd_list() -> dict:
+    """List product scenarios from their canonical Gherkin without executing them."""
+    registry = bdd_registry("auto_emulator")
+    scenarios = [
+        {
+            **item,
+            "id": item["test"],
+            "kind": "workflow",
+            "automation_status": "bound",
+            "execution_family": registry["family"],
+        }
+        for item in registry["scenarios"]
+        if "@product-hpe990" in item["tags"]
+    ]
+    feature = Parser().parse(load_review_source())["feature"]
+    for child in feature["children"]:
+        scenario = child["scenario"]
+        tags = [tag["name"] for tag in scenario["tags"]]
+        scenarios.append(
+            {
+                "id": next(tag[1:] for tag in tags if tag.startswith("@TC-")),
+                "name": scenario["name"],
+                "kind": "product_tc",
+                "tags": tags,
+                "suite": [unquote(tag[6:]) for tag in tags if tag.startswith("@path-")],
+                "review_state": next(tag[8:] for tag in tags if tag.startswith("@review-")),
+                "automation_status": "unbound",
+                "steps": scenario["steps"],
+            }
+        )
+    return {
+        "family": "hpe990",
+        "scenarios": scenarios,
+        "total": len(scenarios),
+        "bound_count": sum(item["automation_status"] == "bound" for item in scenarios),
+        "unbound_count": sum(item["automation_status"] == "unbound" for item in scenarios),
+        "execution_status": "NOT_RUN",
+    }
 
 
 def scenario_catalog(session_id: str | None = None) -> dict:
-    registry = bdd_registry("hpe990")
+    registry = bdd_registry("auto_emulator")
     if session_id is None:
         return registry
     analysis = analyze_ui(session_id)

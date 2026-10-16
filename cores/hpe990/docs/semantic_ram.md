@@ -1,4 +1,4 @@
-# 입력값·문구·색상 변화 RAM
+# 입력값·문구·색상 변화 Real Activity Monitoring
 
 소스 uv MCP에 추가한 관찰 기능입니다. 기존 WinEvent/Rust RAM과 병행하며
 MCP 연결 종료 후에도 실행됩니다. 배포 EXE는 갱신하지 않았습니다.

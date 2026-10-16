@@ -29,7 +29,7 @@ def test_tc_identity_survives_tree_move():
     target_path = f"/{TEST_TARGET['model']}/{TEST_TARGET['version']}"
     assert f'data-node="{target_path}/Setup/Preferences/General"' in original
     assert f'data-node="{target_path}/Setup/Export Options"' in moved
-    assert "Setup &gt; Export Options" in moved
+    assert f"{TEST_TARGET['model']} &gt; {TEST_TARGET['version']} &gt; Setup &gt; Export Options" in moved
 
 
 @pytest.mark.parametrize("identity", ["TC-Setup-General-022", "TC-22", "TC-000", "TC-0022"])
@@ -74,15 +74,25 @@ def test_actual_review_uses_screen_and_function_suites_without_duplicate_cases()
     document, _ = render_review(load_review_source())
     target = f"/{TEST_TARGET['model']}/{TEST_TARGET['version']}"
     for path in (
-        "/Edger/Setup/Preferences/General/Sleep Mode",
-        "/Edger/Setup/Preferences/General/Message Box Font Size",
-        "/Edger/작업 불러오기",
-        "/Edger/작업 불러오기/Job Manager",
+        "/Edger/Setup/Preferences/General",
+        "/Edger",
+        "/Edger/Job Manager",
+        "/Edger/Job Editor",
+        "/Edger/Digital Pattern",
+        "/Edger/Hole Editor",
     ):
         assert f'data-node="{target}{path}"' in document
     assert f'data-node="{target}/Setup"' not in document
+    assert f'data-node="{target}/Edger/Setup/Preferences/General/' not in document
+    assert f'data-node="{target}/Edger/작업 불러오기' not in document
+    assert document.index('href="#TC-1740"') < document.index(
+        f'data-node="{target}/Edger/Job Manager"'
+    )
+    assert document.index(f'data-node="{target}/Edger/Hole Editor"') < document.index(
+        f'data-node="{target}/Edger/Setup"'
+    )
     assert "Sleep Mode &gt;" not in document.split('<div id="results">')[0]
-    for number in (250, 260, 270, 280):
+    for number in (250, 260, 270, 280, 1690, 1700, 1710, 1720, 1730, 1740):
         assert document.count(f'id="TC-{number}"') == 1
         assert document.count(f'href="#TC-{number}"') == 1
 
@@ -92,6 +102,19 @@ def test_four_digit_id_and_explicit_path_required():
     assert 'id="TC-1000"' in document
     with pytest.raises(ValueError, match="@path-"):
         render_review(draft().replace("@path-Setup/Preferences/General", ""))
+
+
+def test_tc_1720_uses_action_steps_and_compares_loaded_job_info():
+    document, _ = render_review(load_review_source())
+    start = document.index('<article class="tc" id="TC-1720">')
+    card = document[start : document.index("</article>", start)]
+    assert "Edger 화면에서 폴더 버튼 클릭" in card
+    assert "Job Manager에서 설치 샘플 탭 선택" in card
+    assert "CIRCLE 작업 선택" in card
+    assert "Digital Pattern·Hole Editor 화면 이동 후 작업 정보 유지 확인" in card
+    assert "작업 번호와 도형이 사전조건에서 확인한 값과 같아야 합니다." in card
+    assert "한다" not in card
+    assert "시험 시작 시 작업 번호·도형·속성을 비교 기준으로 기록" not in card
 
 
 def test_dictionary_violation_is_rejected_before_review_export():

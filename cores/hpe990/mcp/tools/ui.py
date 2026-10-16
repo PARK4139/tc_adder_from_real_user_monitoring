@@ -2,11 +2,24 @@
 
 import uuid
 
+from cores.hpe990.functions.collection_audit import audit_collection
 from cores.hpe990.functions.lifecycle import log_event
 from cores.hpe990.functions.monitoring import action_marker, ram_status, session_guard
 from cores.hpe990.functions.ui import collect_ui, control_ui, ui_catalog, window_geometry
 from cores.hpe990.functions.ui_drag import drag_ui
 from cores.hpe990.functions.ui_viewer import stop_ui_viewer, visualize_ui
+
+
+def hpe990_ui_collection_audit(
+    session_id: str, inventory_paths: list[str], expected_screens: list[str] | None = None
+) -> dict:
+    """Validate explicit UI snapshots: IDs, visible-root captures, PNG hashes and quality.
+
+    Read-only. PASS covers supplied evidence only, never whole-application completeness
+    or functional correctness. Requires evidence paths belonging to this session.
+    expected_screens requires evidence of each named visible, enabled destination.
+    """
+    return audit_collection(session_id, inventory_paths, expected_screens)
 
 
 def hpe990_ui_activate(session_id: str, ui_id: str) -> dict:
@@ -22,7 +35,7 @@ def hpe990_ui_activate(session_id: str, ui_id: str) -> dict:
 
 
 def hpe990_window_minimize(session_id: str, ui_id: str) -> dict:
-    """Minimize an observed enabled native root without closing it; RAM remains active.
+    """Minimize an observed enabled native root without closing it; Real Activity Monitoring remains active.
 
     Use hpe990_ui_activate on its UI ID to restore and activate it again.
     """
@@ -43,7 +56,7 @@ def hpe990_ui_drag(
 
     Fractions lie strictly inside the source/target client areas. target_ui_id defaults
     to source_ui_id. Validate the resulting UI state; delivery is not application success.
-    Rust and timeout cleanup release the mouse button; RAM records before/after evidence.
+    Rust and timeout cleanup release the mouse button; Real Activity Monitoring records before/after evidence.
     """
     try:
         return drag_ui(
@@ -70,18 +83,18 @@ def hpe990_ui_drag(
 
 
 def hpe990_ui_visualize(session_id: str | None = None, open_browser: bool = True) -> dict:
-    """Open the BDD-only scenario screen in the existing HTML location.
+    """Open one tabbed dashboard for activity, collected screens, monitor health and BDD.
 
-    Lists validated scenarios, issue/AC tags, bindings and original Given/When/Then.
-    Registry changes refresh every 3 seconds; collected UI is not required or displayed.
-    session_id is retained in the call contract but does not filter repository scenarios.
+    Combines current-session Native/Semantic activity with saved UI evidence and
+    validated BDD scenarios. The dashboard refreshes live data every 3 seconds.
+    session_id filters activity and screen evidence; repository BDD scenarios remain shared.
     Survives MCP disconnects; use hpe990_ui_viewer_stop to close its server.
     """
     return visualize_ui(session_id, open_browser)
 
 
 def hpe990_ui_viewer_stop() -> dict:
-    """Stop the local UI visualization server without touching Emulator or RAM."""
+    """Stop the local UI visualization server without touching Emulator or Real Activity Monitoring."""
     return stop_ui_viewer()
 
 
@@ -117,14 +130,14 @@ def hpe990_ui_control(
     point_fraction: list[float] | None = None,
     refresh_templates: bool = True,
 ) -> dict:
-    """Operate one uniquely identified live control while RAM records before/after evidence.
+    """Operate one uniquely identified live control while Real Activity Monitoring records before/after evidence.
 
     Supported actions: click, double_click, escape, enter, text, scroll_down, scroll_up.
     Scroll targets the observed Qt scroll-area viewport. Ambiguous, hidden,
     disabled, stale or foreign controls are rejected. root_hwnd scopes duplicate names.
     Text input is restricted to observed edit controls. No arbitrary screen coordinates.
     refresh_templates=false defers draft export for both snapshots only; UI registration
-    and RAM evidence remain active. Complete batches with hpe990_tc_templates.
+    and Real Activity Monitoring evidence remain active. Complete batches with hpe990_tc_templates.
     """
     try:
         return control_ui(
@@ -169,7 +182,7 @@ def hpe990_ui_catalog(session_id: str) -> dict:
 
 
 def hpe990_ui_keys(session_id: str, ui_id: str, keys: list[str]) -> dict:
-    """Deliver key chords/sequences to one current native UI ID with RAM active.
+    """Deliver key chords/sequences to one current native UI ID with Real Activity Monitoring active.
 
     Examples: ["Ctrl+A"], ["Home", "Shift+End"], ["F6", "Escape"].
     Supports Ctrl/Alt/Shift/Win, A-Z, 0-9, F1-F24 and named navigation/edit keys.
@@ -181,20 +194,22 @@ def hpe990_ui_keys(session_id: str, ui_id: str, keys: list[str]) -> dict:
     return keys_ui(session_id, ui_id, keys)
 
 
-def hpe990_ui_control_visual(session_id: str, ui_id: str, action: str = "click") -> dict:
+def hpe990_ui_control_visual(
+    session_id: str, ui_id: str, action: str = "click", refresh_templates: bool = True
+) -> dict:
     """Recollect and click an observed OCR UI ID; never reuse old screenshot coordinates.
 
     Rebind a changed visual ID only for one unique same-root label/type. Reject missing,
     ambiguous, minimized, stale-image, disabled-root or occluded targets. Individual
-    element editability remains unknown unless separately observed. Returns RAM evidence.
+    element editability remains unknown unless separately observed. Returns Real Activity Monitoring evidence.
     """
     from cores.hpe990.functions.ui_visual_control import control_visual
 
-    return control_visual(session_id, ui_id, action)
+    return control_visual(session_id, ui_id, action, refresh_templates)
 
 
 def hpe990_window_geometry(session_id: str, hwnd: int, rect: list[int]) -> dict:
-    """Move/resize one identity-checked session window while RAM records requested/actual bounds."""
+    """Move/resize one identity-checked session window while Real Activity Monitoring records requested/actual bounds."""
     return window_geometry(session_id, hwnd, rect)
 
 

@@ -56,14 +56,16 @@ def resolve_visual(record, ui_id, old=None):
     return target, roots[0], captures[0]
 
 
-def control_visual(session_id, ui_id, action="click"):
+def control_visual(session_id, ui_id, action="click", refresh_templates=True):
     if action not in ("click", "double_click"):
         raise ValueError("Visual control supports click or double_click")
     session_guard(session_id)
     old_session, old = historical_visual(ui_id)
     if old_session != session_id:
         raise ValueError("Visual identity belongs to another session")
-    before = collect_ui(session_id, accessibility_backend="none")
+    before = collect_ui(
+        session_id, accessibility_backend="none", refresh_templates=refresh_templates
+    )
     target, root, capture = resolve_visual(before, ui_id, old)
     if win32gui.IsIconic(root["hwnd"]):
         raise ValueError("Visual root is minimized")
@@ -88,6 +90,7 @@ def control_visual(session_id, ui_id, action="click"):
         hwnd=root["hwnd"],
         point_fraction=[x / width, y / height],
         expected_capture={"rect": root["rect"], "sha256": capture["sha256"]},
+        refresh_templates=refresh_templates,
     )
     return {
         **result,

@@ -389,7 +389,7 @@ def control_semantic(session_id, semantic_id, action="click", text=None, point_f
     from cores.hpe990.functions.ui import control_ui
 
     resolved = resolve_current(session_id, semantic_id)
-    # Pass the current exact HWND and root through existing process/session/RAM guards.
+    # Pass the current exact HWND and root through existing process/session/Real Activity Monitoring guards.
     result = control_ui(
         session_id,
         resolved["internal_name"],

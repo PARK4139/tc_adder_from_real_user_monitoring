@@ -1,4 +1,4 @@
-"""UI-ID-bound native drag with Rust pacing, live identity guards and RAM evidence."""
+"""UI-ID-bound native drag with Rust pacing, live identity guards and Real Activity Monitoring evidence."""
 
 import json
 import math

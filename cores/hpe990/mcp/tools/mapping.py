@@ -35,7 +35,7 @@ def hpe990_ui_control_semantic(
     text: str | None = None,
     point_fraction: list[float] | None = None,
 ) -> dict:
-    """Resolve the current confirmed version map and control it with native RAM evidence.
+    """Resolve the current confirmed version map and control it with native Real Activity Monitoring evidence.
 
     Existing control actions/limits apply. Delivery does not imply application success.
     """

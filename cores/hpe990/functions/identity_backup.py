@@ -17,7 +17,7 @@ from cores.hpe990.functions.monitoring import ram_status, session_guard
 AUTHORITY_TABLES = ("elements", "ui_map_targets", "ui_map_bindings")
 SCOPE = (
     "Canonical UI definitions, allocator counters and semantic mappings only. "
-    "Historical observations, session aliases, RAM logs and screenshots remain in the source; "
+    "Historical observations, session aliases, Real Activity Monitoring logs and screenshots remain in the source; "
     "this is not a complete historical backup."
 )
 
@@ -128,7 +128,9 @@ def snapshot_identity_authority(source_path: Path, destination: Path, timeout_se
 def backup_identity_authority(session_id: str, timeout_seconds: int = 60) -> dict:
     session_guard(session_id)
     if not ram_status(session_id)["active"]:
-        raise RuntimeError("Native RAM must remain active during registry backup")
+        raise RuntimeError(
+            "Native Real Activity Monitoring must remain active during registry backup"
+        )
     directory = hpe990_folders.D_HPE990_EVIDENCE / "ffba3c51" / session_id / uuid.uuid4().hex
     with FileLock(str(hpe990_folders.D_HPE990_RUNTIME / "identity-backup.lock"), timeout=0.1):
         result = snapshot_identity_authority(

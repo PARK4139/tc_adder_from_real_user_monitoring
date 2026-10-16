@@ -1,4 +1,4 @@
-# RAM registry isolation and observation freshness
+# Real Activity Monitoring registry isolation and observation freshness
 
 ## Registry access
 
@@ -16,14 +16,14 @@ entire 241,031.917ms gap cannot be attributed to a single SQLite call.
 
 ## Public MCP backup
 
-Call `hpe990_ui_registry_backup(session_id, timeout_seconds=60)` with native RAM active.
+Call `hpe990_ui_registry_backup(session_id, timeout_seconds=60)` with native Real Activity Monitoring active.
 The timeout range is 1–300 seconds. The tool preserves a point-in-time snapshot of:
 
 - `elements`: canonical selectors, scopes and allocated numbers.
 - `ui_map_targets` and `ui_map_bindings`: version-scoped mappings.
 - `sqlite_sequence`: allocator counters, including counters for omitted history tables.
 
-Observation/session-alias history, RAM logs and screenshots remain in their original
+Observation/session-alias history, Real Activity Monitoring logs and screenshots remain in their original
 storage. This export is **not a full historical backup**. Empty historical tables retain
 their schema. The completed database and `manifest.json` are stored under
 `D_TEMP/hpe990/evidence/ffba3c51/{session_id}/{backup_id}/`.
@@ -47,7 +47,7 @@ complete window coverage or detection of every transient change.
 
 Issues `ffba3c51` and `37b0a63b`: 47 focused tests passed; Ruff passed. WAL isolation
 passed three held-reader/writer trials. Real public MCP backup/collection concurrency
-passed three trials with native RAM, semantic RAM and activity logging active. Exports
+passed three trials with native Real Activity Monitoring, semantic Real Activity Monitoring and activity logging active. Exports
 contained 58,144 canonical identities and matched source definitions, counters and maps
 exactly; integrity was `ok` with no foreign-key errors. Backup duration was
 595.159–1037.891ms; polled observation timestamp gap upper bound was 2440ms and maximum
@@ -55,7 +55,7 @@ observed age was 1720ms during this verification window.
 
 A controlled diagnostic pause of only the semantic observer's owning interpreter
 verified live-but-stale status at age 12596ms and recovery in the same worker at age
-380ms. Native RAM and activity logging stayed active. This intentional diagnostic gap
+380ms. Native Real Activity Monitoring and activity logging stayed active. This intentional diagnostic gap
 is recorded separately from the concurrent-backup verification window. The first pause
 attempt affected only the Windows virtualenv launcher and did not stop sampling;
 its failed assertion/receipts remain preserved.

@@ -21,7 +21,7 @@ dependencies = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["cores/hpe990/tests"]
+testpaths = ["cores/auto_emulator/tests", "cores/hpe990/tests"]
 markers = ["integration: requires the installed HPE990 and an interactive Windows desktop"]
 
 [tool.ruff]

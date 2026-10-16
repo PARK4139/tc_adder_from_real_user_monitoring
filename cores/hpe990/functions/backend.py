@@ -27,7 +27,7 @@ def ram_executable() -> Path:
     else:
         path = hpe990_folders.D_HPE990_BUILD / "rust" / "release" / "hpe990-ram.exe"
     if not path.is_file():
-        raise FileNotFoundError(f"Build Rust RAM worker first: {path}")
+        raise FileNotFoundError(f"Build Rust Real Activity Monitoring worker first: {path}")
     return path
 
 
@@ -131,7 +131,9 @@ def run_backend(token: str) -> None:
                 return
         elif data["kind"] == "semantic_ram":
             if getattr(sys, "frozen", False):
-                raise RuntimeError("Semantic RAM requires the updated source uv environment")
+                raise RuntimeError(
+                    "Semantic Real Activity Monitoring requires the updated source uv environment"
+                )
             directory = Path(data["directory"]).resolve()
             directory.relative_to(hpe990_folders.D_HPE990_SEMANTIC_RAM.resolve())
             process = psutil.Process(data["pid"])

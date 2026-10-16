@@ -1,5 +1,9 @@
 # Repository Guidelines
 
+## Response Language
+
+사용자에게 전달하는 설명, 진행 상황, 최종 답변은 항상 한국어로 작성한다. 코드, 명령어, 경로, 식별자는 원문을 유지한다.
+
 ## Project Structure & Module Organization
 
 Follow `../pk_system/cores/common/rules/path/family_skeleton.py` and `family_local_ssot.py`. Use `cores/{family}/`. New families require:
@@ -54,8 +58,8 @@ Create project families, issues, rules, and implementation only inside auto_emul
 
 ## Emulator MCP Interface
 
-Expose every Emulator function through MCP; follow cores/hpe990/rules/mcp_function_coverage.py. Keep the adapter at cores/hpe990/mcp/server.py and tool groups under mcp/tools/. BDD must use public MCP tools while RAM remains active. Validate complete function-to-tool coverage through actual MCP calls.
+Expose every Emulator function through MCP; follow cores/hpe990/rules/mcp_function_coverage.py. Keep the adapter at cores/hpe990/mcp/server.py and tool groups under mcp/tools/. BDD must use public MCP tools while Real Activity Monitoring remains active. Validate complete function-to-tool coverage through actual MCP calls.
 
 ## One Shot Output
 
-Follow pk_system common one-shot rules with the explicit local destination override in cores/hpe990/rules/one_shot_output.py: auto_emulator/auto_emulator_X.Y.exe. Use the thin one-shot-pipeline.cmd launcher, automatic version allocation, external build intermediates, and verified publication.
+Follow pk_system common one-shot rules with the explicit local destination override in cores/hpe990/rules/one_shot_output.py: 3rd_party/auto_emulator_X.Y.exe, with the fixed runtime at 3rd_party/auto_emulator.exe. Use the thin one-shot-pipeline.cmd launcher, automatic version allocation, external build intermediates, and verified publication.

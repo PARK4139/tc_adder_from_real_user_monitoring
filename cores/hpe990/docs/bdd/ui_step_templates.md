@@ -11,7 +11,7 @@
 | No. | Steps |
 |---|---|
 | 1 | 설정값 복구 준비<br>시험 전 {name}가 {first_value}인 상태 준비<br>원래 선택값와 시험 후 {first_value} 복원 방법 기록 |
-| 2 | {name} 실동작 관찰 준비<br>HPE990 GUI 1.22.0 관찰 기반으로 {first_value}/{second_value} 전환 범위 확인<br>native RAM과 화면·문구 RAM 활성 상태 확인<br>언어 목록·선택값·메뉴·환경 설정의 전후 이미지 및 시각 기록<br>다른 설정 항목은 변경하지 않은 상태 준비 |
+| 2 | {name} 실동작 관찰 준비<br>HPE990 GUI 1.22.0 관찰 기반으로 {first_value}/{second_value} 전환 범위 확인<br>native RAM과 화면·문구 Real Activity Monitoring 활성 상태 확인<br>언어 목록·선택값·메뉴·환경 설정의 전후 이미지 및 시각 기록<br>다른 설정 항목은 변경하지 않은 상태 준비 |
 
 | No. | Steps | Expected Result |
 |---|---|---|

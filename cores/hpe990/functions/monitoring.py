@@ -1,4 +1,4 @@
-"""Session-scoped RAM worker control and evidence access."""
+"""Session-scoped Real Activity Monitoring worker control and evidence access."""
 
 import json
 import time
@@ -74,7 +74,9 @@ def start_ram(session_id: str, interval_ms: int = 100) -> dict:
             existing["activity_log"] = ensure_activity_log(session_id)
             return existing
         if len(session["processes"]) != 1:
-            raise ValueError("RAM currently requires exactly one live target process")
+            raise ValueError(
+                "Real Activity Monitoring currently requires exactly one live target process"
+            )
         process = session["processes"][0]
         directory = path.parent / uuid.uuid4().hex
         directory.mkdir()
@@ -107,9 +109,11 @@ def start_ram(session_id: str, interval_ms: int = 100) -> dict:
                 log_event("ram_started", session_id=session_id, directory=str(directory))
                 return status
             if not status["active"]:
-                raise RuntimeError(f"RAM worker exited: {directory / 'worker-stderr.log'}")
+                raise RuntimeError(
+                    f"Real Activity Monitoring worker exited: {directory / 'worker-stderr.log'}"
+                )
             time.sleep(0.05)
-        raise TimeoutError("RAM first snapshot missing")
+        raise TimeoutError("Real Activity Monitoring first snapshot missing")
 
 
 def stop_ram(session_id: str) -> dict:
@@ -124,7 +128,7 @@ def stop_ram(session_id: str) -> dict:
             log_event("ram_stopped", session_id=session_id, directory=status["directory"])
             return status
         time.sleep(0.05)
-    raise TimeoutError("RAM worker did not stop or finalize evidence")
+    raise TimeoutError("Real Activity Monitoring worker did not stop or finalize evidence")
 
 
 def telemetry_read(session_id: str, after_sequence: int = 0, limit: int = 200) -> dict:
@@ -132,7 +136,7 @@ def telemetry_read(session_id: str, after_sequence: int = 0, limit: int = 200) -
         raise ValueError("Invalid sequence cursor or limit")
     status = ram_status(session_id)
     if "directory" not in status:
-        raise ValueError("Start RAM before reading telemetry")
+        raise ValueError("Start Real Activity Monitoring before reading telemetry")
     events = []
     source = Path(status["directory"]) / "events.jsonl"
     with source.open(encoding="utf-8") as stream:
@@ -158,7 +162,7 @@ def telemetry_read(session_id: str, after_sequence: int = 0, limit: int = 200) -
 def action_marker(session_id: str, action_id: str, phase: str, details: dict) -> None:
     status = ram_status(session_id)
     if not status["active"]:
-        raise RuntimeError("RAM must be active before controlling UI")
+        raise RuntimeError("Real Activity Monitoring must be active before controlling UI")
     commands = Path(status["directory"]) / "commands"
     commands.mkdir(exist_ok=True)
     pending = commands / f"{uuid.uuid4().hex}.pending"
@@ -179,15 +183,17 @@ def action_marker(session_id: str, action_id: str, phase: str, details: dict) ->
         if receipt.is_file():
             return
         if not _worker_alive(status["worker"]):
-            raise RuntimeError("RAM worker exited before recording action marker")
+            raise RuntimeError(
+                "Real Activity Monitoring worker exited before recording action marker"
+            )
         time.sleep(0.01)
-    raise TimeoutError("RAM action marker acknowledgement missing")
+    raise TimeoutError("Real Activity Monitoring action marker acknowledgement missing")
 
 
 def telemetry_export(session_id: str) -> dict:
     status = ram_status(session_id)
     if "directory" not in status:
-        raise ValueError("No RAM evidence for this session")
+        raise ValueError("No Real Activity Monitoring evidence for this session")
     directory = Path(status["directory"])
     run_id = directory.name
     rows = []

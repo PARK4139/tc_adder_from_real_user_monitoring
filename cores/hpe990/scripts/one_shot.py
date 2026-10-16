@@ -15,6 +15,7 @@ from pathlib import Path
 
 from filelock import FileLock
 
+from cores.auto_emulator.common.paths import auto_emulator_folders
 from cores.common.functions.run_family_bdd import run_family_bdd
 from cores.common.paths import D_ROOT
 from cores.hpe990.common.paths import (
@@ -109,7 +110,7 @@ def run(uv: str, verify_existing: bool = False, allow_desktop_input: bool = Fals
                     "-m",
                     "pytest",
                     "-q",
-                    "--ignore=cores/hpe990/tests/bdd",
+                    "--ignore=cores/auto_emulator/tests/bdd",
                     "--basetemp",
                     str(build / "pytest-temp"),
                     "-o",
@@ -130,7 +131,9 @@ def run(uv: str, verify_existing: bool = False, allow_desktop_input: bool = Fals
                 )
             ):
                 raise RuntimeError("Incomplete ordinary test gate")
-            report["bdd"] = run_family_bdd("hpe990", allow_desktop_input, evidence / "source-bdd")
+            report["bdd"] = run_family_bdd(
+                "auto_emulator", allow_desktop_input, evidence / "source-bdd"
+            )
             state = json.loads(F_HPE990_RELEASES.read_text(encoding="utf-8"))
             if verify_existing:
                 release = next(
@@ -151,7 +154,10 @@ def run(uv: str, verify_existing: bool = False, allow_desktop_input: bool = Fals
                         verify(str(executable), ["--mcp"], evidence / role)
                     )
                     report[f"{role}_bdd"] = run_family_bdd(
-                        "hpe990", allow_desktop_input, evidence / f"{role}-bdd", str(executable)
+                        "auto_emulator",
+                        allow_desktop_input,
+                        evidence / f"{role}-bdd",
+                        str(executable),
                     )
                 report.update(verdict="PASS", release=release, mode="verify-existing")
                 return report
@@ -179,7 +185,7 @@ def run(uv: str, verify_existing: bool = False, allow_desktop_input: bool = Fals
                 encoding="utf-8",
             )
             bdd_assets = build / "bdd-assets"
-            source_bdd = hpe990_folders.D_HPE990 / "tests/bdd"
+            source_bdd = auto_emulator_folders.D_AUTO_EMULATOR_BDD
             for pattern in ("**/*.py", "**/*.feature"):
                 for source in source_bdd.glob(pattern):
                     destination = bdd_assets / source.relative_to(source_bdd)
@@ -215,11 +221,11 @@ def run(uv: str, verify_existing: bool = False, allow_desktop_input: bool = Fals
                     "--add-binary",
                     f"{hpe990_folders.D_HPE990_BUILD / 'rust/release/hpe990-ram.exe'};.",
                     "--add-data",
-                    f"{hpe990_folders.D_HPE990 / 'configs/one_shot_bdd.json'};cores/hpe990/configs",
+                    f"{auto_emulator_folders.F_AUTO_EMULATOR_BDD};cores/auto_emulator/configs",
                     "--add-data",
-                    f"{bdd_assets};cores/hpe990/tests/bdd",
+                    f"{bdd_assets};cores/auto_emulator/tests/bdd",
                     "--add-data",
-                    f"{hpe990_folders.D_HPE990 / 'tests/conftest.py'};cores/hpe990/tests",
+                    f"{D_ROOT / 'cores/conftest.py'};cores",
                     "--hidden-import",
                     "win32timezone",
                     "--hide-console",
@@ -235,7 +241,7 @@ def run(uv: str, verify_existing: bool = False, allow_desktop_input: bool = Fals
                 verify(str(candidate), ["--mcp"], evidence / "candidate")
             )
             report["candidate_bdd"] = run_family_bdd(
-                "hpe990", allow_desktop_input, evidence / "candidate-bdd", str(candidate)
+                "auto_emulator", allow_desktop_input, evidence / "candidate-bdd", str(candidate)
             )
             expected_hash = _hash(candidate)
             if F_AUTO_EMULATOR_RUNTIME.exists():
@@ -254,14 +260,14 @@ def run(uv: str, verify_existing: bool = False, allow_desktop_input: bool = Fals
                 verify(str(published), ["--mcp"], evidence / "published")
             )
             report["published_bdd"] = run_family_bdd(
-                "hpe990", allow_desktop_input, evidence / "published-bdd", str(published)
+                "auto_emulator", allow_desktop_input, evidence / "published-bdd", str(published)
             )
             report["stage"] = "runtime-mcp"
             report["runtime_mcp"] = asyncio.run(
                 verify(str(F_AUTO_EMULATOR_RUNTIME), ["--mcp"], evidence / "runtime")
             )
             report["runtime_bdd"] = run_family_bdd(
-                "hpe990",
+                "auto_emulator",
                 allow_desktop_input,
                 evidence / "runtime-bdd",
                 str(F_AUTO_EMULATOR_RUNTIME),

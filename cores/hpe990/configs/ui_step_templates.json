@@ -71,7 +71,7 @@
           "Steps": [
             "{name} 실동작 관찰 준비",
             "HPE990 GUI 1.22.0 관찰 기반으로 {first_value}/{second_value} 전환 범위 확인",
-            "native RAM과 화면·문구 RAM 활성 상태 확인",
+            "native RAM과 화면·문구 Real Activity Monitoring 활성 상태 확인",
             "언어 목록·선택값·메뉴·환경 설정의 전후 이미지 및 시각 기록",
             "다른 설정 항목은 변경하지 않은 상태 준비"
           ]

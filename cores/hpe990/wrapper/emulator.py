@@ -18,6 +18,7 @@ def main() -> int:
         "--version", action="version", version=f"auto_emulator {DEPLOYMENT_VERSION}"
     )
     parser.add_argument("--mcp", action="store_true", help="serve MCP over stdio")
+    parser.add_argument("--mcp-http", action="store_true", help="serve MCP over loopback HTTP")
     parser.add_argument("--backend", help=argparse.SUPPRESS)
     parser.add_argument("--bdd-worker", type=Path, help=argparse.SUPPRESS)
     parser.add_argument(
@@ -36,10 +37,10 @@ def main() -> int:
 
             run_backend(args.backend)
             return 0
-        if args.mcp:
+        if args.mcp or args.mcp_http:
             from cores.hpe990.mcp.server import mcp
 
-            mcp.run(transport="stdio")
+            mcp.run(transport="streamable-http" if args.mcp_http else "stdio")
             return 0
         if args.action == "close":
             if not args.session_id:

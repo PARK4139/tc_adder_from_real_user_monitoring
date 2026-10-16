@@ -1,6 +1,10 @@
 """Implemented public Emulator operations, independently audited against MCP discovery."""
 
 OPERATION_TO_TOOL = {
+    "manage_http_mcp_service": "mcp_server_manager",
+    "automation_observability_boundary_status": "hpe990_automation_observability_status",
+    "real_user_instrumentation_status": "hpe990_rum_status",
+    "backup_ui_registry": "hpe990_ui_registry_backup",
     "versioned_ui_name_map": "hpe990_ui_map",
     "resolve_current_semantic_ui": "hpe990_ui_resolve",
     "control_current_semantic_ui": "hpe990_ui_control_semantic",
@@ -24,6 +28,7 @@ OPERATION_TO_TOOL = {
     "read_sequenced_events": "hpe990_telemetry_read",
     "export_validate_local_events": "hpe990_telemetry_export",
     "native_hierarchy_screenshots": "hpe990_ui_collect",
+    "audit_collected_ui_evidence": "hpe990_ui_collection_audit",
     "observed_control_input": "hpe990_ui_control",
     "inventory_and_unvisited_frontier": "hpe990_ui_catalog",
     "dynamic_collected_ui_visualization": "hpe990_ui_visualize",
@@ -31,6 +36,7 @@ OPERATION_TO_TOOL = {
     "move_resize_session_window": "hpe990_window_geometry",
     "observed_state_transition_analysis": "hpe990_ui_analyze",
     "registered_scenarios_traceability": "hpe990_bdd_catalog",
+    "list_hpe990_product_bdd": "hpe990_bdd_list",
     "execute_real_bdd_with_ram": "hpe990_bdd_run",
     "ui_id_bound_step_template_drafts": "hpe990_tc_templates",
 }

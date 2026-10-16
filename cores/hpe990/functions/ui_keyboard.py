@@ -1,4 +1,4 @@
-"""UI-ID scoped key sequences, with Rust delivery and RAM receipts."""
+"""UI-ID scoped key sequences, with Rust delivery and Real Activity Monitoring receipts."""
 
 import json
 import uuid

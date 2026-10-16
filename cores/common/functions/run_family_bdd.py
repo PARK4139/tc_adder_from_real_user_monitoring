@@ -225,7 +225,7 @@ def frozen_bdd_worker(evidence: Path) -> int:
     import pytest
     import pytest_bdd.plugin
 
-    registry = bdd_registry("hpe990")
+    registry = bdd_registry("auto_emulator")
     evidence = evidence.resolve()
     evidence.relative_to(D_TEMP.resolve())
     evidence.mkdir(parents=True, exist_ok=True)
@@ -233,7 +233,7 @@ def frozen_bdd_worker(evidence: Path) -> int:
     os.environ["HPE990_BDD_EVIDENCE"] = str(evidence)
     os.environ["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
     arguments = [
-        str(D_ROOT / "cores/hpe990/tests/bdd"),
+        str(D_ROOT / "cores/auto_emulator/tests/bdd"),
         "--allow-desktop-input",
         "-q",
         "--junitxml",

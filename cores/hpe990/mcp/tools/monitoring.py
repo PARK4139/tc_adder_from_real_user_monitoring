@@ -1,4 +1,4 @@
-"""Public RAM and local telemetry MCP operations."""
+"""UI observation and local evidence operations; legacy Real Activity Monitoring names are not RUM."""
 
 from cores.hpe990.functions.monitoring import (
     ram_status,
@@ -18,7 +18,7 @@ from cores.hpe990.functions.semantic_ram import (
 def hpe990_ram_semantic_start(
     session_id: str, interval_ms: int = 250, accessibility_backend: str = "msaa"
 ) -> dict:
-    """Start RGB-zero-threshold/image/OCR/readable-value monitoring alongside native RAM."""
+    """Start RGB-zero-threshold/image/OCR/readable-value monitoring alongside native Real Activity Monitoring."""
     return semantic_start(session_id, interval_ms, accessibility_backend)
 
 
@@ -28,7 +28,7 @@ def hpe990_ram_semantic_status(session_id: str) -> dict:
 
 
 def hpe990_ram_semantic_stop(session_id: str) -> dict:
-    """Flush and stop only the semantic observer; preserve Emulator and native RAM."""
+    """Flush and stop only the semantic observer; preserve Emulator and native Real Activity Monitoring."""
     return semantic_stop(session_id)
 
 
@@ -48,7 +48,7 @@ def hpe990_ram_status(session_id: str) -> dict:
 
 
 def hpe990_ram_stop(session_id: str) -> dict:
-    """Stop only this session's RAM worker, flushing its sequenced events and timing report."""
+    """Stop only this session's Real Activity Monitoring worker, flushing its sequenced events and timing report."""
     return stop_ram(session_id)
 
 
@@ -58,5 +58,5 @@ def hpe990_telemetry_read(session_id: str, after_sequence: int = 0, limit: int =
 
 
 def hpe990_telemetry_export(session_id: str) -> dict:
-    """Export this RAM run's local JSONL and validate sequence/session/run/schema integrity."""
+    """Export this Real Activity Monitoring run's local JSONL and validate sequence/session/run/schema integrity."""
     return telemetry_export(session_id)

@@ -23,7 +23,7 @@
 
 TC는 미실행 초안이다. 숫자가 보이는 필드도 개별 편집 가능 여부와 실제 입력유형을 확인하기 전 `(입력란)`으로 작성했다. 입력유형·허용 형식/범위·시험값·미개방 선택 목록·저장 규칙은 구체적인 칩으로 구분한다. Hole Editor 상단 무라벨 필드도 포함했다. 미개방 팝업과 실제 장비 동작의 전체 수집·시험 완료를 의미하지 않는다.
 
-수집 중 설정값을 변경하거나 Save를 누르지 않았다. Preferences를 Cancel로 닫고 원래 Setup으로 복귀했으며 기존 Emulator 세션·RAM·timestamp 로그·검수 서버를 유지했다.
+수집 중 설정값을 변경하거나 Save를 누르지 않았다. Preferences를 Cancel로 닫고 원래 Setup으로 복귀했으며 기존 Emulator 세션·Real Activity Monitoring·timestamp 로그·검수 서버를 유지했다.
 
 ## 개별 팝업 수집과 순차 TC 갱신
 
@@ -35,6 +35,6 @@ Machine ID는 영문·숫자 화면 키보드로 확인해 `(문자 입력란)`�
 
 수집 직후 기존 `to_review` 파일을 갱신한다. 관찰된 숫자 모달은 `(숫자 입력란)`과 터치 Steps를 반영하고, 저장·재진입·실동작 미검증은 유지한다. TC-360 PD는 원본 이미지에서 확인한 표시 범위 30.0~99.5를 포함한다. TC-1190의 이전 무라벨 입력란은 실제 팝업 제목 `Hole Depth (0=Through Hole)`로 갱신한다. TC ID를 새로 발급하거나 `reviewed` 파일을 변경하지 않는다.
 
-반복 수집에서는 공개 MCP `hpe990_ui_collect` / `hpe990_ui_control`의 `refresh_templates=false`로 종합 초안 내보내기만 보류할 수 있다. 이미지·HWND·UI ID 등록과 RAM 기록은 유지된다. 탐색 마지막에 `hpe990_tc_templates`를 호출해 종합 카탈로그를 갱신한다. 기본값 `true`는 기존 동작을 유지한다.
+반복 수집에서는 공개 MCP `hpe990_ui_collect` / `hpe990_ui_control`의 `refresh_templates=false`로 종합 초안 내보내기만 보류할 수 있다. 이미지·HWND·UI ID 등록과 Real Activity Monitoring 기록은 유지된다. 탐색 마지막에 `hpe990_tc_templates`를 호출해 종합 카탈로그를 갱신한다. 기본값 `true`는 기존 동작을 유지한다.
 
 `hpe990_tc_templates(summary_only=true)`는 전체 JSON/HTML을 생성한 뒤 개수·파일 경로만 MCP로 반환한다. 누적 증거가 큰 세션에서 전체 초안 목록을 전송하지 않고도 완료 기록을 확보할 수 있다.

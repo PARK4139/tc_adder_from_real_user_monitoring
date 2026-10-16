@@ -16,7 +16,7 @@ def collect_accessibility(
         [
             root
             for root in roots
-            if root["visible"] and root["enabled"] and root["class_name"] == "QWidget"
+            if root["visible"] and root["enabled"]
         ]
         if backend != "none"
         else []

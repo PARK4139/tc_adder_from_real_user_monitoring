@@ -29,7 +29,7 @@ BODY = """
 - Existing UI-xxxxxx IDs and raw evidence are preserved. HWND recreation can map to
   the same meaning when version and verified structure agree; HWND itself is not SSOT.
 - Expose map observation/catalog/verification/revocation, resolution and semantic
-  control through MCP. Control uses existing native actions and RAM evidence; actual
+  control through MCP. Control uses existing native actions and Real Activity Monitoring evidence; actual
   application effects require separate assertions.
 - TCs reference meaning IDs separately from TC IDs. Example: TC-030 references
   HPE990.Setup.Preferences.General.Language. Its current HWND and UI ID are resolved

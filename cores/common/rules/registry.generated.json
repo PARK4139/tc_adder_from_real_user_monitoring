@@ -1,22 +1,29 @@
 {
   "summary": {
-    "rule_count": 10,
+    "rule_count": 11,
     "verdict": "PASS"
   },
   "rules": [
+    {
+      "RULE_ID": "HPE990_AUTOMATION_OBSERVABILITY_BOUNDARY",
+      "TITLE": "UI Automation & Observability responsibility boundary",
+      "SOURCE": "cores/hpe990/rules/automation_observability.py",
+      "STATUS": "active",
+      "body_sha256": "6c4de23585c2c63c111f7ccde5511fc5e511a58f3470429d6a09eb8907882dc1"
+    },
     {
       "RULE_ID": "HPE990_MCP_FUNCTION_COVERAGE",
       "TITLE": "Expose every Emulator operation through MCP",
       "SOURCE": "cores/hpe990/rules/mcp_function_coverage.py",
       "STATUS": "active",
-      "body_sha256": "30e775be708423019ff784c044f6d68fe52c5f72da0a6447fd5599940f480111"
+      "body_sha256": "6853020a59e23c7510c74f557ed0b411cb728b592e53ddcbbae1601fb31dc502"
     },
     {
       "RULE_ID": "HPE990_ONE_SHOT_OUTPUT",
       "TITLE": "auto_emulator one-shot output",
       "SOURCE": "cores/hpe990/rules/one_shot_output.py",
       "STATUS": "active",
-      "body_sha256": "1982bcee4b9df5ce37769b025d4265eb61557f3d9007808f2e903fd58c9d5771"
+      "body_sha256": "64d9a299bc75ea54e6bcb017d4911a365e01da104bd5d6f6687b2f0820b21415"
     },
     {
       "RULE_ID": "HPE990_TC_REVIEW_STATE",
@@ -44,7 +51,7 @@
       "TITLE": "TC up dictionary: TC 문구 작성",
       "SOURCE": "cores/hpe990/rules/scenarios/tc_up_dictionary.py",
       "STATUS": "active",
-      "body_sha256": "52cc3c1c41239d7ce1ea4c58dfee665987c8c44094ade5d069f6c954f1990c7c"
+      "body_sha256": "3278198a454154a05e43b76c86d7de14a8468cbcd5a473e93ce88a5b6477faf1"
     },
     {
       "RULE_ID": "HPE990_UI_STEP_TEMPLATES",
@@ -72,7 +79,7 @@
       "TITLE": "Version-aware internal UI names and semantic ID mappings",
       "SOURCE": "cores/hpe990/rules/versioned_ui_mapping.py",
       "STATUS": "active",
-      "body_sha256": "ab67b2e49d467a89eab87b8afa41ef811e4aa34deeded984119a7054fa8e1ea3"
+      "body_sha256": "46b932edf42a5e3b77b709913f8664a5d6026111eddb708ef22d9265de62e2b8"
     }
   ]
 }

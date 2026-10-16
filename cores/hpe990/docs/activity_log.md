@@ -1,6 +1,6 @@
-# RAM timestamp 병렬 로그
+# Real Activity Monitoring timestamp 병렬 로그
 
-RAM 시작 시 독립 writer가 자동 연결되어 native/semantic `events.jsonl`을 읽고,
+Real Activity Monitoring 시작 시 독립 writer가 자동 연결되어 native/semantic `events.jsonl`을 읽고,
 `{D_TEMP}/hpe990/runtime/activity-log/{session_id}/activity.log`에 지속 기록합니다.
 별도 MCP 도구는 없습니다. 기존 `hpe990_ram_start`의 `activity_log` 결과와
 `hpe990_ram_status`에서 경로·writer 상태·오류를 확인합니다.
@@ -19,6 +19,6 @@ run_id, sequence, ui_id(미식별 시 unidentified), 변화 종류, 원본 관�
 - native/semantic 순번은 합치지 않습니다. 재시작 시 로그의 stream/run_id/sequence로
   중복을 방지하고 마지막 불완전 로그 행만 복구합니다.
 - 모든 연결된 수집기가 종료되면 writer도 종료합니다. writer 실패는 Emulator나 RAM을
-  종료하지 않습니다. 다음 RAM 시작 호출은 종료된 writer를 다시 연결합니다.
+  종료하지 않습니다. 다음 Real Activity Monitoring 시작 호출은 종료된 writer를 다시 연결합니다.
 - 시작·종료, observation_gap 및 늦은 이벤트도 원본 종류와 시각을 그대로 보존합니다.
   전체 UI 및 모든 순간 변화가 감지됐다는 의미는 아닙니다.

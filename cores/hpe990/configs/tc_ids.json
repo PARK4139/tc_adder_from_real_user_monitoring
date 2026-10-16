@@ -1,5 +1,5 @@
 {
-  "next_number": 1940,
+  "next_number": 1960,
   "issued_ids": [
     "TC-010",
     "TC-020",
@@ -193,7 +193,9 @@
     "TC-1900",
     "TC-1910",
     "TC-1920",
-    "TC-1930"
+    "TC-1930",
+    "TC-1940",
+    "TC-1950"
   ],
   "renumber_migrations": [
     {
@@ -230,122 +232,122 @@
         {
           "old_id": "TC-001",
           "new_id": "TC-010",
-          "title": "General 화면 진입 및 입력요소 표시"
+          "title": "General \ud654\uba74 \uc9c4\uc785 \ubc0f \uc785\ub825\uc694\uc18c \ud45c\uc2dc"
         },
         {
           "old_id": "TC-022",
           "new_id": "TC-020",
-          "title": "General 스크롤 및 설정값 유지"
+          "title": "General \uc2a4\ud06c\ub864 \ubc0f \uc124\uc815\uac12 \uc720\uc9c0"
         },
         {
           "old_id": "TC-002",
           "new_id": "TC-030",
-          "title": "Language 선택 및 저장값 확인 (선택기)"
+          "title": "Language \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\uc120\ud0dd\uae30)"
         },
         {
           "old_id": "TC-003",
           "new_id": "TC-040",
-          "title": "Beep Sound 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "Beep Sound \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-004",
           "new_id": "TC-050",
-          "title": "Frame Fitting Mode 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "Frame Fitting Mode \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-013",
           "new_id": "TC-060",
-          "title": "Sleep Mode 체크 상태 변경 및 저장값 확인 (체크박스)"
+          "title": "Sleep Mode \uccb4\ud06c \uc0c1\ud0dc \ubcc0\uacbd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\uccb4\ud06c\ubc15\uc2a4)"
         },
         {
           "old_id": "TC-014",
           "new_id": "TC-070",
-          "title": "Wait (minutes) 숫자 입력 및 저장값 확인 (숫자 입력란)"
+          "title": "Wait (minutes) \uc22b\uc790 \uc785\ub825 \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\uc22b\uc790 \uc785\ub825\ub780)"
         },
         {
           "old_id": "TC-015",
           "new_id": "TC-080",
-          "title": "Wait (minutes) 숫자 입력 경계값 (숫자 입력란)"
+          "title": "Wait (minutes) \uc22b\uc790 \uc785\ub825 \uacbd\uacc4\uac12 (\uc22b\uc790 \uc785\ub825\ub780)"
         },
         {
           "old_id": "TC-016",
           "new_id": "TC-090",
-          "title": "Wait (minutes) 잘못된 숫자 입력 (숫자 입력란)"
+          "title": "Wait (minutes) \uc798\ubabb\ub41c \uc22b\uc790 \uc785\ub825 (\uc22b\uc790 \uc785\ub825\ub780)"
         },
         {
           "old_id": "TC-005",
           "new_id": "TC-100",
-          "title": "Edit Processed Job 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "Edit Processed Job \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-006",
           "new_id": "TC-110",
-          "title": "Show Tip Message 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "Show Tip Message \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-007",
           "new_id": "TC-120",
-          "title": "Digital Designer Mode 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "Digital Designer Mode \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-008",
           "new_id": "TC-130",
-          "title": "Show Grid 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "Show Grid \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-009",
           "new_id": "TC-140",
-          "title": "R/L Shape Mirroring 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "R/L Shape Mirroring \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-010",
           "new_id": "TC-150",
-          "title": "Eccentricity Check 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "Eccentricity Check \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-011",
           "new_id": "TC-160",
-          "title": "Easy Click Mode 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "Easy Click Mode \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-017",
           "new_id": "TC-170",
-          "title": "Message Box Font Size 숫자 입력 및 저장값 확인 (숫자 입력란)"
+          "title": "Message Box Font Size \uc22b\uc790 \uc785\ub825 \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\uc22b\uc790 \uc785\ub825\ub780)"
         },
         {
           "old_id": "TC-018",
           "new_id": "TC-180",
-          "title": "Message Box Font Size 숫자 입력 경계값 (숫자 입력란)"
+          "title": "Message Box Font Size \uc22b\uc790 \uc785\ub825 \uacbd\uacc4\uac12 (\uc22b\uc790 \uc785\ub825\ub780)"
         },
         {
           "old_id": "TC-019",
           "new_id": "TC-190",
-          "title": "Message Box Font Size 잘못된 숫자 입력 (숫자 입력란)"
+          "title": "Message Box Font Size \uc798\ubabb\ub41c \uc22b\uc790 \uc785\ub825 (\uc22b\uc790 \uc785\ub825\ub780)"
         },
         {
           "old_id": "TC-012",
           "new_id": "TC-200",
-          "title": "LED Notification 선택 및 저장값 확인 (라디오 버튼)"
+          "title": "LED Notification \uc120\ud0dd \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\ub77c\ub514\uc624 \ubc84\ud2bc)"
         },
         {
           "old_id": "TC-030",
           "new_id": "TC-210",
-          "title": "Config DB History 입력 및 저장값 확인 (입력란)"
+          "title": "Config DB History \uc785\ub825 \ubc0f \uc800\uc7a5\uac12 \ud655\uc778 (\uc785\ub825\ub780)"
         },
         {
           "old_id": "TC-040",
           "new_id": "TC-220",
-          "title": "Export Options 항목 표시 및 접근 확인"
+          "title": "Export Options \ud56d\ubaa9 \ud45c\uc2dc \ubc0f \uc811\uadfc \ud655\uc778"
         },
         {
           "old_id": "TC-020",
           "new_id": "TC-230",
-          "title": "Save 버튼의 설정 저장 (버튼)"
+          "title": "Save \ubc84\ud2bc\uc758 \uc124\uc815 \uc800\uc7a5 (\ubc84\ud2bc)"
         },
         {
           "old_id": "TC-021",
           "new_id": "TC-240",
-          "title": "Cancel 버튼의 설정 변경 취소 (버튼)"
+          "title": "Cancel \ubc84\ud2bc\uc758 \uc124\uc815 \ubcc0\uacbd \ucde8\uc18c (\ubc84\ud2bc)"
         }
       ]
     }

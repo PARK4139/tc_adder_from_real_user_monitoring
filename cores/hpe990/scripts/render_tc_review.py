@@ -247,7 +247,8 @@ def render_review(
         if any(not label.strip() for label in path):
             raise ValueError(f"Empty tree path segment: {identity}")
         tc_label = identity
-        tc_path = " > ".join(path)
+        target = TEST_TARGET
+        tc_path = " > ".join((target["model"], target["version"], *path))
         title = scenario["name"]
         for prefix in (identity, identity.removeprefix("TC-")):
             if title.startswith(prefix + " "):

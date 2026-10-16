@@ -23,13 +23,14 @@ class Hpe990Folders:
         self.D_HPE990_VISUAL_BUILD = self.D_HPE990_BUILD / "visual"
         self.D_HPE990_INPUT_BUILD = self.D_HPE990_BUILD / "input"
         self.D_HPE990_EVIDENCE = D_TEMP / "hpe990" / "evidence"
-        self.D_AUTO_EMULATOR_OUTPUT = D_ROOT
+        self.D_AUTO_EMULATOR_OUTPUT = D_ROOT.parent
         self.F_HPE990_VISUAL = self.D_HPE990_VISUAL_BUILD / "release/hpe990-visual.exe"
         self.F_HPE990_INPUT = self.D_HPE990_INPUT_BUILD / "release/hpe990-input.exe"
         self.F_HPE990_UI_REGISTRY = self.D_HPE990_RUNTIME / "ui-elements.sqlite3"
         self.F_HPE990_STEP_TEMPLATES = self.D_HPE990_CONFIGS / "ui_step_templates.json"
         self.F_HPE990_STEP_BINDINGS = self.D_HPE990_CONFIGS / "ui_step_bindings.json"
         self.F_HPE990_TC_REVIEW = self.D_HPE990_CONFIGS / "tc_review.json"
+        self.F_HPE990_TC_IDS = self.D_HPE990_CONFIGS / "tc_ids.json"
         self.F_HPE990_UI_SEMANTICS = self.D_HPE990_CONFIGS / "ui_semantics.json"
 
 

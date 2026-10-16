@@ -1,4 +1,4 @@
-"""Independent, restartable human-readable mirror of original RAM event streams."""
+"""Independent, restartable human-readable mirror of original Real Activity Monitoring event streams."""
 
 import json
 import os
@@ -50,7 +50,7 @@ def activity_status(session_id):
 
 
 def ensure_activity_log(session_id):
-    """RAM start attaches the logger; failure never terminates a collector."""
+    """Real Activity Monitoring start attaches the logger; failure never terminates a collector."""
     from cores.hpe990.functions.backend import request_backend
 
     directory = _directory(session_id)
