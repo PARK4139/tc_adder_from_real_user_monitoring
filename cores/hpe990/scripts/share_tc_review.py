@@ -152,7 +152,7 @@ def main():
                     dashboard_data.update(latest)
             except Exception:
                 pass
-            stop.wait(5)
+            threading.Event().wait(5)
 
     def events(handler):
         handler.send_response(200)
